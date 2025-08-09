@@ -1,4 +1,3 @@
-
 /* --- ESTILOS GERAIS --- */
 :root {
   --cor-principal: #e947be;
@@ -890,53 +889,64 @@ input:checked + .slider:before {
 .slider.round:before {
   border-radius: 50%;
 }
-
-/* ======================================================================== */
-/* ---               INÍCIO DAS MODIFICAÇÕES PARA CELULAR               --- */
-/* ======================================================================== */
-
+/* --- ESTILOS RESPONSIVOS | LAYOUT COMPACTO ESTILO STREAMING --- */
 @media (max-width: 768px) {
-  #app-container {
-    padding: 75px 15px 15px 15px; /* Reduz padding geral e aumenta o superior para o header */
+
+  /* --- FORÇAR RESPEITO À LARGURA DA TELA --- */
+  html, body {
+    width: 100%;
+    overflow-x: hidden;
+    font-size: 14px; /* Reduz o tamanho da fonte base para tudo ficar menor */
   }
 
-  .main-header {
-    flex-wrap: wrap; /* Permite que os itens do header quebrem a linha */
-    justify-content: center;
-    padding: 10px 15px;
-    height: auto;
+  /* --- AJUSTES GERAIS DE LAYOUT --- */
+  #app-container {
+    padding: 65px 10px 10px 10px; /* Espaçamento muito menor */
   }
-  
-  .header-left, .header-right {
-      flex-basis: 50%; /* Cada lado ocupa metade da largura */
+
+  /* --- CABEÇALHO COMPACTO --- */
+/* --- CABEÇALHO COM DUAS LINHAS --- */
+  .main-header {
+    padding: 10px 15px;
+    gap: 10px;
+    flex-wrap: wrap; /* 1. Permite que os itens quebrem para a linha de baixo */
   }
 
   .header-left {
-      justify-content: flex-start;
-      order: 1;
+    flex-grow: 1; /* Faz o logo empurrar os ícones para a direita */
   }
-  
+
   .header-right {
-      justify-content: flex-end;
-      order: 2;
+    flex-shrink: 0; /* Impede que os ícones encolham */
   }
 
   .header-center {
-      order: 3;
-      flex-basis: 100%; /* Ocupa a linha inteira abaixo */
-      justify-content: center;
-      margin-top: 10px;
+    flex-basis: 100%; /* 2. Faz o container das tags ocupar 100% da largura */
+    order: 3; /* 3. Joga ele para o final, efetivamente para a segunda linha */
+    justify-content: flex-start; /* Alinha as tags à esquerda */
+  }
+  h1#main-title {
+    font-size: 28px; /* Título bem menor */
+    line-height: 1;
+  }
+  #hamburger-menu {
+    font-size: 24px;
+  }
+  #search-toggle {
+    font-size: 20px;
   }
   
-  h1 {
-      font-size: 32px; /* Título principal menor */
+  /* Reduz o tamanho dos filtros de tag */
+  .tag {
+    padding: 6px 12px;
+    font-size: 12px;
   }
-  
-  #search-wrapper.show {
-    width: 200px;
+  #tag-dropdown-btn {
+    padding: 6px 10px;
+    font-size: 12px;
   }
 
-  #destaque-container {
+    #destaque-container {
       height: 300px; /* Destaque menor */
       margin-bottom: 20px;
   }
