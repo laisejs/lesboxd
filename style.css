@@ -1,3 +1,4 @@
+
 /* --- ESTILOS GERAIS --- */
 :root {
   --cor-principal: #e947be;
@@ -889,141 +890,120 @@ input:checked + .slider:before {
 .slider.round:before {
   border-radius: 50%;
 }
-/* --- ESTILOS RESPONSIVOS | LAYOUT COMPACTO ESTILO STREAMING --- */
+
+/* ======================================================================== */
+/* ---               INÍCIO DAS MODIFICAÇÕES PARA CELULAR               --- */
+/* ======================================================================== */
+
 @media (max-width: 768px) {
-
-  /* --- FORÇAR RESPEITO À LARGURA DA TELA --- */
-  html, body {
-    width: 100%;
-    overflow-x: hidden;
-    font-size: 14px; /* Reduz o tamanho da fonte base para tudo ficar menor */
-  }
-
-  /* --- AJUSTES GERAIS DE LAYOUT --- */
   #app-container {
-    padding: 65px 10px 10px 10px; /* Espaçamento muito menor */
+    padding: 75px 15px 15px 15px; /* Reduz padding geral e aumenta o superior para o header */
   }
 
-  /* --- CABEÇALHO COMPACTO --- */
-/* --- CABEÇALHO COM DUAS LINHAS --- */
   .main-header {
+    flex-wrap: wrap; /* Permite que os itens do header quebrem a linha */
+    justify-content: center;
     padding: 10px 15px;
-    gap: 10px;
-    flex-wrap: wrap; /* 1. Permite que os itens quebrem para a linha de baixo */
+    height: auto;
+  }
+  
+  .header-left, .header-right {
+      flex-basis: 50%; /* Cada lado ocupa metade da largura */
   }
 
   .header-left {
-    flex-grow: 1; /* Faz o logo empurrar os ícones para a direita */
+      justify-content: flex-start;
+      order: 1;
   }
-
+  
   .header-right {
-    flex-shrink: 0; /* Impede que os ícones encolham */
+      justify-content: flex-end;
+      order: 2;
   }
 
   .header-center {
-    flex-basis: 100%; /* 2. Faz o container das tags ocupar 100% da largura */
-    order: 3; /* 3. Joga ele para o final, efetivamente para a segunda linha */
-    justify-content: flex-start; /* Alinha as tags à esquerda */
-  }
-  h1#main-title {
-    font-size: 28px; /* Título bem menor */
-    line-height: 1;
-  }
-  #hamburger-menu {
-    font-size: 24px;
-  }
-  #search-toggle {
-    font-size: 20px;
+      order: 3;
+      flex-basis: 100%; /* Ocupa a linha inteira abaixo */
+      justify-content: center;
+      margin-top: 10px;
   }
   
-  /* Reduz o tamanho dos filtros de tag */
-  .tag {
-    padding: 6px 12px;
-    font-size: 12px;
+  h1 {
+      font-size: 32px; /* Título principal menor */
   }
-  #tag-dropdown-btn {
-    padding: 6px 10px;
-    font-size: 12px;
+  
+  #search-wrapper.show {
+    width: 200px;
   }
 
-  /* --- SEÇÃO DE DESTAQUE MENOR --- */
   #destaque-container {
-    height: 250px; /* Altura drasticamente reduzida */
-    margin-bottom: 20px;
-  }
-  .destaque-info {
-    padding: 10px;
-    background: rgba(0,0,0,0.7);
+      height: 300px; /* Destaque menor */
+      margin-bottom: 20px;
   }
   .destaque-info h2 {
-    font-size: 18px;
+      font-size: 24px;
   }
   .destaque-info p {
-    display: none; /* Esconde a sinopse no destaque para uma interface mais limpa */
-  }
-  .destaque-info a {
-    padding: 8px 15px;
-    font-size: 13px;
+      font-size: 14px;
+      -webkit-line-clamp: 3;
   }
 
-  /* --- GRIDS E LINHAS DE FILMES --- */
-  .section-title {
-    font-size: 18px; /* Títulos de seção menores */
-    margin-bottom: 10px;
-  }
-
-  /* Linhas Horizontais (Tela Inicial) */
-  .linha-horizontal {
-    gap: 10px;
-    margin-bottom: 20px;
-  }
-  .card-mini {
-    width: 110px; /* Cards bem menores para caberem mais na tela */
-  }
-  .card-mini img {
-    height: 160px;
-  }
-  .card-mini h3 {
-    font-size: 13px;
-  }
-
-  /* Grid de Filmes (Páginas de Filtro) */
   .grid {
-    gap: 10px;
-    /* Cards com largura mínima menor para ter mais colunas */
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    /* Ajusta a grade para ter cards menores */
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); 
+    gap: 15px; /* Menor espaçamento entre os cards */
   }
-  .card {
-    border-radius: 5px;
-  }
+
   .card img {
-    height: 160px;
+    /* Remove a altura fixa para deixar o aspect-ratio controlar */
+    height: auto;
+    /* Mantém a proporção da imagem dentro do wrapper */
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
+
+  .card .card-image-wrapper {
+    /* Define a proporção retangular para os posters (largura / altura) */
+    aspect-ratio: 2 / 3;
+  }
+
   .card h3 {
     font-size: 14px;
-    margin-top: 8px;
-  }
-  .card .synopsis {
-    display: none; /* Esconde sinopse na grade para um visual limpo */
   }
 
-  /* --- MODAL AJUSTADO --- */
+  .card .synopsis {
+    /* Oculta a sinopse na grade principal para um visual mais limpo */
+    display: none; 
+  }
+
+  .card-mini {
+      width: 120px;
+  }
+  .card-mini img {
+      height: 180px;
+  }
+
+  .section-title {
+      font-size: 20px;
+  }
+  
+  /* Ajustes no Modal para Celular */
   #modal-content {
-    flex-direction: column;
-    width: 95vw;
-    height: 90vh;
+      flex-direction: column;
+      width: 95vw;
+      max-height: 85vh;
   }
   .modal-left {
-    height: 220px;
+      flex: 0 0 200px; /* Altura máxima da imagem no modal */
+  }
+  .modal-left img {
+      object-position: top; /* Foca no topo da imagem do poster */
   }
   .modal-right {
-    padding: 15px;
+      padding: 20px;
   }
   .modal-title-container h2 {
-    font-size: 20px;
-  }
-  .modal-button {
-    padding: 8px 12px;
-    font-size: 13px;
+      font-size: 24px;
   }
 }
