@@ -203,13 +203,13 @@
         favBtn: document.getElementById("show-favorites-btn"),
         watchBtn: document.getElementById("show-watched-btn"),
         wantBtn: document.getElementById("show-want-btn"),
-        amigosBtn: document.getElementById('show-amigos-btn'), // NOVO
+        amigosBtn: document.getElementById('show-amigos-btn'),
         logoutBtn: document.getElementById("logout-btn"),
         profileName: document.getElementById('profile-name-element'),
         profilePic: document.getElementById('profile-pic-element'),
         profilePicEditBtn: document.getElementById('profile-pic-edit-btn'),
         watchedCounter: document.getElementById('side-menu-watched-counter'),
-        visibilityToggle: document.getElementById('visibility-toggle') // NOVO
+        visibilityToggle: document.getElementById('visibility-toggle')
       },
       modal: {
         bg: document.getElementById("modal-bg"),
@@ -344,8 +344,8 @@
     function mostrarFilmesGrid(lista) {
       currentView = 'grid';
       dom.destaque.style.display = 'none';
-      dom.displayArea.innerHTML = ""; // Limpa a área antes de adicionar
-      dom.displayArea.className = 'grid-container'; // Usa um container para o título e a grid
+      dom.displayArea.innerHTML = "";
+      dom.displayArea.className = 'grid-container';
 
       const grid = document.createElement('div');
       grid.className = 'grid';
@@ -355,7 +355,7 @@
       } else {
         lista.forEach(filme => grid.appendChild(createCard(filme, 'grid')));
       }
-      dom.displayArea.appendChild(grid); // Adiciona a grid ao container
+      dom.displayArea.appendChild(grid);
     }
 
     async function mostrarAmigos() {
@@ -388,7 +388,6 @@
                 amigoCard.className = 'amigo-card';
                 amigoCard.dataset.uid = amigoData.uid;
 
-                // Mapeia os títulos para objetos de filme completos
                 const mapTitlesToFilmes = (titles) => titles.map(titulo => filmes.find(f => f.titulo === titulo)).filter(Boolean);
                 const filmesFavoritos = mapTitlesToFilmes(amigoData.favoritos || []);
                 const filmesAssistidos = mapTitlesToFilmes(amigoData.assistidos || []);
@@ -433,7 +432,6 @@
                 const watchedContainer = createListContainer('assistidos', filmesAssistidos);
                 const wantContainer = createListContainer('quero', filmesQuero);
 
-                // Mostra favoritos por padrão, esconde os outros
                 watchedContainer.style.display = 'none';
                 wantContainer.style.display = 'none';
 
@@ -444,29 +442,6 @@
                 amigosContainer.appendChild(amigoCard);
             });
             dom.displayArea.appendChild(amigosContainer);
-
-            // Adiciona os event listeners para os botões de aba
-            document.querySelectorAll('.amigo-tab-btn').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const targetButton = e.target;
-                    const listToShow = targetButton.dataset.list;
-                    const card = targetButton.closest('.amigo-card');
-
-                    // Remove a classe 'active' de todos os botões no mesmo card
-                    card.querySelectorAll('.amigo-tab-btn').forEach(btn => btn.classList.remove('active'));
-                    // Adiciona 'active' ao botão clicado
-                    targetButton.classList.add('active');
-
-                    // Esconde todas as listas de filmes no card
-                    card.querySelectorAll('.amigo-film-list-container').forEach(container => {
-                        container.style.display = 'none';
-                    });
-
-                    // Mostra a lista selecionada
-                    card.querySelector(`.amigo-film-list-container[data-list="${listToShow}"]`).style.display = 'block';
-                });
-            });
-
 
         } catch (error) {
             console.error("Erro ao buscar usuários:", error);
@@ -542,7 +517,7 @@
         const el = document.createElement("span");
         el.className = "tag base-tag";
         el.textContent = tagText;
-        el.onclick = () => handleBaseFilterClick(tagText);
+        el.dataset.filter = tagText; // CORREÇÃO: Usar dataset para o filtro
         dom.tags.fixedContainer.appendChild(el);
       });
 
@@ -555,11 +530,7 @@
           el.href = "#";
           el.className = "dropdown-tag";
           el.textContent = tagText;
-          el.onclick = (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              toggleTagFilter(tagText);
-          };
+          el.dataset.filter = tagText; // CORREÇÃO: Usar dataset para o filtro
           dom.tags.dropdownContent.appendChild(el);
       });
       updateTagUI();
@@ -591,7 +562,7 @@
             const el = document.createElement("span");
             el.className = "tag active";
             el.textContent = tagText;
-            el.onclick = () => toggleTagFilter(tagText);
+            el.dataset.filter = tagText; // CORREÇÃO: Usar dataset para o filtro
             dom.tags.selectedContainer.appendChild(el);
         });
 
@@ -716,11 +687,11 @@
 
     async function setRating(titulo, rating) {
         userData.estrelas[titulo] = rating;
-        syncFilmesWithUserData();
-        renderStarsInModal(titulo);
         await updateDoc(userDocRef, { estrelas: userData.estrelas });
+        syncFilmesWithUserData();
+        renderStarsInModal(titulo); // Re-renderiza as estrelas no modal
         if (currentBaseFilter === 'Assistidos') {
-            applyAllFilters();
+            applyAllFilters(); // Re-renderiza a grid se a visão for de 'Assistidos'
         }
     }
 
@@ -730,8 +701,11 @@
         for (let i = 1; i <= 5; i++) {
             const star = document.createElement('span');
             star.textContent = '★';
-            star.className = i <= rating ? 'filled' : '';
-            star.onclick = () => setRating(titulo, i);
+            star.className = 'star';
+            star.dataset.value = i; // Guarda o valor da estrela
+            if (i <= rating) {
+                star.classList.add('filled');
+            }
             dom.modal.stars.appendChild(star);
         }
     }
@@ -922,6 +896,41 @@
         }
       }
     }
+    
+    // CORREÇÃO: Usar delegação de eventos para os filtros e estrelas
+    document.addEventListener('click', function(e) {
+        // Filtros clicáveis
+        if (e.target.matches('.base-tag')) {
+            handleBaseFilterClick(e.target.dataset.filter);
+        }
+        if (e.target.matches('.dropdown-tag') || e.target.matches('.tag.active')) {
+             e.preventDefault();
+             toggleTagFilter(e.target.dataset.filter);
+        }
+
+        // Star Rating no Modal
+        if (e.target.matches('#modal-stars .star')) {
+            const titulo = dom.modal.title.textContent;
+            const rating = parseInt(e.target.dataset.value, 10);
+            setRating(titulo, rating);
+        }
+        
+        // Abas na página de amigos
+        if (e.target.matches('.amigo-tab-btn')) {
+            const targetButton = e.target;
+            const listToShow = targetButton.dataset.list;
+            const card = targetButton.closest('.amigo-card');
+
+            card.querySelectorAll('.amigo-tab-btn').forEach(btn => btn.classList.remove('active'));
+            targetButton.classList.add('active');
+
+            card.querySelectorAll('.amigo-film-list-container').forEach(container => {
+                container.style.display = 'none';
+            });
+            card.querySelector(`.amigo-film-list-container[data-list="${listToShow}"]`).style.display = 'block';
+        }
+    });
+
 
   </script>
 

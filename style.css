@@ -524,12 +524,37 @@ h1 {
     color: var(--cor-texto-secundario);
     font-weight: 500;
 }
-.no-favorites {
+/* ADICIONADO: Estilos para os botões de filtro dos amigos */
+.amigo-list-selector {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #444;
+    padding-bottom: 15px;
+}
+.amigo-tab-btn {
+    background: #444;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+    white-space: nowrap;
+    border: none;
+}
+.amigo-tab-btn:hover {
+  background: #888;
+}
+.amigo-tab-btn.active {
+  background: var(--cor-principal);
+  font-weight: bold;
+}
+.no-items-message {
     font-size: 14px;
     color: var(--cor-texto-secundario);
     padding-left: 5px;
 }
-
 
 /* --- CARTÕES (CARDS) --- */
 .card-base {
@@ -932,6 +957,10 @@ input:checked + .slider:before {
   #search-toggle {
     font-size: 20px;
   }
+    #login-box {
+    width: 70%;
+    padding: 25px;
+  }
   
   /* Reduz o tamanho dos filtros de tag */
   .tag {
@@ -943,34 +972,27 @@ input:checked + .slider:before {
     font-size: 12px;
   }
 
-  /* --- SEÇÃO DE DESTAQUE MENOR --- */
-  #destaque-container {
-    height: 250px; /* Altura drasticamente reduzida */
-    margin-bottom: 20px;
-  }
-  .destaque-info {
-    padding: 10px;
-    background: rgba(0,0,0,0.7);
-  }
-  .destaque-info h2 {
-    font-size: 18px;
-  }
-  .destaque-info p {
-    display: none; /* Esconde a sinopse no destaque para uma interface mais limpa */
-  }
-  .destaque-info a {
-    padding: 8px 15px;
-    font-size: 13px;
-  }
-/* ADICIONADO: Ajustes para destaque em mobile */
-  #destaque-container {
-      height: auto;
-      aspect-ratio: 16 / 9;
-      margin-bottom: 25px;
-      align-items: flex-end;
-  }
-  #destaque-container::after {
-      background: linear-gradient(to top, rgba(0,0,0,0.9) 20%, rgba(0,0,0,0) 80%);
+   /* ADICIONADO: Ajustes para destaque em mobile */
+#destaque-container {
+  /* Adicione position: relative se ainda não existir no seu código original */
+  position: relative; 
+  height: auto;
+  aspect-ratio: 16 / 9;
+  margin-bottom: 25px;
+  align-items: flex-end;
+  /* Mantenha as outras propriedades como display, overflow, etc. */
+  display: flex;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+#destaque-container::after {
+  content: ''; /* Pseudo-elementos sempre precisam de 'content' */
+  position: absolute;
+  inset: 0; /* Faz o ::after ocupar todo o espaço do pai */
+  background: linear-gradient(to top, rgba(0,0,0,0.9) 20%, rgba(0,0,0,0) 80%);
+  z-index: 1; /* Garante que o gradiente fique sobre a imagem de fundo, mas abaixo do texto */
+}
   }
   .destaque-info {
       max-width: 100%;
@@ -979,7 +1001,7 @@ input:checked + .slider:before {
       text-align: center;
   }
   .destaque-info h2 {
-      font-size: 28px;
+      font-size: 15px;
   }
   .destaque-info .destaque-sinopse {
       display: none;
@@ -989,33 +1011,7 @@ input:checked + .slider:before {
       padding: 10px 20px;
   }
 
-  /* ADICIONADO: Ajustes para modal em mobile */
-  #modal-content {
-      flex-direction: column;
-      padding: 20px;
-      justify-content: flex-start;
-      gap: 20px;
-      overflow-y: auto;
-  }
-  .modal-left {
-    flex-basis: auto;
-    width: 60%;
-    max-width: 200px;
-    margin-top: 50px;
-  }
-  .modal-right {
-    height: auto;
-    max-width: 100%;
-    text-align: center;
-    margin-top: 0;
-  }
-  #modal-title {
-    font-size: 28px;
-  }
-  .modal-actions, .modal-title-container, .star-rating {
-    justify-content: center;
-  }
-}
+
   /* --- GRIDS E LINHAS DE FILMES --- */
   .section-title {
     font-size: 18px; /* Títulos de seção menores */
@@ -1076,3 +1072,4 @@ input:checked + .slider:before {
     padding: 8px 12px;
     font-size: 13px;
   }
+}
