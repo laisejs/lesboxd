@@ -1,15 +1,15 @@
 const CACHE_NAME = 'meu-pwa-cache-v1';
 
 // Lista de arquivos que o Service Worker vai salvar no cache
+// Coloque esta lista corrigida no seu arquivo sw.js (ou service-worker.js)
 const urlsToCache = [
   '/',
   '/index.html',
-  '/styles/main.css',
-  '/scripts/main.js',
-  '/assets/images/logo.png',
-  '/assets/icons/icon-192x192.png'
+  '/style.css',                         // Corrigido
+  '/manifest.json',                     // Adicionado (boa prática)
+  '/assets/icons/icon-192x192.png',
+  '/assets/icons/icon-512x512.png'      // Adicionado a partir do seu manifest.json
 ];
-
 // Ouve o evento 'install' (instalação do PWA)
 self.addEventListener('install', event => {
   event.waitUntil(
