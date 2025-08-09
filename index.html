@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LESBOXD</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🌷</title>
   <link rel="stylesheet" href="style.css">
   <link rel="manifest" href="/manifest.json">
     <script>
@@ -753,6 +754,9 @@
       renderStarsInModal(index);
       dom.modal.bg.style.display = "flex";
       dom.modal.closeBtn.focus();
+      
+      // *** MODIFICAÇÃO 1: Adiciona estado ao histórico ***
+      history.pushState({ modal: true }, "");
     }
 
     function updateModalButtons(index){
@@ -808,6 +812,13 @@
       updateWatchedCounters(); 
       popularTags();
       mostrarTelaInicial();
+
+      // *** MODIFICAÇÃO 2: Adiciona o listener para o botão voltar ***
+      window.addEventListener('popstate', function(event) {
+        if (dom.modal.bg.style.display === 'flex') {
+          fecharModal();
+        }
+      });
 
       // Event Listeners Globais
       dom.search.box.addEventListener("input", () => applyAllFilters());
