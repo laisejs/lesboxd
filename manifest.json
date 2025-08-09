@@ -1,11 +1,11 @@
 {
-  "name": "Nome Completo do Meu Blog",
-  "short_name": "Blog Pessoal",
+  "name": "LESBOXD",
+  "short_name": "l",
   "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#2196f3",
-  "description": "Um blog simples sobre as minhas fotos e pensamentos.",
+  "description": "Alexandria",
   "icons": [
     {
       "src": "/assets/icons/icon-192x192.png",
