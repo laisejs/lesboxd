@@ -905,23 +905,26 @@ input:checked + .slider:before {
   }
 
   /* --- CABEÇALHO COMPACTO --- */
+/* --- CABEÇALHO COM DUAS LINHAS --- */
   .main-header {
-    padding: 8px 10px;
-    gap: 8px;
-    flex-wrap: nowrap; /* Impede a quebra de linha para manter tudo visível */
-  }
-  .header-left {
-    flex-shrink: 1; /* Permite que o título encolha se necessário */
-  }
-  .header-center {
-    flex-grow: 1; /* Ocupa o espaço que sobrar */
-    flex-shrink: 1;
-    min-width: 50px; /* Largura mínima para não desaparecer */
-  }
-  .header-right {
-    flex-shrink: 0; /* Não deixa os ícones encolherem */
+    padding: 10px 15px;
+    gap: 10px;
+    flex-wrap: wrap; /* 1. Permite que os itens quebrem para a linha de baixo */
   }
 
+  .header-left {
+    flex-grow: 1; /* Faz o logo empurrar os ícones para a direita */
+  }
+
+  .header-right {
+    flex-shrink: 0; /* Impede que os ícones encolham */
+  }
+
+  .header-center {
+    flex-basis: 100%; /* 2. Faz o container das tags ocupar 100% da largura */
+    order: 3; /* 3. Joga ele para o final, efetivamente para a segunda linha */
+    justify-content: flex-start; /* Alinha as tags à esquerda */
+  }
   h1#main-title {
     font-size: 28px; /* Título bem menor */
     line-height: 1;
