@@ -905,26 +905,23 @@ input:checked + .slider:before {
   }
 
   /* --- CABEÇALHO COMPACTO --- */
-/* --- CABEÇALHO COM DUAS LINHAS --- */
   .main-header {
-    padding: 10px 15px;
-    gap: 10px;
-    flex-wrap: wrap; /* 1. Permite que os itens quebrem para a linha de baixo */
+    padding: 8px 10px;
+    gap: 8px;
+    flex-wrap: nowrap; /* Impede a quebra de linha para manter tudo visível */
   }
-
   .header-left {
-    flex-grow: 1; /* Faz o logo empurrar os ícones para a direita */
+    flex-shrink: 1; /* Permite que o título encolha se necessário */
   }
-
-  .header-right {
-    flex-shrink: 0; /* Impede que os ícones encolham */
-  }
-
   .header-center {
-    flex-basis: 100%; /* 2. Faz o container das tags ocupar 100% da largura */
-    order: 3; /* 3. Joga ele para o final, efetivamente para a segunda linha */
-    justify-content: flex-start; /* Alinha as tags à esquerda */
+    flex-grow: 1; /* Ocupa o espaço que sobrar */
+    flex-shrink: 1;
+    min-width: 50px; /* Largura mínima para não desaparecer */
   }
+  .header-right {
+    flex-shrink: 0; /* Não deixa os ícones encolherem */
+  }
+
   h1#main-title {
     font-size: 28px; /* Título bem menor */
     line-height: 1;
@@ -946,74 +943,84 @@ input:checked + .slider:before {
     font-size: 12px;
   }
 
-    #destaque-container {
-      height: 300px; /* Destaque menor */
-      margin-bottom: 20px;
+  /* --- SEÇÃO DE DESTAQUE MENOR --- */
+  #destaque-container {
+    height: 250px; /* Altura drasticamente reduzida */
+    margin-bottom: 20px;
+  }
+  .destaque-info {
+    padding: 10px;
+    background: rgba(0,0,0,0.7);
   }
   .destaque-info h2 {
-      font-size: 24px;
+    font-size: 18px;
   }
   .destaque-info p {
-      font-size: 14px;
-      -webkit-line-clamp: 3;
+    display: none; /* Esconde a sinopse no destaque para uma interface mais limpa */
+  }
+  .destaque-info a {
+    padding: 8px 15px;
+    font-size: 13px;
   }
 
-  .grid {
-    /* Ajusta a grade para ter cards menores */
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); 
-    gap: 15px; /* Menor espaçamento entre os cards */
+  /* --- GRIDS E LINHAS DE FILMES --- */
+  .section-title {
+    font-size: 18px; /* Títulos de seção menores */
+    margin-bottom: 10px;
   }
 
-  .card img {
-    /* Remove a altura fixa para deixar o aspect-ratio controlar */
-    height: auto;
-    /* Mantém a proporção da imagem dentro do wrapper */
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  /* Linhas Horizontais (Tela Inicial) */
+  .linha-horizontal {
+    gap: 10px;
+    margin-bottom: 20px;
   }
-
-  .card .card-image-wrapper {
-    /* Define a proporção retangular para os posters (largura / altura) */
-    aspect-ratio: 2 / 3;
-  }
-
-  .card h3 {
-    font-size: 14px;
-  }
-
-  .card .synopsis {
-    /* Oculta a sinopse na grade principal para um visual mais limpo */
-    display: none; 
-  }
-
   .card-mini {
-      width: 120px;
+    width: 110px; /* Cards bem menores para caberem mais na tela */
   }
   .card-mini img {
-      height: 180px;
+    height: 160px;
+  }
+  .card-mini h3 {
+    font-size: 13px;
   }
 
-  .section-title {
-      font-size: 20px;
+  /* Grid de Filmes (Páginas de Filtro) */
+  .grid {
+    gap: 10px;
+    /* Cards com largura mínima menor para ter mais colunas */
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
   }
-  
-  /* Ajustes no Modal para Celular */
+  .card {
+    border-radius: 5px;
+  }
+  .card img {
+    height: 160px;
+  }
+  .card h3 {
+    font-size: 14px;
+    margin-top: 8px;
+  }
+  .card .synopsis {
+    display: none; /* Esconde sinopse na grade para um visual limpo */
+  }
+
+  /* --- MODAL AJUSTADO --- */
   #modal-content {
-      flex-direction: column;
-      width: 95vw;
-      max-height: 85vh;
+    flex-direction: column;
+    width: 95vw;
+    height: 90vh;
   }
   .modal-left {
-      flex: 0 0 200px; /* Altura máxima da imagem no modal */
-  }
-  .modal-left img {
-      object-position: top; /* Foca no topo da imagem do poster */
+    height: 220px;
   }
   .modal-right {
-      padding: 20px;
+    padding: 15px;
   }
   .modal-title-container h2 {
-      font-size: 24px;
+    font-size: 20px;
+  }
+  .modal-button {
+    padding: 8px 12px;
+    font-size: 13px;
   }
 }
