@@ -7,8 +7,8 @@ const urlsToCache = [
   '/index.html',
   '/style.css',                         // Corrigido
   '/manifest.json',                     // Adicionado (boa prática)
-  '/assets/icons/icon-192x192.png',
-  '/assets/icons/icon-512x512.png'      // Adicionado a partir do seu manifest.json
+  '/icon1.png',
+  '/icon2.png'      // Adicionado a partir do seu manifest.json
 ];
 // Ouve o evento 'install' (instalação do PWA)
 self.addEventListener('install', event => {
