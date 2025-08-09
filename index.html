@@ -163,7 +163,7 @@
     // =================================================================================
     // --- BANCO DE DADOS E ESTADO GLOBAL ---
     // =================================================================================
-    let filmes = []; // Esta variável será preenchida com os dados do JSON
+    let filmes = [];
 
     // =================================================================================
     // --- REFERÊNCIAS DOS ELEMENTOS DO DOM ---
@@ -251,7 +251,6 @@
         }));
     }
 
-
     // =================================================================================
     // --- FUNÇÕES DE RENDERIZAÇÃO E LAYOUT (CRIAÇÃO DA UI) ---
     // =================================================================================
@@ -265,7 +264,6 @@
       return shuffled;
     }
 
-    /** Função principal que decide o que renderizar com base no estado atual */
     function render() {
       if (currentView === 'grid') {
         dom.destaque.style.display = 'none';
@@ -369,9 +367,9 @@
             const querySnapshot = await getDocs(collection(db, "usuarios"));
             const usuariosPublicos = [];
             querySnapshot.forEach((doc) => {
-                const userData = doc.data();
-                if (userData.isPublic) {
-                    usuariosPublicos.push(userData);
+                const data = doc.data();
+                if (data.isPublic) {
+                    usuariosPublicos.push(data);
                 }
             });
 
@@ -386,13 +384,11 @@
             usuariosPublicos.forEach(amigoData => {
                 const amigoCard = document.createElement('div');
                 amigoCard.className = 'amigo-card';
-                amigoCard.dataset.uid = amigoData.uid;
 
                 const mapTitlesToFilmes = (titles) => titles.map(titulo => filmes.find(f => f.titulo === titulo)).filter(Boolean);
                 const filmesFavoritos = mapTitlesToFilmes(amigoData.favoritos || []);
                 const filmesAssistidos = mapTitlesToFilmes(amigoData.assistidos || []);
                 const filmesQuero = mapTitlesToFilmes(amigoData.quero || []);
-
 
                 amigoCard.innerHTML = `
                     <div class="amigo-profile-info">
@@ -403,24 +399,21 @@
                         </div>
                     </div>
                      <div class="amigo-list-selector">
-                        <button class="amigo-tab-btn active" data-list="favoritos">Favoritos</button>
-                        <button class="amigo-tab-btn" data-list="assistidos">Assistidos</button>
-                        <button class="amigo-tab-btn" data-list="quero">Quero Assistir</button>
+                        <button class="amigo-tab-btn active" onclick="switchAmigoTab(this, 'favoritos')">Favoritos</button>
+                        <button class="amigo-tab-btn" onclick="switchAmigoTab(this, 'assistidos')">Assistidos</button>
+                        <button class="amigo-tab-btn" onclick="switchAmigoTab(this, 'quero')">Quero Assistir</button>
                     </div>
                 `;
 
                 const createListContainer = (listName, filmList) => {
                     const container = document.createElement('div');
-                    container.className = `amigo-film-list-container`;
-                    container.dataset.list = listName;
+                    container.className = `amigo-film-list-container ${listName}-list`;
 
                     const linha = document.createElement('div');
                     linha.className = 'linha-horizontal';
 
                     if (filmList.length > 0) {
-                        filmList.forEach(filme => {
-                            linha.appendChild(createCard(filme, 'mini'));
-                        });
+                        filmList.forEach(filme => linha.appendChild(createCard(filme, 'mini')));
                     } else {
                         linha.innerHTML = `<p class="no-items-message">Nenhum item para mostrar.</p>`;
                     }
@@ -504,9 +497,9 @@
             const index = filmes.findIndex(f => f.titulo === filme.titulo);
             abrirModal(index);
         };
-
         return card;
     }
+
     // =================================================================================
     // --- MANIPULADORES DE EVENTOS E LÓGICA DE FILTROS ---
     // =================================================================================
@@ -517,7 +510,7 @@
         const el = document.createElement("span");
         el.className = "tag base-tag";
         el.textContent = tagText;
-        el.dataset.filter = tagText; // CORREÇÃO: Usar dataset para o filtro
+        el.onclick = () => handleBaseFilterClick(tagText);
         dom.tags.fixedContainer.appendChild(el);
       });
 
@@ -530,7 +523,11 @@
           el.href = "#";
           el.className = "dropdown-tag";
           el.textContent = tagText;
-          el.dataset.filter = tagText; // CORREÇÃO: Usar dataset para o filtro
+          el.onclick = (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              toggleTagFilter(tagText);
+          };
           dom.tags.dropdownContent.appendChild(el);
       });
       updateTagUI();
@@ -562,7 +559,7 @@
             const el = document.createElement("span");
             el.className = "tag active";
             el.textContent = tagText;
-            el.dataset.filter = tagText; // CORREÇÃO: Usar dataset para o filtro
+            el.onclick = () => toggleTagFilter(tagText);
             dom.tags.selectedContainer.appendChild(el);
         });
 
@@ -612,7 +609,17 @@
     function resetFilters() {
         currentBaseFilter = 'Todos';
         activeTags.clear();
+        dom.search.box.value = '';
         updateTagUI();
+    }
+    
+    // RESTAURADO: Função para buscar por termo clicado
+    function searchByTerm(term) {
+        dom.search.box.value = term;
+        currentBaseFilter = 'Todos';
+        activeTags.clear();
+        applyAllFilters();
+        fecharModal();
     }
 
     async function toggleFavorite(titulo) {
@@ -628,13 +635,17 @@
 
     async function toggleAssistido(titulo) {
         const idx = userData.assistidos.indexOf(titulo);
-        if (idx >= 0) userData.assistidos.splice(idx, 1);
-        else userData.assistidos.push(titulo);
-        await updateDoc(userDocRef, { assistidos: userData.assistidos });
+        if (idx >= 0) {
+            userData.assistidos.splice(idx, 1);
+            delete userData.estrelas[titulo]; // Remove a nota ao desmarcar
+        } else {
+            userData.assistidos.push(titulo);
+        }
+        await updateDoc(userDocRef, { assistidos: userData.assistidos, estrelas: userData.estrelas });
         syncFilmesWithUserData();
         updateWatchedCounters();
         const index = filmes.findIndex(f => f.titulo === titulo);
-        if(dom.modal.bg.style.display === "flex") updateModalButtons(index);
+        if(dom.modal.bg.style.display === "flex") abrirModal(index);
         render();
     }
 
@@ -658,7 +669,13 @@
       dom.modal.poster.src = filme.imagem;
       dom.modal.title.innerHTML = filme.titulo;
       dom.modal.modalDurationDots.innerHTML = createDurationDotsHTML(filme.screentime);
-      dom.modal.info.textContent = `Ano: ${filme.ano} | Elenco: ${Array.isArray(filme.elenco) ? filme.elenco.join(', ') : filme.elenco}`;
+      
+      // RESTAURADO: Lógica para criar info clicável
+      const anoHtml = `Ano: <span class="info-clickable" onclick="searchByTerm('${filme.ano}')">${filme.ano}</span>`;
+      const elencoArray = Array.isArray(filme.elenco) ? filme.elenco : [filme.elenco];
+      const elencoHtml = `Elenco: ${elencoArray.map(ator => `<span class="info-clickable" onclick="searchByTerm('${ator}')">${ator}</span>`).join(', ')}`;
+      dom.modal.info.innerHTML = `${anoHtml} | ${elencoHtml}`;
+
       dom.modal.sinopse.textContent = filme.sinopse;
 
       dom.modal.youtubeLink.style.display = filme.youtubeLink ? 'inline-block' : 'none';
@@ -677,6 +694,7 @@
         dom.modal.favBtn.classList.toggle('active', filme.favorito);
         dom.modal.watchBtn.classList.toggle('active', filme.assistido);
         dom.modal.wantBtn.classList.toggle('active', filme.queroAssistir);
+        dom.modal.stars.style.display = filme.assistido ? 'block' : 'none';
     }
 
     function fecharModal() {
@@ -689,34 +707,30 @@
         userData.estrelas[titulo] = rating;
         await updateDoc(userDocRef, { estrelas: userData.estrelas });
         syncFilmesWithUserData();
-        renderStarsInModal(titulo); // Re-renderiza as estrelas no modal
+        renderStarsInModal(titulo);
         if (currentBaseFilter === 'Assistidos') {
-            applyAllFilters(); // Re-renderiza a grid se a visão for de 'Assistidos'
+            applyAllFilters();
         }
     }
 
+    // RESTAURADO: Lógica de criação e clique das estrelas
     function renderStarsInModal(titulo) {
         const rating = userData.estrelas[titulo] || 0;
         dom.modal.stars.innerHTML = '';
         for (let i = 1; i <= 5; i++) {
             const star = document.createElement('span');
             star.textContent = '★';
-            star.className = 'star';
-            star.dataset.value = i; // Guarda o valor da estrela
-            if (i <= rating) {
-                star.classList.add('filled');
-            }
+            star.className = `star ${i <= rating ? 'filled' : ''}`;
+            star.onclick = () => setRating(titulo, i);
             dom.modal.stars.appendChild(star);
         }
     }
-
 
     // =================================================================================
     // --- LÓGICA DE AUTENTICAÇÃO E DADOS DO USUÁRIO ---
     // =================================================================================
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            // Usuário está logado
             dom.auth.section.style.display = 'none';
             dom.main.style.display = 'block';
             userDocRef = doc(db, "usuarios", user.uid);
@@ -727,24 +741,16 @@
                 dom.sideMenu.profilePic.src = userData.foto || 'https://i.pinimg.com/736x/27/fd/95/27fd95d3bf879bf965f3d1da751d8c84.jpg';
                 dom.sideMenu.visibilityToggle.checked = userData.isPublic || false;
             } else {
-                // Primeira vez logando, cria o documento
                 const defaultData = {
-                    uid: user.uid,
-                    email: user.email,
-                    apelido: 'Novo Usuário',
+                    uid: user.uid, email: user.email, apelido: 'Novo Usuário',
                     foto: 'https://i.pinimg.com/736x/27/fd/95/27fd95d3bf879bf965f3d1da751d8c84.jpg',
-                    favoritos: [],
-                    assistidos: [],
-                    quero: [],
-                    estrelas: {},
-                    isPublic: false
+                    favoritos: [], assistidos: [], quero: [], estrelas: {}, isPublic: false
                 };
                 await setDoc(userDocRef, defaultData);
                 userData = defaultData;
             }
             fetchAndRenderMovies();
         } else {
-            // Usuário deslogado
             dom.auth.section.style.display = 'flex';
             dom.main.style.display = 'none';
             dom.sideMenu.menu.classList.remove('open');
@@ -782,7 +788,6 @@
             .catch(error => dom.auth.errorDisplay.textContent = "Não foi possível enviar o email. Verifique o endereço digitado.");
     };
 
-
     dom.sideMenu.logoutBtn.onclick = () => signOut(auth);
 
     dom.sideMenu.profileName.onblur = () => {
@@ -807,6 +812,11 @@
         try {
             const response = await fetch("filmes.json");
             filmes = await response.json();
+            // Disponibiliza funções globalmente para o onclick no HTML
+            window.searchByTerm = searchByTerm;
+            window.setRating = setRating;
+            window.switchAmigoTab = switchAmigoTab;
+
             syncFilmesWithUserData();
             popularTags();
             updateWatchedCounters();
@@ -815,6 +825,17 @@
             console.error("Erro ao carregar filmes:", error);
             dom.displayArea.innerHTML = "<p>Não foi possível carregar a lista de filmes.</p>";
         }
+    }
+    
+    // RESTAURADO: Função para as abas dos amigos
+    function switchAmigoTab(buttonElement, listToShow) {
+        const card = buttonElement.closest('.amigo-card');
+        card.querySelectorAll('.amigo-tab-btn').forEach(btn => btn.classList.remove('active'));
+        buttonElement.classList.add('active');
+        card.querySelectorAll('.amigo-film-list-container').forEach(container => {
+            container.style.display = 'none';
+        });
+        card.querySelector(`.${listToShow}-list`).style.display = 'block';
     }
 
     function updateWatchedCounters() {
@@ -830,7 +851,6 @@
       document.getElementById('watched-counter').style.display = 'none';
     }
 
-    // --- Event Listeners ---
     dom.title.onclick = () => {
       resetFilters();
       mostrarTelaInicial();
@@ -877,7 +897,6 @@
         dom.sideMenu.overlay.style.display = 'none';
     };
 
-
     dom.search.toggleBtn.onclick = () => {
       dom.search.wrapper.classList.toggle('show');
       if(dom.search.wrapper.classList.contains('show')) {
@@ -896,41 +915,6 @@
         }
       }
     }
-    
-    // CORREÇÃO: Usar delegação de eventos para os filtros e estrelas
-    document.addEventListener('click', function(e) {
-        // Filtros clicáveis
-        if (e.target.matches('.base-tag')) {
-            handleBaseFilterClick(e.target.dataset.filter);
-        }
-        if (e.target.matches('.dropdown-tag') || e.target.matches('.tag.active')) {
-             e.preventDefault();
-             toggleTagFilter(e.target.dataset.filter);
-        }
-
-        // Star Rating no Modal
-        if (e.target.matches('#modal-stars .star')) {
-            const titulo = dom.modal.title.textContent;
-            const rating = parseInt(e.target.dataset.value, 10);
-            setRating(titulo, rating);
-        }
-        
-        // Abas na página de amigos
-        if (e.target.matches('.amigo-tab-btn')) {
-            const targetButton = e.target;
-            const listToShow = targetButton.dataset.list;
-            const card = targetButton.closest('.amigo-card');
-
-            card.querySelectorAll('.amigo-tab-btn').forEach(btn => btn.classList.remove('active'));
-            targetButton.classList.add('active');
-
-            card.querySelectorAll('.amigo-film-list-container').forEach(container => {
-                container.style.display = 'none';
-            });
-            card.querySelector(`.amigo-film-list-container[data-list="${listToShow}"]`).style.display = 'block';
-        }
-    });
-
 
   </script>
 
