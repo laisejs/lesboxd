@@ -16,7 +16,10 @@ body {
 
 /* --- LAYOUT PRINCIPAL --- */
 #app-container {
-  padding: 90px 25px 15px 25px;
+  padding-top: 90px;
+  padding-left: 25px;
+  padding-right: 25px;
+  padding-bottom: 15px;
 }
 
 #main-content {
@@ -428,25 +431,25 @@ h1 {
     font-size: 16px;
     line-height: 1.5;
     margin: 0 0 20px 0;
-    max-height: 120px;
+    max-height: 120px; /* Limita a altura da sinopse */
     overflow: hidden;
     text-overflow: ellipsis;
 }
 .destaque-info a {
-  background: var(--cor-principal);
-  color: #fff;
-  padding: 12px 25px;
-  border-radius: 8px;
-  text-decoration: none;
-  font-weight: bold;
-  transition: background 0.3s;
+    background: var(--cor-principal);
+    color: #fff;
+    padding: 12px 25px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background 0.3s;
 }
 .destaque-info a:hover {
-  background: #f087d4;
+    background: #f087d4;
 }
 
 /* --- SEÇÕES E GRIDS DE FILMES --- */
-.grid-container { /* NOVO: Container para título e grid */
+.grid-container {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -454,9 +457,10 @@ h1 {
 }
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  /* ALTERADO: Ajustado para 3-4 colunas em telas maiores */
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 20px;
-  width: 100%; /* Faz a grid ocupar todo o espaço do container */
+  width: 100%;
 }
 .linha-horizontal {
   display: flex;
@@ -469,21 +473,20 @@ h1 {
   font-size: 28px;
   margin-left: 0;
   text-align: left;
-  width: 100%; /* Garante que o título ocupe a largura toda */
+  width: 100%;
   margin-bottom: 20px;
 }
-
-.dynamic-title { /* NOVO: Para centralizar o título "Exibindo por..." */
+.dynamic-title {
   text-align: center !important;
   margin-bottom: 30px;
 }
 
 .linha-horizontal::-webkit-scrollbar {
-  height: 8px;
+    height: 8px;
 }
 .linha-horizontal::-webkit-scrollbar-thumb {
-  background: #666;
-  border-radius: 4px;
+    background: #666;
+    border-radius: 4px;
 }
 
 /* --- SEÇÃO AMIGOS (NOVO) --- */
@@ -501,7 +504,7 @@ h1 {
     display: flex;
     align-items: center;
     gap: 20px;
-    margin-bottom: 15px;
+    margin-bottom: 20px; /* Aumentado */
 }
 .amigo-profile-pic {
     width: 80px;
@@ -518,18 +521,42 @@ h1 {
     color: var(--cor-texto-secundario);
     margin: 5px 0 0 0;
 }
-.amigo-card h4 {
-    margin: 20px 0 10px 0;
-    font-size: 18px;
-    color: var(--cor-texto-secundario);
-    font-weight: 500;
+
+/* Estilo dos botões de aba (favoritos, etc.) */
+.amigo-list-selector {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #444;
+    padding-bottom: 15px;
 }
-.no-favorites {
+
+.amigo-tab-btn {
+    background: #444;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+    white-space: nowrap;
+    border: none;
+}
+
+.amigo-tab-btn:hover {
+    background: #666;
+}
+
+.amigo-tab-btn.active {
+    background: var(--cor-principal);
+    font-weight: bold;
+}
+
+.no-items-message {
     font-size: 14px;
     color: var(--cor-texto-secundario);
     padding-left: 5px;
 }
-
 
 /* --- CARTÕES (CARDS) --- */
 .card-base {
@@ -543,15 +570,22 @@ h1 {
   display: flex;
   flex-direction: column;
 }
+
 .card-base:hover {
   transform: scale(1.03);
 }
+
 .card-base .favorite-heart {
-  position: absolute; top: 10px; right: 10px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
   background: rgba(0,0,0,0.5);
   border-radius: 50%;
-  width: 32px; height: 32px;
-  display: flex; justify-content: center; align-items: center;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   color: white;
   font-size: 18px;
   border: none;
@@ -565,462 +599,296 @@ h1 {
 .card-base .favorite-heart.favorited {
   color: var(--cor-principal);
 }
+
 .card-image-wrapper {
   position: relative;
   flex-shrink: 0;
   background-color: #000;
 }
+
 .duration-dots-container {
-  position: absolute;
-  bottom: 16px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 4px;
-  pointer-events: none;
-  z-index: 2;
-}
-.duration-dot {
-  width: 8px;
-  height: 8px;
-  background-color: var(--cor-principal);
-  border-radius: 50%;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-}
-.card-content {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-.card img, .card-mini img {
-  width: 100%;
-  border-radius: 6px;
-  display: block;
-}
-
-/* Card Grid */
-.card .card-content {
-    padding: 0 15px 15px 15px;
-    flex-grow: 1;
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
-    flex-direction: column;
-}
-.card img {
-  height: 280px;
-  object-fit: cover;
-}
-.card h3 {
-  margin: 10px 0 5px;
-  font-size: 18px;
-  flex-shrink: 0;
-}
-.card .synopsis {
-  font-size: 13px;
-  color: var(--cor-texto-secundario);
-  line-height: 1.2;
-  margin-top: 8px;
-  flex-grow: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 4;
-  -webkit-box-orient: vertical;
-}
-.card-stars-display {
-  margin-top: 8px;
-  color: #777;
-  font-size: 18px;
-  text-align: left;
-  flex-shrink: 0;
-  min-height: 20px;
-}
-.card-stars-display:empty {
-  min-height: 0;
-  margin-top: 0;
-}
-.card-stars-display .star.filled {
-  color: var(--cor-principal);
+    gap: 4px;
+    pointer-events: none; /* Não interfere no clique */
+    z-index: 2;
 }
 
-/* Card Mini (Horizontal) */
+.duration-dot {
+    width: 8px;
+    height: 8px;
+    background-color: var(--cor-principal);
+    border-radius: 50%;
+    box-shadow: 0 0 5px rgba(233, 71, 190, 0.7);
+}
+
+/* Tipos de Card */
 .card-mini {
-  width: 150px;
-  flex-shrink: 0;
+  min-width: 160px;
+  width: 160px;
 }
-.card-mini .card-content {
-  padding: 5px;
-  text-align: center;
-  justify-content: center;
-}
-.card-mini img {
-  height: 220px;
-  object-fit: cover;
+.card-mini .card-image-wrapper {
+  height: 230px;
 }
 .card-mini h3 {
   font-size: 14px;
-  color: var(--cor-texto);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card { /* Card da Grid */
+  width: 100%;
+}
+.card .card-image-wrapper {
+  height: 280px; /* Altura padrão para grid */
+}
+.card h3 {
+  font-size: 16px;
+}
+
+.card-content {
+  padding: 15px;
+  flex-grow: 1;
+}
+.card-content h3 {
   margin: 0;
 }
 
-.watched-counter {
-  font-size: 20px;
-  color: var(--cor-texto-secundario);
-  margin-bottom: 20px;
-  padding-left: 5px;
-  font-weight: 500;
-}
-
-/* --- MODAL DE DETALHES --- */
-#modal-bg {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.85);
-  z-index: 1000;
-  justify-content: center;
-  align-items: center;
-}
-#modal-content {
-  background: var(--cor-card);
-  border-radius: 12px;
-  width: 800px;
-  max-width: 95vw;
-  padding: 0;
-  box-sizing: border-box;
-  color: var(--cor-texto);
-  position: relative;
-  display: flex;
-  overflow: hidden;
-  max-height: 90vh;
-}
-#modal-close {
-  position: absolute;
-  top: 12px;
-  right: 15px;
-  background: transparent;
-  border: none;
-  font-size: 28px;
-  color: #aaa;
-  cursor: pointer;
-  transition: color 0.3s;
-  z-index: 10;
-}
-#modal-close:hover {
-  color: #fff;
-}
-.modal-left {
-  flex: 0 0 300px;
-}
-.modal-left img {
+.card-image-wrapper img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: opacity 0.3s;
+}
+
+.synopsis {
+  font-size: 13px;
+  color: var(--cor-texto-secundario);
+  margin-top: 8px;
+  line-height: 1.4;
+  height: 55px;
+  overflow: hidden;
+}
+
+/* --- MODAL (ALTERADO) --- */
+#modal-bg {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.92); /* Fundo mais escuro */
+    z-index: 2500;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    padding: 0; /* Remove padding para ocupar a tela toda */
+    box-sizing: border-box;
+}
+#modal-content {
+  background: transparent; /* Fundo do conteúdo transparente */
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center; /* Centraliza verticalmente o conteúdo */
+  justify-content: center; /* Centraliza horizontalmente o conteúdo */
+  border-radius: 0; /* Remove bordas arredondadas */
+  overflow: hidden;
+  position: relative;
+  padding: 5vh 5vw; /* Espaçamento interno responsivo */
+  box-sizing: border-box;
+  gap: 5vw; /* Espaço entre poster e informações */
+}
+#modal-close {
+  position: absolute;
+  top: 30px;
+  right: 30px;
+  background: rgba(0,0,0,0.5);
+  border: none;
+  color: white;
+  font-size: 24px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-left {
+  flex: 0 0 300px; /* Largura fixa para o poster */
+  height: auto;
+  align-self: flex-start; /* Alinha o poster no topo */
+  margin-top: 30px; /* Desce um pouco */
+}
+.modal-left img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 2/3; /* Proporção de poster */
+  object-fit: cover;
   display: block;
+  border-radius: 10px; /* Bordas arredondadas no poster */
 }
 .modal-right {
-  flex: 1;
-  padding: 25px 30px;
+  padding: 0;
+  flex-grow: 1;
   overflow-y: auto;
+  max-width: 600px; /* Largura máxima para o texto */
+  align-self: flex-start; /* Alinha as informações no topo */
+  margin-top: 30px; /* Desce um pouco */
+  height: 85vh; /* Altura máxima para permitir rolagem */
+}
+#modal-title {
+  font-size: 48px;
+  font-weight: bold;
+  margin: 0 0 10px 0;
 }
 .modal-title-container {
   display: flex;
   align-items: center;
   gap: 15px;
-  margin-bottom: 15px;
-}
-.modal-title-container h2 {
-  font-size: 32px;
-  text-align: left;
-  margin: 0;
-}
-#modal-duration-dots {
-  display: flex;
-  gap: 5px;
+  margin-bottom: 20px;
 }
 #modal-info {
-  font-size: 14px;
+  font-size: 16px;
   color: var(--cor-texto-secundario);
-  margin-bottom: 15px;
+  margin: 15px 0;
 }
 #modal-sinopse {
-  font-size: 15px;
-  line-height: 1.5;
-  margin-bottom: 20px;
+  font-size: 16px;
+  line-height: 1.7;
+  margin-bottom: 25px;
 }
+
 .modal-actions {
   display: flex;
-  gap: 10px;
+  gap: 15px;
   margin-bottom: 20px;
-  flex-wrap: wrap;
 }
 .modal-button {
-  background: #555;
-  border: none;
+  background: #333;
   color: var(--cor-texto);
-  padding: 10px 15px;
-  border-radius: 5px;
-  cursor: pointer;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 8px;
   font-size: 14px;
+  cursor: pointer;
   transition: background 0.3s;
-  font-weight: bold;
-  text-decoration: none;
-  display: inline-block;
+}
+.modal-button:hover {
+  background: #444;
 }
 .modal-button.active {
   background: var(--cor-principal);
-}
-.modal-button:hover {
-  background: #666;
-}
-.modal-button.active:hover {
-  background: #f087d4;
+  color: white;
 }
 #modal-youtube-link {
-  background-color: #399f53;
+    text-decoration: none;
+    display: inline-block; /* Para o padding funcionar */
 }
-#modal-youtube-link:hover {
-  background-color: #82ce86;
-}
+
+
+/* --- ESTRELAS --- */
 .star-rating {
-  display: flex;
-  gap: 5px;
-  font-size: 24px;
-  cursor: pointer;
-  color: #777;
-  margin-bottom: 15px;
-}
-.star-rating .star:hover,
-.star-rating .star.selected {
-  color: var(--cor-principal);
-}
-
-/* --- ESTILO PARA FILTROS CLICÁVEIS NO MODAL --- */
-.clickable-filter {
-  cursor: pointer;
-  transition: color 0.3s;
-}
-.clickable-filter:hover {
-  color: var(--cor-principal);
-}
-
-
-/* --- MODAL GALERIA --- */
-#gallery-image-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
-  margin-bottom: 15px;
-}
-#gallery-image-container img {
-  width: 100%;
-  border-radius: 8px;
-}
-
-.profile-pic-container {
-  position: relative;
-  width: 100px;
-  height: 100px;
-  margin: 0 auto;
-  border-radius: 50%;
-}
-.profile-pic-edit-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 30px;
-  border-radius: 50%;
-  cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-.profile-pic-container:hover .profile-pic-edit-overlay {
-  opacity: 1;
-}
-
-/* --- ESTILOS DO TOGGLE SWITCH (NOVO) --- */
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 48px;
-  height: 24px;
-}
-.switch input { 
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #555;
-  transition: .4s;
-}
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 18px;
-  width: 18px;
-  left: 3px;
-  bottom: 3px;
-  background-color: white;
-  transition: .4s;
-}
-input:checked + .slider {
-  background-color: var(--cor-principal);
-}
-input:focus + .slider {
-  box-shadow: 0 0 1px var(--cor-principal);
-}
-input:checked + .slider:before {
-  transform: translateX(24px);
-}
-.slider.round {
-  border-radius: 24px;
-}
-.slider.round:before {
-  border-radius: 50%;
-}
-/* --- ESTILOS RESPONSIVOS | LAYOUT COMPACTO ESTILO STREAMING --- */
-@media (max-width: 768px) {
-
-  /* --- FORÇAR RESPEITO À LARGURA DA TELA --- */
-  html, body {
-    width: 100%;
-    overflow-x: hidden;
-    font-size: 14px; /* Reduz o tamanho da fonte base para tudo ficar menor */
-  }
-
-  /* --- AJUSTES GERAIS DE LAYOUT --- */
-  #app-container {
-    padding: 65px 10px 10px 10px; /* Espaçamento muito menor */
-  }
-
-  /* --- CABEÇALHO COMPACTO --- */
-  .main-header {
-    padding: 8px 10px;
-    gap: 8px;
-    flex-wrap: nowrap; /* Impede a quebra de linha para manter tudo visível */
-  }
-  .header-left {
-    flex-shrink: 1; /* Permite que o título encolha se necessário */
-  }
-  .header-center {
-    flex-grow: 1; /* Ocupa o espaço que sobrar */
-    flex-shrink: 1;
-    min-width: 50px; /* Largura mínima para não desaparecer */
-  }
-  .header-right {
-    flex-shrink: 0; /* Não deixa os ícones encolherem */
-  }
-
-  h1#main-title {
-    font-size: 28px; /* Título bem menor */
-    line-height: 1;
-  }
-  #hamburger-menu {
-    font-size: 24px;
-  }
-  #search-toggle {
-    font-size: 20px;
-  }
-  
-  /* Reduz o tamanho dos filtros de tag */
-  .tag {
-    padding: 6px 12px;
-    font-size: 12px;
-  }
-  #tag-dropdown-btn {
-    padding: 6px 10px;
-    font-size: 12px;
-  }
-
-  /* --- SEÇÃO DE DESTAQUE MENOR --- */
-  #destaque-container {
-    height: 250px; /* Altura drasticamente reduzida */
     margin-bottom: 20px;
+}
+.star-rating .star, .card-stars-display .star {
+    font-size: 28px;
+    color: #555;
+    cursor: pointer;
+}
+.star-rating .star.filled, .card-stars-display .star.filled {
+    color: #ffc107;
+}
+
+
+/* --- RESPONSIVIDADE --- */
+
+@media (max-width: 768px) {
+  #app-container {
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 80px; /* Garante que o conteúdo não fique sob o header */
+  }
+
+  .main-header {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  h1 {
+    font-size: 32px;
+  }
+
+  /* Faz a busca ocupar mais espaço e os outros itens sumirem */
+  .header-center {
+      display: none;
+  }
+  #search-wrapper.show {
+    width: calc(100vw - 120px);
+  }
+
+  /* Ajustes na tela de login para telas menores */
+  #login-box {
+    width: 85%;
+    padding: 25px;
+  }
+
+  /* Ajustes na seção de destaque */
+  #destaque-container {
+      height: auto; /* Altura automática */
+      aspect-ratio: 16 / 9; /* Proporção mais retangular */
+      margin-bottom: 25px;
+      align-items: flex-end; /* Alinha o conteúdo na base */
+  }
+  #destaque-container::after {
+      /* Gradiente mais forte para garantir legibilidade */
+      background: linear-gradient(to top, rgba(0,0,0,0.9) 20%, rgba(0,0,0,0) 80%);
   }
   .destaque-info {
-    padding: 10px;
-    background: rgba(0,0,0,0.7);
+      max-width: 100%;
+      padding: 20px;
+      margin-left: 0;
+      text-align: center;
   }
   .destaque-info h2 {
-    font-size: 18px;
+      font-size: 28px;
   }
-  .destaque-info p {
-    display: none; /* Esconde a sinopse no destaque para uma interface mais limpa */
+  /* Esconde a sinopse no destaque em telas menores */
+  .destaque-info .destaque-sinopse {
+      display: none;
   }
   .destaque-info a {
-    padding: 8px 15px;
-    font-size: 13px;
+      font-size: 14px;
+      padding: 10px 20px;
   }
 
-  /* --- GRIDS E LINHAS DE FILMES --- */
-  .section-title {
-    font-size: 18px; /* Títulos de seção menores */
-    margin-bottom: 10px;
-  }
-
-  /* Linhas Horizontais (Tela Inicial) */
-  .linha-horizontal {
-    gap: 10px;
-    margin-bottom: 20px;
-  }
-  .card-mini {
-    width: 110px; /* Cards bem menores para caberem mais na tela */
-  }
-  .card-mini img {
-    height: 160px;
-  }
-  .card-mini h3 {
-    font-size: 13px;
-  }
-
-  /* Grid de Filmes (Páginas de Filtro) */
-  .grid {
-    gap: 10px;
-    /* Cards com largura mínima menor para ter mais colunas */
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-  }
-  .card {
-    border-radius: 5px;
-  }
-  .card img {
-    height: 160px;
-  }
-  .card h3 {
-    font-size: 14px;
-    margin-top: 8px;
-  }
-  .card .synopsis {
-    display: none; /* Esconde sinopse na grade para um visual limpo */
-  }
-
-  /* --- MODAL AJUSTADO --- */
+  /* ALTERADO: Ajustes no Modal para mobile */
   #modal-content {
-    flex-direction: column;
-    width: 95vw;
-    height: 90vh;
+      flex-direction: column;
+      padding: 20px;
+      justify-content: flex-start;
+      gap: 20px;
+      overflow-y: auto; /* Permite rolagem no modal inteiro */
   }
   .modal-left {
-    height: 220px;
+    flex-basis: auto;
+    width: 60%;
+    max-width: 200px;
+    margin-top: 50px; /* Espaço do topo */
   }
   .modal-right {
-    padding: 15px;
+    height: auto; /* Altura automática no mobile */
+    max-width: 100%;
+    text-align: center;
+    margin-top: 0;
   }
-  .modal-title-container h2 {
-    font-size: 20px;
+  #modal-title {
+    font-size: 28px;
   }
-  .modal-button {
-    padding: 8px 12px;
-    font-size: 13px;
+  .modal-actions, .modal-title-container, .star-rating {
+    justify-content: center;
   }
 }
