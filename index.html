@@ -5,6 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>🌷</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="/manifest.json">
+    <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.service-worker.register('/sw.js')
+          .then(registration => {
+            console.log('Service Worker registrado com sucesso:', registration.scope);
+          })
+          .catch(error => {
+            console.log('Falha ao registrar o Service Worker:', error);
+          });
+      });
+    }
+  </script>
 </head>
 
 <body>
@@ -133,7 +147,7 @@
         apiKey: "AIzaSyAb2eewnWnHU3xN3Pxio-Hy55SDz_W3zfI",
         authDomain: "saficos-b5494.firebaseapp.com",
         projectId: "saficos-b5494",
-        storageBucket: "saficos-b5494.firebasestorage.app",
+        storageBucket: "saficos-b5494.appspot.com",
         messagingSenderId: "706719668164",
         appId: "1:706719668164:web:265bbd08b6ad395dbf7691",
         measurementId: "G-SVVS0C0C9V"
@@ -189,13 +203,13 @@
         favBtn: document.getElementById("show-favorites-btn"),
         watchBtn: document.getElementById("show-watched-btn"),
         wantBtn: document.getElementById("show-want-btn"),
-        amigosBtn: document.getElementById('show-amigos-btn'), // NOVO
+        amigosBtn: document.getElementById('show-amigos-btn'),
         logoutBtn: document.getElementById("logout-btn"),
         profileName: document.getElementById('profile-name-element'),
         profilePic: document.getElementById('profile-pic-element'),
         profilePicEditBtn: document.getElementById('profile-pic-edit-btn'),
         watchedCounter: document.getElementById('side-menu-watched-counter'),
-        visibilityToggle: document.getElementById('visibility-toggle') // NOVO
+        visibilityToggle: document.getElementById('visibility-toggle')
       },
       modal: {
         bg: document.getElementById("modal-bg"),
@@ -344,6 +358,7 @@
       dom.displayArea.appendChild(grid); // Adiciona a grid ao container
     }
 
+    // ===== FUNÇÃO "mostrarAmigos" ATUALIZADA =====
     async function mostrarAmigos() {
         currentView = 'amigos';
         dom.destaque.style.display = 'none';
@@ -355,9 +370,9 @@
             const querySnapshot = await getDocs(collection(db, "usuarios"));
             const usuariosPublicos = [];
             querySnapshot.forEach((doc) => {
-                const userData = doc.data();
-                if (userData.isPublic) {
-                    usuariosPublicos.push(userData);
+                const data = doc.data();
+                if (data.isPublic) {
+                    usuariosPublicos.push(data);
                 }
             });
 
@@ -372,43 +387,74 @@
             usuariosPublicos.forEach(amigoData => {
                 const amigoCard = document.createElement('div');
                 amigoCard.className = 'amigo-card';
+                amigoCard.dataset.uid = amigoData.uid;
 
-                const filmesFavoritos = amigoData.favoritos
-                    .map(titulo => filmes.find(f => f.titulo === titulo))
-                    .filter(Boolean); // Filtra caso algum filme não seja encontrado
+                const mapTitlesToFilmes = (titles) => (titles || []).map(titulo => filmes.find(f => f.titulo === titulo)).filter(Boolean);
+                const filmesFavoritos = mapTitlesToFilmes(amigoData.favoritos);
+                const filmesAssistidos = mapTitlesToFilmes(amigoData.assistidos);
+                const filmesQuero = mapTitlesToFilmes(amigoData.quero);
 
                 amigoCard.innerHTML = `
                     <div class="amigo-profile-info">
                         <img src="${amigoData.foto}" alt="Foto de ${amigoData.apelido}" class="amigo-profile-pic">
                         <div>
                             <h3 class="amigo-name">${amigoData.apelido}</h3>
-                            <p class="amigo-watched-count">${amigoData.assistidos.length} assistidos</p>
+                            <p class="amigo-watched-count">${(amigoData.assistidos || []).length} assistidos</p>
                         </div>
                     </div>
-                    <h4>Favoritos:</h4>
-                `;
-                
-                const linhaFavoritos = document.createElement('div');
-                linhaFavoritos.className = 'linha-horizontal';
+                     <div class="amigo-list-selector">
+                        <button class="amigo-tab-btn active" data-list="favoritos">Favoritos</button>
+                        <button class="amigo-tab-btn" data-list="assistidos">Assistidos</button>
+                        <button class="amigo-tab-btn" data-list="quero">Quero Assistir</button>
+                    </div>`;
 
-                if (filmesFavoritos.length > 0) {
-                    filmesFavoritos.forEach(filme => {
-                        linhaFavoritos.appendChild(createCard(filme, 'mini'));
-                    });
-                } else {
-                    linhaFavoritos.innerHTML = '<p class="no-favorites">Nenhum favorito para mostrar.</p>';
-                }
-                
-                amigoCard.appendChild(linhaFavoritos);
+                const createListContainer = (listName, filmList) => {
+                    const container = document.createElement('div');
+                    container.className = 'amigo-film-list-container';
+                    container.dataset.list = listName;
+                    const linha = document.createElement('div');
+                    linha.className = 'linha-horizontal';
+                    if (filmList.length > 0) {
+                        filmList.forEach(filme => linha.appendChild(createCard(filme, 'mini')));
+                    } else {
+                        linha.innerHTML = `<p class="no-items-message">Nenhum item para mostrar.</p>`;
+                    }
+                    container.appendChild(linha);
+                    return container;
+                };
+
+                const favContainer = createListContainer('favoritos', filmesFavoritos);
+                const watchedContainer = createListContainer('assistidos', filmesAssistidos);
+                const wantContainer = createListContainer('quero', filmesQuero);
+
+                watchedContainer.style.display = 'none';
+                wantContainer.style.display = 'none';
+
+                amigoCard.appendChild(favContainer);
+                amigoCard.appendChild(watchedContainer);
+                amigoCard.appendChild(wantContainer);
                 amigosContainer.appendChild(amigoCard);
             });
             dom.displayArea.appendChild(amigosContainer);
+
+            document.querySelectorAll('.amigo-tab-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const targetButton = e.target;
+                    const listToShow = targetButton.dataset.list;
+                    const card = targetButton.closest('.amigo-card');
+                    card.querySelectorAll('.amigo-tab-btn').forEach(btn => btn.classList.remove('active'));
+                    targetButton.classList.add('active');
+                    card.querySelectorAll('.amigo-film-list-container').forEach(c => c.style.display = 'none');
+                    card.querySelector(`.amigo-film-list-container[data-list="${listToShow}"]`).style.display = 'block';
+                });
+            });
 
         } catch (error) {
             console.error("Erro ao buscar usuários:", error);
             dom.displayArea.innerHTML += '<p>Ocorreu um erro ao carregar a lista de amigos.</p>';
         }
     }
+    // ===== FIM DA FUNÇÃO ATUALIZADA =====
 
     function createDurationDotsHTML(screentime) {
       if (!screentime) return '';
@@ -621,9 +667,18 @@
     }
 
 
-    function openSideMenu() { dom.sideMenu.menu.classList.add('open'); dom.sideMenu.overlay.style.display = 'block'; }
-    function closeSideMenu() { dom.sideMenu.menu.classList.remove('open');
-    dom.sideMenu.overlay.style.display = 'none'; }
+// Substitua as duas funções antigas por estas:
+function openSideMenu() { 
+  dom.sideMenu.menu.classList.add('open'); 
+  dom.sideMenu.overlay.style.display = 'block'; 
+  document.body.classList.add('noscroll'); // <-- Adicione esta linha
+}
+
+function closeSideMenu() { 
+  dom.sideMenu.menu.classList.remove('open'); 
+  dom.sideMenu.overlay.style.display = 'none'; 
+  document.body.classList.remove('noscroll'); // <-- Adicione esta linha
+}
     
     function ocultarContador() {
         const counter = document.getElementById('watched-counter');
@@ -846,7 +901,7 @@
       dom.sideMenu.favBtn.onclick = createSideMenuFilterHandler('Favoritos');
       dom.sideMenu.watchBtn.onclick = createSideMenuFilterHandler('Assistidos');
       dom.sideMenu.wantBtn.onclick = createSideMenuFilterHandler('Quero Assistir');
-      dom.sideMenu.amigosBtn.onclick = () => { // NOVO
+      dom.sideMenu.amigosBtn.onclick = () => {
           mostrarAmigos();
           closeSideMenu();
       };
@@ -888,7 +943,7 @@
           estrelas: {},
           apelido: "Novo Usuário",
           foto: "https://i.pinimg.com/736x/27/fd/95/27fd95d3bf879bf965f3d1da751d8c84.jpg",
-          isPublic: false // NOVO: Perfil privado por padrão
+          isPublic: false
         });
       } catch (e) {
          switch(e.code) {
@@ -938,7 +993,6 @@
             }
         });
         
-        // NOVO: Event listener para o toggle de visibilidade
         dom.sideMenu.visibilityToggle.addEventListener('change', async (e) => {
             const isPublic = e.target.checked;
             if(userDocRef) {
@@ -953,7 +1007,6 @@
           userData = docSnap.data();
           if (userData.foto) dom.sideMenu.profilePic.src = userData.foto;
           if (userData.apelido) dom.sideMenu.profileName.textContent = userData.apelido;
-          // NOVO: Sincroniza o estado do toggle com o banco de dados
           dom.sideMenu.visibilityToggle.checked = !!userData.isPublic; 
 
         } else {

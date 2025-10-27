@@ -264,6 +264,8 @@ h1 {
     background: #666;
 }
 
+
+
 /* --- CONTROLES DE FILTRO E PESQUISA --- */
 #search-toggle {
   background: none;
@@ -508,6 +510,7 @@ h1 {
     height: 80px;
     border-radius: 50%;
     object-fit: cover;
+    margin-left: 25px; /* Experimente valores pequenos como 5px, 10px */
 }
 .amigo-name {
     font-size: 24px;
@@ -528,6 +531,36 @@ h1 {
     font-size: 14px;
     color: var(--cor-texto-secundario);
     padding-left: 5px;
+}
+/* SUBSTITUA O CÓDIGO ANTIGO .amigo-tab-btn POR ESTE BLOCO ABAIXO */
+
+.amigo-tab-btn {
+  display: inline-block; /* Garante comportamento similar ao span */
+  background: #444;      /* Cor de fundo igual ao .tag */
+  color: white;          /* Cor do texto igual ao .tag */
+  padding: 8px 16px;     /* Mesmo padding do .tag */
+  margin: 0;             /* Remove margens extras se houver */
+  border-radius: 20px;   /* Mesmo arredondamento do .tag */
+  cursor: pointer;
+  font-size: 14px;       /* Mesmo tamanho de fonte do .tag */
+  font-weight: bold;     /* Adiciona negrito como no .tag.active (fica bom sempre)*/
+  border: none;          /* Remove a borda */
+  transition: background 0.3s;
+  white-space: nowrap;   /* Impede que o texto quebre linha */
+  text-decoration: none; /* Garante que não haja sublinhado */
+  margin-left: 15px; /* Experimente valores pequenos como 5px, 10px */
+  margin-bottom: 25px; /* Experimente valores pequenos como 5px, 10px */
+}
+
+.amigo-tab-btn:hover {
+  background: #888;      /* Cor de hover igual ao .tag:hover */
+  color: white;          /* Mantém a cor do texto */
+}
+
+.amigo-tab-btn.active {
+  background: var(--cor-principal); /* Cor de fundo ativa igual ao .tag.active */
+  color: white;                  /* Mantém a cor do texto */
+  font-weight: bold;             /* Garante negrito no ativo */
 }
 
 
@@ -888,4 +921,18 @@ input:checked + .slider:before {
 }
 .slider.round:before {
   border-radius: 50%;
+}
+
+body.noscroll {
+  overflow: hidden;
+  /* Opcional: para evitar que o conteúdo pule quando a barra de rolagem some */
+  padding-right: 15px; /* Ajuste este valor se necessário */
+}
+
+/* Garante que o menu lateral tenha sua própria rolagem */
+#side-menu {
+  /* Adicione ou modifique estas propriedades no seu seletor #side-menu existente */
+  max-height: 100vh; /* A altura máxima do menu é a altura da tela */
+  overflow-y: auto;  /* Adiciona uma barra de rolagem vertical APENAS se o conteúdo do menu for maior que a tela */
+  overflow-x: hidden;/* Esconde a rolagem horizontal */
 }
