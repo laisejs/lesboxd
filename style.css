@@ -1,8 +1,8 @@
 /* --- ESTILOS GERAIS --- */
 :root {
-  --cor-principal: #e947be;
-  --cor-fundo: #111;
-  --cor-card: #222;
+  --cor-principal: #709e75;
+  --cor-fundo: #242d26;
+  --cor-card: #344236;
   --cor-texto: #eee;
   --cor-texto-secundario: #ccc;
 }
@@ -12,15 +12,59 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: var(--cor-fundo);
   color: var(--cor-texto);
+  cursor: default; 
+  user-select: none; 
+  -webkit-user-select: none; 
+  background-image: radial-gradient(circle at center, transparent 30%, rgba(0, 0, 0, 0.85) 120%);
+  background-attachment: fixed; 
 }
 
-/* --- LAYOUT PRINCIPAL --- */
-#app-container {
-  padding: 90px 25px 15px 25px;
+input, textarea, [contenteditable="true"] {
+  cursor: text;
+  user-select: auto;
+  -webkit-user-select: auto;
+}
+
+/* --- BARRAS DE ROLAGEM MINIMALISTAS --- */
+#modal-bg.details-sidebar::-webkit-scrollbar,
+.amigo-comments-container::-webkit-scrollbar {
+    width: 6px; 
+}
+#modal-bg.details-sidebar::-webkit-scrollbar-track,
+.amigo-comments-container::-webkit-scrollbar-track {
+    background: transparent; 
+}
+#modal-bg.details-sidebar::-webkit-scrollbar-thumb,
+.amigo-comments-container::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2); 
+    border-radius: 10px; 
+}
+#modal-bg.details-sidebar::-webkit-scrollbar-thumb:hover,
+.amigo-comments-container::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.4); 
+}
+
+
+/* --- LAYOUT WRAPPER E MAIN CONTENT --- */
+#layout-container {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
 }
 
 #main-content {
-  display: none;
+  flex: 1;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  display: none; 
+}
+
+#app-container {
+  padding: 20px 25px 15px 25px; 
 }
 
 #filmes-display-area {
@@ -35,9 +79,8 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  position: fixed;
+  position: sticky; 
   top: 0;
-  left: 0;
   width: 100%;
   z-index: 990;
   background-color: var(--cor-fundo);
@@ -139,8 +182,7 @@ h1 {
     display: inline-block;
 }
 
-
-/* --- MENU LATERAL --- */
+/* --- MENU LATERAL DIREITO (CONTA/AMIGOS) --- */
 #hamburger-menu {
   background: none;
   border: none;
@@ -170,6 +212,9 @@ h1 {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  max-height: 100vh; 
+  overflow-y: auto;  
+  overflow-x: hidden;
 }
 #side-menu.open {
   right: 0;
@@ -231,13 +276,11 @@ h1 {
   background: #444;
 }
 
-/* NOVO: Estilos para a parte inferior do menu */
 .side-menu-bottom {
     margin-top: auto;
     padding-top: 20px;
     border-top: 1px solid #333;
 }
-
 #visibility-toggle-container {
     display: flex;
     justify-content: space-between;
@@ -247,11 +290,10 @@ h1 {
     margin-bottom: 20px;
     padding: 0 5px;
 }
-
 #logout-btn {
     background: #555;
     color: var(--cor-texto-secundario);
-    width: 100%; /* Ocupa a largura toda */
+    width: 100%;
     border: none;
     padding: 12px 15px;
     border-radius: 8px;
@@ -264,8 +306,6 @@ h1 {
     background: #666;
 }
 
-
-
 /* --- CONTROLES DE FILTRO E PESQUISA --- */
 #search-toggle {
   background: none;
@@ -277,6 +317,11 @@ h1 {
   margin: 0;
   line-height: 1;
   order: 1;
+}
+#search-toggle img {
+    width: 30px; 
+    height: 30px; 
+    display: block;
 }
 #search-wrapper {
     position: absolute;
@@ -306,7 +351,7 @@ h1 {
   box-sizing: border-box;
 }
 
-/* --- NOVO SISTEMA DE TAGS --- */
+/* --- SISTEMA DE TAGS --- */
 #fixed-tags-container {
   display: flex;
   gap: 10px;
@@ -448,7 +493,7 @@ h1 {
 }
 
 /* --- SEÇÕES E GRIDS DE FILMES --- */
-.grid-container { /* NOVO: Container para título e grid */
+.grid-container { 
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -458,7 +503,7 @@ h1 {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 20px;
-  width: 100%; /* Faz a grid ocupar todo o espaço do container */
+  width: 100%;
 }
 .linha-horizontal {
   display: flex;
@@ -471,11 +516,10 @@ h1 {
   font-size: 28px;
   margin-left: 0;
   text-align: left;
-  width: 100%; /* Garante que o título ocupe a largura toda */
+  width: 100%; 
   margin-bottom: 20px;
 }
-
-.dynamic-title { /* NOVO: Para centralizar o título "Exibindo por..." */
+.dynamic-title { 
   text-align: center !important;
   margin-bottom: 30px;
 }
@@ -488,7 +532,7 @@ h1 {
   border-radius: 4px;
 }
 
-/* --- SEÇÃO AMIGOS (NOVO) --- */
+/* --- SEÇÃO AMIGOS --- */
 #amigos-section {
     display: flex;
     flex-direction: column;
@@ -510,7 +554,7 @@ h1 {
     height: 80px;
     border-radius: 50%;
     object-fit: cover;
-    margin-left: 25px; /* Experimente valores pequenos como 5px, 10px */
+    margin-left: 25px; 
 }
 .amigo-name {
     font-size: 24px;
@@ -532,37 +576,33 @@ h1 {
     color: var(--cor-texto-secundario);
     padding-left: 5px;
 }
-/* SUBSTITUA O CÓDIGO ANTIGO .amigo-tab-btn POR ESTE BLOCO ABAIXO */
 
 .amigo-tab-btn {
-  display: inline-block; /* Garante comportamento similar ao span */
-  background: #444;      /* Cor de fundo igual ao .tag */
-  color: white;          /* Cor do texto igual ao .tag */
-  padding: 8px 16px;     /* Mesmo padding do .tag */
-  margin: 0;             /* Remove margens extras se houver */
-  border-radius: 20px;   /* Mesmo arredondamento do .tag */
+  display: inline-block; 
+  background: #444;      
+  color: white;          
+  padding: 8px 16px;     
+  margin: 0;             
+  border-radius: 20px;   
   cursor: pointer;
-  font-size: 14px;       /* Mesmo tamanho de fonte do .tag */
-  font-weight: bold;     /* Adiciona negrito como no .tag.active (fica bom sempre)*/
-  border: none;          /* Remove a borda */
+  font-size: 14px;       
+  font-weight: bold;     
+  border: none;          
   transition: background 0.3s;
-  white-space: nowrap;   /* Impede que o texto quebre linha */
-  text-decoration: none; /* Garante que não haja sublinhado */
-  margin-left: 15px; /* Experimente valores pequenos como 5px, 10px */
-  margin-bottom: 25px; /* Experimente valores pequenos como 5px, 10px */
+  white-space: nowrap;   
+  text-decoration: none; 
+  margin-left: 15px; 
+  margin-bottom: 25px; 
 }
-
 .amigo-tab-btn:hover {
-  background: #888;      /* Cor de hover igual ao .tag:hover */
-  color: white;          /* Mantém a cor do texto */
+  background: #888;      
+  color: white;          
 }
-
 .amigo-tab-btn.active {
-  background: var(--cor-principal); /* Cor de fundo ativa igual ao .tag.active */
-  color: white;                  /* Mantém a cor do texto */
-  font-weight: bold;             /* Garante negrito no ativo */
+  background: var(--cor-principal); 
+  color: white;                  
+  font-weight: bold;             
 }
-
 
 /* --- CARTÕES (CARDS) --- */
 .card-base {
@@ -704,152 +744,327 @@ h1 {
   font-weight: 500;
 }
 
-/* --- MODAL DE DETALHES --- */
-#modal-bg {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.85);
-  z-index: 1000;
-  justify-content: center;
-  align-items: center;
+/* =========================================================================
+   SIDEBAR LATERAL ESQUERDA PARA DETALHES
+   ========================================================================= */
+
+#modal-bg.details-sidebar {
+    width: 0;
+    height: 100vh;
+    background: var(--cor-card);
+    overflow-y: hidden;
+    overflow-x: hidden;
+    transition: width 0.3s ease;
+    border-right: 1px solid rgba(255,255,255,0.1);
+    z-index: 1000;
+    flex-shrink: 0;
+    display: block; 
 }
-#modal-content {
-  background: var(--cor-card);
-  border-radius: 12px;
-  width: 800px;
-  max-width: 95vw;
-  padding: 0;
-  box-sizing: border-box;
-  color: var(--cor-texto);
-  position: relative;
-  display: flex;
-  overflow: hidden;
-  max-height: 90vh;
+
+#modal-bg.details-sidebar.open {
+    width: 380px;
+    overflow-y: auto;
 }
+
+#modal-content.sidebar-content {
+    width: 380px;
+    min-width: 380px;
+    background: transparent;
+    border-radius: 0;
+    padding: 0;
+    color: var(--cor-texto);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+#modal-bg.details-sidebar.open #modal-content.sidebar-content {
+    opacity: 1;
+    transition: opacity 0.3s 0.1s;
+}
+
 #modal-close {
-  position: absolute;
-  top: 12px;
-  right: 15px;
-  background: transparent;
-  border: none;
-  font-size: 28px;
-  color: #aaa;
-  cursor: pointer;
-  transition: color 0.3s;
-  z-index: 10;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(0,0,0,0.6);
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    transition: background 0.3s;
+    z-index: 10;
+    border: none;
 }
 #modal-close:hover {
-  color: #fff;
+    background: rgba(0,0,0,0.9);
 }
-.modal-left {
-  flex: 0 0 300px;
+
+/* --- POSTER MENOR COM BORDA --- */
+.sidebar-poster-container {
+    width: 100%;
+    flex-shrink: 0;
+    background-color: transparent;
+    padding: 30px 20px 10px 20px; 
+    box-sizing: border-box;
 }
-.modal-left img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+.sidebar-poster-container img {
+    width: 55%; 
+    max-width: 200px;
+    height: auto;
+    object-fit: cover;
+    margin: 0 auto; 
+    display: block;
+    border: 0px solid rgba(255, 255, 255, 0.8); 
+    border-radius: 0px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.6); 
 }
-.modal-right {
-  flex: 1;
-  padding: 25px 30px;
-  overflow-y: auto;
+
+.sidebar-details-container {
+    padding: 20px;
+    flex-grow: 1;
+    overflow-y: visible;
 }
+
+.section-subtitle {
+    font-size: 16px;
+    margin-bottom: 12px;
+    color: var(--cor-texto-secundario);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 5px;
+}
+
 .modal-title-container {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
 }
 .modal-title-container h2 {
-  font-size: 32px;
-  text-align: left;
-  margin: 0;
+    font-size: 26px;
+    text-align: left;
+    margin: 0;
+    word-break: break-word;
 }
 #modal-duration-dots {
-  display: flex;
-  gap: 5px;
+    display: flex;
+    gap: 5px;
 }
 #modal-info {
-  font-size: 14px;
-  color: var(--cor-texto-secundario);
-  margin-bottom: 15px;
+    font-size: 14px;
+    color: var(--cor-texto-secundario);
+    margin-bottom: 15px;
 }
 #modal-sinopse {
-  font-size: 15px;
-  line-height: 1.5;
-  margin-bottom: 20px;
+    font-size: 15px;
+    line-height: 1.5;
+    margin-bottom: 20px;
 }
 .modal-actions {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
 }
 .modal-button {
-  background: #555;
-  border: none;
-  color: var(--cor-texto);
-  padding: 10px 15px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background 0.3s;
-  font-weight: bold;
-  text-decoration: none;
-  display: inline-block;
+    background: #555;
+    border: none;
+    color: var(--cor-texto);
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-block;
 }
 .modal-button.active {
-  background: var(--cor-principal);
+    background: var(--cor-principal);
 }
 .modal-button:hover {
-  background: #666;
+    background: #666;
 }
 .modal-button.active:hover {
-  background: #f087d4;
+    background: #f087d4;
 }
 #modal-youtube-link {
-  background-color: #399f53;
+    background-color: #399f53;
 }
 #modal-youtube-link:hover {
-  background-color: #82ce86;
+    background-color: #82ce86;
 }
 .star-rating {
-  display: flex;
-  gap: 5px;
-  font-size: 24px;
-  cursor: pointer;
-  color: #777;
-  margin-bottom: 15px;
+    display: flex;
+    gap: 5px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #777;
+    margin-bottom: 15px;
 }
 .star-rating .star:hover,
 .star-rating .star.selected {
-  color: var(--cor-principal);
+    color: var(--cor-principal);
 }
 
-/* --- ESTILO PARA FILTROS CLICÁVEIS NO MODAL --- */
 .clickable-filter {
-  cursor: pointer;
-  transition: color 0.3s;
+    cursor: pointer;
+    transition: color 0.3s;
 }
 .clickable-filter:hover {
-  color: var(--cor-principal);
+    color: var(--cor-principal);
 }
 
-
-/* --- MODAL GALERIA --- */
+/* Galeria Inline */
 #gallery-image-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
-  margin-bottom: 15px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 15px;
 }
 #gallery-image-container img {
-  width: 100%;
-  border-radius: 8px;
+    width: 100%;
+    border-radius: 8px;
 }
 
+/* =========================================================================
+   ESTILIZAÇÃO DOS COMENTÁRIOS E BOTÃO EXCLUIR
+   ========================================================================= */
+#comments-section {
+    margin-top: 10px;
+    margin-bottom: 30px;
+}
+.comment-input-area {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+#comment-input {
+    width: 100%;
+    height: 70px;
+    background-color: rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: var(--cor-texto);
+    border-radius: 8px;
+    padding: 10px;
+    font-family: inherit;
+    resize: vertical;
+    box-sizing: border-box;
+}
+#submit-comment-btn {
+    align-self: flex-end;
+    background: var(--cor-principal);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+#submit-comment-btn:hover { background: #f087d4; }
+.comment-bubble {
+    display: flex;
+    gap: 15px;
+    background: rgba(0,0,0,0.15);
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+}
+.comment-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+.comment-content {
+    flex-grow: 1;
+    width: 100%;
+}
+.comment-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 5px;
+    width: 100%;
+}
+.comment-header strong {
+    font-size: 14px;
+    color: var(--cor-texto);
+}
+.comment-stars {
+    font-size: 14px;
+    color: #777;
+    display: flex;
+    gap: 2px;
+}
+.comment-stars .star.filled {
+    color: var(--cor-principal);
+}
+.comment-content p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--cor-texto-secundario);
+}
+.comment-date {
+    font-size: 11px;
+    color: #777;
+    margin-top: 5px;
+    display: block;
+}
+
+/* NOVO: Botão de Lixeira */
+.delete-comment-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-left: auto; /* Joga a lixeira pro canto direito */
+    font-size: 14px;
+    opacity: 0.6;
+    transition: opacity 0.2s, transform 0.2s;
+    padding: 0 5px;
+}
+.delete-comment-btn:hover {
+    opacity: 1;
+    transform: scale(1.2);
+}
+
+/* CAIXA DE COMENTÁRIOS DOS AMIGOS COM ROLAGEM LIMITADA */
+.amigo-comments-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 250px; 
+    overflow-y: auto; 
+    padding-right: 8px; 
+}
+.amigo-recent-comment {
+    background: rgba(0,0,0,0.2);
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 3px solid var(--cor-principal);
+}
+.amigo-recent-comment p {
+    margin: 8px 0;
+    font-size: 14px;
+    font-style: italic;
+}
+
+
+/* --- PERFIL --- */
 .profile-pic-container {
   position: relative;
   width: 100px;
@@ -875,7 +1090,61 @@ h1 {
   opacity: 1;
 }
 
-/* --- ESTILOS DO TOGGLE SWITCH (NOVO) --- */
+/* --- ESTILO DO BOTÃO DE TEMA E TEMA CLARO --- */
+#theme-toggle-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--cor-texto-secundario);
+    font-size: 14px;
+    margin-bottom: 15px; 
+    padding: 0 5px;
+}
+
+body.light-theme {
+  --cor-fundo: #f4f4f9;
+  --cor-card: #bed5c1;
+  --cor-texto: #111111;
+  --cor-texto-secundario: #555555;
+  background-image: radial-gradient(circle at center, transparent 40%, rgba(0, 0, 0, 0.08) 120%);
+}
+
+body.light-theme #side-menu { background: #ffffff; }
+body.light-theme .menu-nav-button { background: #eaeaea; color: #111; }
+body.light-theme .menu-nav-button:hover { background: #d4d4d4; }
+body.light-theme #search-box, 
+body.light-theme .login-input { background: #fff; border: 1px solid #aaa; color: #111; }
+body.light-theme #tag-dropdown-content { background-color: #fff; border: 1px solid #ddd; }
+body.light-theme .dropdown-tag { color: #111; }
+body.light-theme .dropdown-tag:hover { background-color: #f0f0f0; }
+body.light-theme .tag, 
+body.light-theme .amigo-tab-btn { background: #e0e0e0; color: #333; }
+body.light-theme .tag:hover, 
+body.light-theme .amigo-tab-btn:hover { background: #ccc; }
+body.light-theme .tag.active, 
+body.light-theme .amigo-tab-btn.active { background: var(--cor-principal); color: white; }
+body.light-theme .modal-button { background: #e0e0e0; color: #222; }
+body.light-theme .modal-button:hover { background: #ccc; }
+body.light-theme .modal-button.active { background: var(--cor-principal); color: white; }
+body.light-theme .watched-counter-menu { background-color: #eaeaea; }
+body.light-theme #login-box { background: #ffffff; }
+body.light-theme #logout-btn { background: #dcdcdc; }
+body.light-theme #logout-btn:hover { background: #c7c7c7; }
+body.light-theme .sidebar-poster-container img { border: 0px solid #fff; }
+body.light-theme .section-subtitle { border-bottom-color: rgba(0,0,0,0.1); }
+body.light-theme #comment-input { background-color: #fff; border-color: #ccc; color: #111; }
+body.light-theme .comment-bubble, body.light-theme .amigo-recent-comment { background: rgba(0,0,0,0.05); }
+
+body.light-theme #modal-bg.details-sidebar::-webkit-scrollbar-thumb,
+body.light-theme .amigo-comments-container::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+body.light-theme #modal-bg.details-sidebar::-webkit-scrollbar-thumb:hover,
+body.light-theme .amigo-comments-container::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+/* --- TOGGLE SWITCH --- */
 .switch {
   position: relative;
   display: inline-block;
@@ -925,14 +1194,262 @@ input:checked + .slider:before {
 
 body.noscroll {
   overflow: hidden;
-  /* Opcional: para evitar que o conteúdo pule quando a barra de rolagem some */
-  padding-right: 15px; /* Ajuste este valor se necessário */
+  padding-right: 15px; 
 }
 
-/* Garante que o menu lateral tenha sua própria rolagem */
-#side-menu {
-  /* Adicione ou modifique estas propriedades no seu seletor #side-menu existente */
-  max-height: 100vh; /* A altura máxima do menu é a altura da tela */
-  overflow-y: auto;  /* Adiciona uma barra de rolagem vertical APENAS se o conteúdo do menu for maior que a tela */
-  overflow-x: hidden;/* Esconde a rolagem horizontal */
+
+/* --- RESPONSIVIDADE MOBILE --- */
+@media (max-width: 768px) {
+
+  #app-container {
+    padding: 20px 15px 15px 15px; 
+  }
+  #filmes-display-area {
+    padding: 0; 
+  }
+  .section-title {
+    font-size: 20px; 
+    margin-left: 0; 
+    text-align: left;
+  }
+  .dynamic-title {
+     font-size: 16px; 
+     text-align: center !important; 
+  }
+
+  .main-header {
+    padding: 8px 15px; 
+    gap: 10px;
+  }
+  .header-left h1 {
+    font-size: 28px; 
+  }
+
+  .header-center {
+   flex-grow: 1; 
+   display: flex;
+   flex-wrap: wrap; 
+   align-items: center; 
+   gap: 8px; 
+   min-width: 0; 
+  }
+  .header-center-top-row { 
+    display: flex;
+    align-items: center;
+    gap: 10px; 
+    width: 100%; 
+    overflow-x: auto; 
+    padding-bottom: 5px; 
+  }
+  .header-center-top-row::-webkit-scrollbar { display: none; }
+  .header-center-top-row { -ms-overflow-style: none; scrollbar-width: none; }
+
+  #fixed-tags-container {
+    display: flex;
+    gap: 10px;
+  }
+  #fixed-tags-container.search-active {
+    display: none;
+  }
+
+  #dropdown-container {
+    flex-shrink: 0; 
+  }
+
+  #tag-dropdown-content {
+    position: absolute; 
+    left: 0; 
+    top: 100%; 
+    z-index: 1050; 
+    display: none; 
+    margin-top: 5px; 
+  }
+  #tag-dropdown-content.show {
+    display: block;
+  }
+
+  #active-filters-separator {
+    display: none; 
+  }
+
+  #selected-tags-container {
+    display: flex;
+    gap: 8px; 
+    width: 100%; 
+    overflow-x: auto; 
+    padding-bottom: 5px; 
+  }
+  #selected-tags-container::-webkit-scrollbar { display: none; }
+  #selected-tags-container { -ms-overflow-style: none; scrollbar-width: none; }
+
+  #search-wrapper.show {
+    width: calc(100% - 110px); 
+    position: static; 
+    transform: none;
+    flex-grow: 1; 
+    order: 0; 
+  }
+  #search-box {
+      font-size: 13px;
+      padding: 8px 10px;
+  }
+  .header-right {
+      gap: 10px; 
+      flex-shrink: 0; 
+  }
+  #search-toggle {
+      font-size: 20px;
+      order: 1; 
+  }
+  #hamburger-menu {
+      font-size: 22px;
+      order: 2; 
+  }
+
+  #side-menu {
+    width: 260px; 
+    right: -280px; 
+    padding: 15px;
+  }
+  #side-menu.open { right: 0; }
+  .profile-pic { width: 70px; height: 70px; }
+  .profile-name { font-size: 16px; }
+  .menu-nav-button { padding: 10px; font-size: 14px; }
+
+  #destaque-container {
+    height: 280px; 
+    margin-bottom: 20px;
+  }
+  #destaque-container::after {
+     background: linear-gradient(to top, rgba(0,0,0,0.9) 10%, rgba(0,0,0,0.0) 70%); 
+  }
+  .destaque-info {
+    max-width: 95%; 
+    padding: 15px;
+    margin-top: auto; 
+    text-align: center;
+  }
+  .destaque-info h2 {
+    font-size: 22px; 
+    margin-bottom: 10px;
+  }
+  .destaque-info p {
+    display: none; 
+  }
+  .destaque-info a {
+       padding: 8px 15px; 
+       font-size: 13px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); 
+    gap: 10px; 
+  }
+  .linha-horizontal {
+    gap: 8px; 
+    margin-bottom: 20px;
+  }
+
+  .card img {
+    height: 160px; 
+  }
+  .card .synopsis {
+      display: none; 
+  }
+  .card h3 {
+      font-size: 13px; 
+      margin: 8px 0 5px; 
+      -webkit-line-clamp: 2; 
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+  }
+  .card .card-content {
+      padding: 0 8px 8px 8px; 
+  }
+  .card-stars-display { display: none; } 
+
+  .card-mini {
+    width: 90px; 
+  }
+  .card-mini img {
+    height: 130px; 
+  }
+  .card-mini h3 {
+    font-size: 11px; 
+  }
+  .card-base .favorite-heart {
+      width: 24px; height: 24px; font-size: 14px; top: 5px; right: 5px;
+  }
+
+  /* --- ADAPTAÇÃO DA NOVA SIDEBAR (DETALHES) PARA MOBILE --- */
+  #modal-bg.details-sidebar.open {
+      width: 100vw;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 2000;
+  }
+  #modal-content.sidebar-content {
+      width: 100vw;
+      min-width: 100vw;
+  }
+  .sidebar-poster-container {
+      padding: 20px 20px 10px 20px;
+  }
+  .sidebar-poster-container img {
+      width: 45%; 
+      max-width: 150px;
+  }
+  .sidebar-details-container {
+      padding: 15px;
+  }
+
+  .modal-title-container {
+       margin-bottom: 10px;
+       gap: 10px;
+  }
+  .modal-title-container h2 {
+    font-size: 18px; 
+  }
+  .modal-actions {
+       margin-bottom: 15px;
+       gap: 6px; 
+  }
+  #modal-info, #modal-sinopse, .modal-button {
+    font-size: 12px; 
+  }
+  #modal-sinopse {
+       line-height: 1.4; 
+       margin-bottom: 15px;
+  }
+  .modal-button {
+      padding: 6px 10px; 
+  }
+  .star-rating {
+       font-size: 18px; 
+       margin-bottom: 10px;
+  }
+  #gallery-image-container {
+        grid-template-columns: 1fr 1fr; 
+        gap: 8px;
+  }
+
+  .amigo-card { padding: 10px; }
+  .amigo-profile-info { gap: 10px; align-items: flex-start; margin-bottom: 10px;}
+  .amigo-profile-pic { width: 50px; height: 50px; }
+  .amigo-name { font-size: 16px; }
+  .amigo-watched-count { font-size: 11px; }
+  .amigo-list-selector { gap: 6px; margin-bottom: 8px; padding-bottom: 8px; }
+  .amigo-tab-btn { padding: 5px 10px; font-size: 12px; }
+
+  #login-box {
+      width: 90%; 
+      max-width: 320px; 
+      margin: 0 auto; 
+      padding: 20px; 
+      box-sizing: border-box; 
+  }
+
 }

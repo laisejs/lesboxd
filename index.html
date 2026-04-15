@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>🌷</title>
+  <title>LESBOXD</title>
+  <link rel="icon" type="image/png" href="lily.png">
   <link rel="stylesheet" href="style.css">
   <link rel="manifest" href="/manifest.json">
     <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.service-worker.register('/sw.js')
+        navigator.serviceWorker.register('/sw.js')
           .then(registration => {
             console.log('Service Worker registrado com sucesso:', registration.scope);
           })
@@ -35,7 +36,6 @@
     </div>
   </div>
 
-
   <div id="menu-overlay"></div>
   <aside id="side-menu">
     <button id="close-menu">×</button>
@@ -54,6 +54,13 @@
       <button class="menu-nav-button" id="show-amigos-btn">Amigos</button>
     </nav>
     <div class="side-menu-bottom">
+        <div id="theme-toggle-container">
+            <label for="theme-toggle">Tema Claro ☀️</label>
+            <label class="switch">
+                <input type="checkbox" id="theme-toggle">
+                <span class="slider round"></span>
+            </label>
+        </div>
         <div id="visibility-toggle-container">
             <label for="visibility-toggle">Perfil Público 👁️</label>
             <label class="switch">
@@ -65,11 +72,57 @@
     </div>
   </aside>
 
-  <main id="main-content">
-    <div id="app-container">
+  <div id="layout-container">
+    
+    <aside id="modal-bg" class="details-sidebar">
+      <div id="modal-content" class="sidebar-content">
+        <button id="modal-close">×</button>
+        
+        <div class="modal-left sidebar-poster-container">
+          <img id="modal-poster" src="" alt="Pôster do filme">
+        </div>
+        
+        <div class="modal-right sidebar-details-container">
+          <div id="modal-details-view">
+            <div class="modal-title-container">
+              <h2 id="modal-title"></h2>
+              <div id="modal-duration-dots"></div>
+            </div>
+            <div class="modal-actions">
+              <button id="modal-fav-btn" class="modal-button">Favoritar</button>
+              <button id="modal-watch-btn" class="modal-button">Assistido</button>
+              <button id="modal-want-btn" class="modal-button">+</button>
+            </div>
+            <div id="modal-stars" class="star-rating"></div>
+            <p id="modal-info"></p>
+            <p id="modal-sinopse"></p>
+            
+            <div id="inline-gallery-container" style="display: none; margin-bottom: 25px;">
+               <h3 class="section-subtitle">Galeria</h3>
+               <div id="gallery-image-container"></div>
+            </div>
+
+            <a id="modal-youtube-link" href="#" target="_blank" class="modal-button" style="margin-bottom: 30px;">Assistir Trailer</a>
+
+            <div id="comments-section">
+                <h3 class="section-subtitle">Comentários</h3>
+                <div class="comment-input-area">
+                    <textarea id="comment-input" placeholder="O que você achou deste filme?"></textarea>
+                    <button id="submit-comment-btn">Publicar</button>
+                </div>
+                <div id="comments-list">
+                    </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <main id="main-content">
       <header class="main-header" id="main-header">
         <div class="header-left">
-          <h1 id="main-title">🌷</h1>
+          <img id="main-title" src="lily.png" alt="lily" height="60">
         </div>
         <div class="header-center">
             <div id="fixed-tags-container">
@@ -87,62 +140,32 @@
             <div id="search-wrapper">
                 <input type="text" id="search-box" placeholder="Pesquise por título, elenco..." />
             </div>
-            <button id="search-toggle" title="Buscar">🔍</button>
+            <button id="search-toggle" title="Buscar">
+            <img src="lupa.png" alt="Ícone de Pesquisa">
+            </button>
             <button id="hamburger-menu" title="Menu">☰</button>
         </div>
       </header>
 
-      <div id="destaque-container" style="display: none;">
-      </div>
-    
-      <div class="watched-counter" id="watched-counter" style="display:none;"></div>
-
-      <div id="filmes-display-area">
-      </div>
-    </div>
-  </main>
-
-  <div id="modal-bg">
-    <div id="modal-content">
-      <button id="modal-close">×</button>
-      <div class="modal-left">
-        <img id="modal-poster" src="" alt="Pôster do filme">
-      </div>
-      <div class="modal-right">
-        <div id="modal-details-view">
-          <div class="modal-title-container">
-            <h2 id="modal-title"></h2>
-            <div id="modal-duration-dots"></div>
-          </div>
-          <div class="modal-actions">
-            <button id="modal-fav-btn" class="modal-button">Favoritar</button>
-            <button id="modal-watch-btn" class="modal-button">Assistido</button>
-            <button id="modal-want-btn" class="modal-button">+</button>
-            <button id="modal-gallery-btn" class="modal-button">Galeria</button>
-          </div>
-          <div id="modal-stars" class="star-rating"></div>
-          <p id="modal-info"></p>
-          <p id="modal-sinopse"></p>
-          <a id="modal-youtube-link" href="#" target="_blank" class="modal-button">Assistir Trailer</a>
+      <div id="app-container">
+        <div id="destaque-container" style="display: none;">
         </div>
-        <div id="modal-gallery-view" style="display: none;">
-          <h2>Galeria</h2>
-          <div id="gallery-image-container"></div>
-          <button id="modal-back-btn" class="modal-button">Voltar aos Detalhes</button>
+      
+        <div class="watched-counter" id="watched-counter" style="display:none;"></div>
+
+        <div id="filmes-display-area">
         </div>
       </div>
-    </div>
+    </main>
+
   </div>
 
   <script type="module">
-    // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-analytics.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
     import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
-
-    // Your web app's Firebase configuration
     const firebaseConfig = {
         apiKey: "AIzaSyAb2eewnWnHU3xN3Pxio-Hy55SDz_W3zfI",
         authDomain: "saficos-b5494.firebaseapp.com",
@@ -153,21 +176,13 @@
         measurementId: "G-SVVS0C0C9V"
     };
 
-
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const analytics = getAnalytics(app);
     const auth = getAuth();
     const db = getFirestore();
 
-    // =================================================================================
-    // --- BANCO DE DADOS E ESTADO GLOBAL ---
-    // =================================================================================
-    let filmes = []; // Esta variável será preenchida com os dados do JSON
+    let filmes = []; 
 
-    // =================================================================================
-    // --- REFERÊNCIAS DOS ELEMENTOS DO DOM ---
-    // =================================================================================
     const dom = {
       auth: {
           section: document.getElementById('auth-section'),
@@ -209,7 +224,8 @@
         profilePic: document.getElementById('profile-pic-element'),
         profilePicEditBtn: document.getElementById('profile-pic-edit-btn'),
         watchedCounter: document.getElementById('side-menu-watched-counter'),
-        visibilityToggle: document.getElementById('visibility-toggle')
+        visibilityToggle: document.getElementById('visibility-toggle'),
+        themeToggle: document.getElementById('theme-toggle')
       },
       modal: {
         bg: document.getElementById("modal-bg"),
@@ -226,20 +242,20 @@
         wantBtn: document.getElementById("modal-want-btn"),
         stars: document.getElementById("modal-stars"),
         youtubeLink: document.getElementById("modal-youtube-link"),
-        galleryBtn: document.getElementById("modal-gallery-btn"),
-        galleryView: document.getElementById("modal-gallery-view"),
+        inlineGalleryWrapper: document.getElementById("inline-gallery-container"),
         galleryContainer: document.getElementById("gallery-image-container"),
-        backBtn: document.getElementById("modal-back-btn")
+        commentsSection: document.getElementById("comments-section"),
+        commentInput: document.getElementById("comment-input"),
+        submitCommentBtn: document.getElementById("submit-comment-btn"),
+        commentsList: document.getElementById("comments-list")
       }
     };
-    // =================================================================================
-    // --- GERENCIAMENTO DE ESTADO E FIREBASE ---
-    // =================================================================================
+
     let currentBaseFilter = 'Todos';
     let activeTags = new Set();
     let currentView = 'home';
     let userDocRef;
-    let userData = { favoritos: [], assistidos: [], quero: [], estrelas: {}, isPublic: false };
+    let userData = { favoritos: [], assistidos: [], quero: [], estrelas: {}, comentarios: [], isPublic: false };
 
     function syncFilmesWithUserData() {
         filmes = filmes.map(filme => ({
@@ -251,11 +267,6 @@
         }));
     }
 
-
-    // =================================================================================
-    // --- FUNÇÕES DE RENDERIZAÇÃO E LAYOUT (CRIAÇÃO DA UI) ---
-    // =================================================================================
-
     function shuffleArray(array) {
       const shuffled = [...array];
       for (let i = shuffled.length - 1; i > 0; i--) {
@@ -265,7 +276,6 @@
       return shuffled;
     }
 
-    /** Função principal que decide o que renderizar com base no estado atual */
     function render() {
       if (currentView === 'grid') {
         dom.destaque.style.display = 'none';
@@ -344,8 +354,8 @@
     function mostrarFilmesGrid(lista) {
       currentView = 'grid';
       dom.destaque.style.display = 'none';
-      dom.displayArea.innerHTML = ""; // Limpa a área antes de adicionar
-      dom.displayArea.className = 'grid-container'; // Usa um container para o título e a grid
+      dom.displayArea.innerHTML = ""; 
+      dom.displayArea.className = 'grid-container'; 
 
       const grid = document.createElement('div');
       grid.className = 'grid';
@@ -355,10 +365,9 @@
       } else {
         lista.forEach(filme => grid.appendChild(createCard(filme, 'grid')));
       }
-      dom.displayArea.appendChild(grid); // Adiciona a grid ao container
+      dom.displayArea.appendChild(grid); 
     }
 
-    // ===== FUNÇÃO "mostrarAmigos" ATUALIZADA =====
     async function mostrarAmigos() {
         currentView = 'amigos';
         dom.destaque.style.display = 'none';
@@ -371,6 +380,7 @@
             const usuariosPublicos = [];
             querySnapshot.forEach((doc) => {
                 const data = doc.data();
+                data.uid = doc.id; // Garante que o ID fique salvo na variável para usarmos depois
                 if (data.isPublic) {
                     usuariosPublicos.push(data);
                 }
@@ -393,6 +403,7 @@
                 const filmesFavoritos = mapTitlesToFilmes(amigoData.favoritos);
                 const filmesAssistidos = mapTitlesToFilmes(amigoData.assistidos);
                 const filmesQuero = mapTitlesToFilmes(amigoData.quero);
+                const comentarios = amigoData.comentarios || [];
 
                 amigoCard.innerHTML = `
                     <div class="amigo-profile-info">
@@ -406,6 +417,7 @@
                         <button class="amigo-tab-btn active" data-list="favoritos">Favoritos</button>
                         <button class="amigo-tab-btn" data-list="assistidos">Assistidos</button>
                         <button class="amigo-tab-btn" data-list="quero">Quero Assistir</button>
+                        <button class="amigo-tab-btn" data-list="comentarios">Comentários</button>
                     </div>`;
 
                 const createListContainer = (listName, filmList) => {
@@ -426,13 +438,49 @@
                 const favContainer = createListContainer('favoritos', filmesFavoritos);
                 const watchedContainer = createListContainer('assistidos', filmesAssistidos);
                 const wantContainer = createListContainer('quero', filmesQuero);
+                
+                const commentsContainer = document.createElement('div');
+                commentsContainer.className = 'amigo-film-list-container amigo-comments-container';
+                commentsContainer.dataset.list = 'comentarios';
+                
+                if (comentarios.length > 0) {
+                    const sortedComments = [...comentarios].sort((a,b) => b.timestamp - a.timestamp);
+                    sortedComments.forEach(c => {
+                         const rating = (amigoData.estrelas && amigoData.estrelas[c.filme]) ? amigoData.estrelas[c.filme] : 0;
+                         const isOwner = amigoData.uid === auth.currentUser.uid;
+                         const deleteBtnHtml = isOwner ? `<button class="delete-comment-btn" title="Excluir">🗑️</button>` : '';
+
+                         const div = document.createElement('div');
+                         div.className = 'amigo-recent-comment';
+                         div.innerHTML = `
+                             <div class="comment-header">
+                                <strong style="color: var(--cor-principal); font-size: 16px;">${c.filme}</strong>
+                                <span class="comment-stars">${createStarsHTML(rating)}</span>
+                                ${deleteBtnHtml}
+                             </div>
+                             <p>"${c.texto}"</p>
+                             <span class="comment-date">${new Date(c.timestamp).toLocaleDateString('pt-BR')}</span>
+                         `;
+                         
+                         // Vincula o evento de deletar
+                         if (isOwner) {
+                             div.querySelector('.delete-comment-btn').onclick = () => deletarComentario(c.timestamp, c.filme);
+                         }
+
+                         commentsContainer.appendChild(div);
+                    });
+                } else {
+                    commentsContainer.innerHTML = `<p class="no-items-message">Nenhum comentário ainda.</p>`;
+                }
 
                 watchedContainer.style.display = 'none';
                 wantContainer.style.display = 'none';
+                commentsContainer.style.display = 'none';
 
                 amigoCard.appendChild(favContainer);
                 amigoCard.appendChild(watchedContainer);
                 amigoCard.appendChild(wantContainer);
+                amigoCard.appendChild(commentsContainer);
                 amigosContainer.appendChild(amigoCard);
             });
             dom.displayArea.appendChild(amigosContainer);
@@ -445,7 +493,7 @@
                     card.querySelectorAll('.amigo-tab-btn').forEach(btn => btn.classList.remove('active'));
                     targetButton.classList.add('active');
                     card.querySelectorAll('.amigo-film-list-container').forEach(c => c.style.display = 'none');
-                    card.querySelector(`.amigo-film-list-container[data-list="${listToShow}"]`).style.display = 'block';
+                    card.querySelector(`.amigo-film-list-container[data-list="${listToShow}"]`).style.display = 'flex';
                 });
             });
 
@@ -454,7 +502,6 @@
             dom.displayArea.innerHTML += '<p>Ocorreu um erro ao carregar a lista de amigos.</p>';
         }
     }
-    // ===== FIM DA FUNÇÃO ATUALIZADA =====
 
     function createDurationDotsHTML(screentime) {
       if (!screentime) return '';
@@ -511,10 +558,6 @@
         };
         return card;
     }
-
-    // =================================================================================
-    // --- MANIPULADORES DE EVENTOS E LÓGICA DE FILTROS ---
-    // =================================================================================
 
     function popularTags() {
         dom.tags.fixedContainer.innerHTML = '';
@@ -622,6 +665,7 @@
         activeTags.clear();
         updateTagUI();
     }
+
     async function toggleFavorite(titulo) {
       const idx = userData.favoritos.indexOf(titulo);
       if (idx >= 0) userData.favoritos.splice(idx, 1);
@@ -629,7 +673,7 @@
       await updateDoc(userDocRef, { favoritos: userData.favoritos });
       syncFilmesWithUserData();
       const index = filmes.findIndex(f => f.titulo === titulo);
-      if (dom.modal.bg.style.display === "flex") updateModalButtons(index);
+      if (dom.modal.bg.classList.contains("open")) updateModalButtons(index);
       render();
     }
     
@@ -641,7 +685,7 @@
       syncFilmesWithUserData();
       updateWatchedCounters(); 
       const index = filmes.findIndex(f => f.titulo === titulo);
-      if (dom.modal.bg.style.display === "flex") updateModalButtons(index);
+      if (dom.modal.bg.classList.contains("open")) updateModalButtons(index);
       render();
     }
 
@@ -652,7 +696,7 @@
       await updateDoc(userDocRef, { quero: userData.quero });
       syncFilmesWithUserData();
       const index = filmes.findIndex(f => f.titulo === titulo);
-      if (dom.modal.bg.style.display === "flex") updateModalButtons(index);
+      if (dom.modal.bg.classList.contains("open")) updateModalButtons(index);
       render();
     }
 
@@ -662,23 +706,136 @@
       await updateDoc(userDocRef, { estrelas: userData.estrelas });
       syncFilmesWithUserData();
       const index = filmes.findIndex(f => f.titulo === titulo);
-      if (dom.modal.bg.style.display === "flex") renderStarsInModal(index);
+      if (dom.modal.bg.classList.contains("open")) {
+          renderStarsInModal(index);
+          renderCommentsForMovie(titulo); 
+      }
       render();
     }
 
+    // --- LÓGICA DE COMENTÁRIOS E EXCLUSÃO ---
+    async function adicionarComentario(titulo) {
+        const texto = dom.modal.commentInput.value.trim();
+        if(!texto) return;
 
-// Substitua as duas funções antigas por estas:
-function openSideMenu() { 
-  dom.sideMenu.menu.classList.add('open'); 
-  dom.sideMenu.overlay.style.display = 'block'; 
-  document.body.classList.add('noscroll'); // <-- Adicione esta linha
-}
+        if (!userData.comentarios) userData.comentarios = [];
+        
+        const novoComentario = {
+            filme: titulo,
+            texto: texto,
+            timestamp: Date.now()
+        };
+        
+        userData.comentarios.push(novoComentario);
+        
+        try {
+            await updateDoc(userDocRef, { comentarios: userData.comentarios });
+            dom.modal.commentInput.value = ''; 
+            renderCommentsForMovie(titulo); 
+        } catch(e) {
+            console.error("Erro ao salvar comentário", e);
+            alert("Erro ao publicar comentário.");
+        }
+    }
 
-function closeSideMenu() { 
-  dom.sideMenu.menu.classList.remove('open'); 
-  dom.sideMenu.overlay.style.display = 'none'; 
-  document.body.classList.remove('noscroll'); // <-- Adicione esta linha
-}
+    async function deletarComentario(timestamp, titulo) {
+        if(!confirm("Tem certeza que deseja excluir este comentário?")) return;
+        
+        userData.comentarios = userData.comentarios.filter(c => c.timestamp !== timestamp);
+        
+        try {
+            await updateDoc(userDocRef, { comentarios: userData.comentarios });
+            
+            // Recarrega na interface que estiver aberta
+            if (dom.modal.bg.classList.contains("open")) {
+                renderCommentsForMovie(titulo); 
+            }
+            if (currentView === 'amigos') {
+                mostrarAmigos();
+            }
+        } catch(e) {
+            console.error("Erro ao deletar comentário", e);
+            alert("Erro ao excluir comentário.");
+        }
+    }
+
+    async function renderCommentsForMovie(titulo) {
+        dom.modal.commentsList.innerHTML = '<p style="color:#888; font-size: 13px;">Carregando comentários...</p>';
+        try {
+            const querySnapshot = await getDocs(collection(db, "usuarios"));
+            let todosComentarios = [];
+
+            querySnapshot.forEach(doc => {
+                const data = doc.data();
+                if (data.isPublic || doc.id === auth.currentUser.uid) {
+                    const userComments = data.comentarios || [];
+                    const userRating = (data.estrelas && data.estrelas[titulo]) ? data.estrelas[titulo] : 0;
+                    const movieComments = userComments.filter(c => c.filme === titulo);
+
+                    movieComments.forEach(c => {
+                        todosComentarios.push({
+                            uid: doc.id, // Usado para saber quem é o dono
+                            nome: data.apelido || "Anônimo",
+                            foto: data.foto || "https://i.pinimg.com/736x/27/fd/95/27fd95d3bf879bf965f3d1da751d8c84.jpg",
+                            texto: c.texto,
+                            timestamp: c.timestamp,
+                            rating: userRating
+                        });
+                    });
+                }
+            });
+
+            todosComentarios.sort((a, b) => b.timestamp - a.timestamp);
+
+            dom.modal.commentsList.innerHTML = '';
+            if(todosComentarios.length === 0) {
+                dom.modal.commentsList.innerHTML = '<p style="color:#888; font-size: 13px; font-style: italic;">Ninguém comentou sobre este filme ainda. Seja o primeiro!</p>';
+            } else {
+                todosComentarios.forEach(c => {
+                    const div = document.createElement('div');
+                    div.className = 'comment-bubble';
+                    
+                    const isOwner = c.uid === auth.currentUser.uid;
+                    const deleteBtnHtml = isOwner ? `<button class="delete-comment-btn" title="Excluir">🗑️</button>` : '';
+
+                    div.innerHTML = `
+                        <img src="${c.foto}" class="comment-pic">
+                        <div class="comment-content">
+                            <div class="comment-header">
+                                <strong>${c.nome}</strong>
+                                <span class="comment-stars">${createStarsHTML(c.rating)}</span>
+                                ${deleteBtnHtml}
+                            </div>
+                            <p>${c.texto}</p>
+                            <span class="comment-date">${new Date(c.timestamp).toLocaleDateString('pt-BR')}</span>
+                        </div>
+                    `;
+                    
+                    if (isOwner) {
+                        div.querySelector('.delete-comment-btn').onclick = () => deletarComentario(c.timestamp, titulo);
+                    }
+
+                    dom.modal.commentsList.appendChild(div);
+                });
+            }
+        } catch(e) {
+            console.error("Erro ao carregar comentários:", e);
+            dom.modal.commentsList.innerHTML = '<p style="color:red; font-size: 13px;">Erro ao carregar os comentários.</p>';
+        }
+    }
+
+
+    function openSideMenu() { 
+      dom.sideMenu.menu.classList.add('open'); 
+      dom.sideMenu.overlay.style.display = 'block'; 
+      document.body.classList.add('noscroll'); 
+    }
+
+    function closeSideMenu() { 
+      dom.sideMenu.menu.classList.remove('open'); 
+      dom.sideMenu.overlay.style.display = 'none'; 
+      document.body.classList.remove('noscroll'); 
+    }
     
     function ocultarContador() {
         const counter = document.getElementById('watched-counter');
@@ -699,10 +856,6 @@ function closeSideMenu() {
             mainCounter.textContent = text;
         }
     }
-    
-    // =================================================================================
-    // --- FUNÇÕES PARA FILTRAGEM DINÂMICA ---
-    // =================================================================================
 
     function createClickableFilterHTML(type, data, joiner = ', ') {
         if (!data) return '';
@@ -745,27 +898,18 @@ function closeSideMenu() {
         
         mostrarFilmesGrid(filteredList);
         
-        // Prepend a title to the display area
         const title = document.createElement('h2');
         title.className = 'section-title dynamic-title';
         let typeDisplay = type.charAt(0).toUpperCase() + type.slice(1);
         title.textContent = `Exibindo por ${typeDisplay}: ${value}`;
         
-        // Add title before the grid
         dom.displayArea.prepend(title);
-
         ocultarContador();
     }
-
-    // =================================================================================
-    // --- FUNÇÕES DO MODAL ---
-    // =================================================================================
 
     function abrirModal(index) {
       syncFilmesWithUserData();
       const f = filmes[index];
-      dom.modal.detailsView.style.display = 'block';
-      dom.modal.galleryView.style.display = 'none';
       dom.modal.poster.src = f.imagem;
       dom.modal.title.textContent = f.titulo;
       dom.modal.modalDurationDots.innerHTML = createDurationDotsHTML(f.screentime);
@@ -783,16 +927,31 @@ function closeSideMenu() {
       dom.modal.youtubeLink.style.display = f.youtubeLink ? 'inline-block' : 'none';
       if(f.youtubeLink) dom.modal.youtubeLink.href = f.youtubeLink;
 
+      // PREENCHER A GALERIA INLINE 
       const hasImages = f.galleryImages && f.galleryImages.length > 0;
-      dom.modal.galleryBtn.style.display = hasImages ? 'inline-block' : 'none';
-      if(hasImages) dom.modal.galleryBtn.onclick = () => showGallery(f.galleryImages);
+      if(hasImages) {
+        dom.modal.inlineGalleryWrapper.style.display = 'block';
+        dom.modal.galleryContainer.innerHTML = '';
+        f.galleryImages.forEach(imgUrl => {
+            const img = document.createElement('img');
+            img.src = imgUrl;
+            dom.modal.galleryContainer.appendChild(img);
+        });
+      } else {
+        dom.modal.inlineGalleryWrapper.style.display = 'none';
+      }
 
       dom.modal.favBtn.onclick = () => toggleFavorite(f.titulo);
       dom.modal.watchBtn.onclick = () => toggleAssistido(f.titulo);
       dom.modal.wantBtn.onclick = () => toggleQueroAssistir(f.titulo);
 
       renderStarsInModal(index);
-      dom.modal.bg.style.display = "flex";
+
+      dom.modal.commentInput.value = ''; 
+      dom.modal.submitCommentBtn.onclick = () => adicionarComentario(f.titulo);
+      renderCommentsForMovie(f.titulo); 
+      
+      dom.modal.bg.classList.add("open");
       dom.modal.closeBtn.focus();
     }
 
@@ -804,22 +963,6 @@ function closeSideMenu() {
       dom.modal.watchBtn.textContent = f.assistido ? 'Assistido' : 'Marcar como assistido';
       dom.modal.wantBtn.classList.toggle('active', f.queroAssistir);
       dom.modal.wantBtn.textContent = f.queroAssistir ? 'Na Lista' : '+';
-    }
-
-    function showGallery(images) {
-      dom.modal.detailsView.style.display = 'none';
-      dom.modal.galleryView.style.display = 'block';
-      dom.modal.galleryContainer.innerHTML = '';
-      images.forEach(imgUrl => {
-        const img = document.createElement('img');
-        img.src = imgUrl;
-        dom.modal.galleryContainer.appendChild(img);
-      });
-    }
-
-    function showDetailsFromGallery() {
-      dom.modal.detailsView.style.display = 'block';
-      dom.modal.galleryView.style.display = 'none';
     }
 
     function renderStarsInModal(index) {
@@ -836,12 +979,8 @@ function closeSideMenu() {
     }
     
     function fecharModal() {
-      dom.modal.bg.style.display = "none";
+      dom.modal.bg.classList.remove("open");
     }
-
-    // =================================================================================
-    // --- AUTENTICAÇÃO E LÓGICA PRINCIPAL ---
-    // =================================================================================
 
     function init() {
       dom.main.style.display = "block";
@@ -850,7 +989,6 @@ function closeSideMenu() {
       popularTags();
       mostrarTelaInicial();
 
-      // Event Listeners Globais
       dom.search.box.addEventListener("input", () => applyAllFilters());
       dom.title.addEventListener('click', () => { dom.search.box.value = ""; ocultarContador(); mostrarTelaInicial(); });
 
@@ -863,9 +1001,10 @@ function closeSideMenu() {
       });
       
       dom.modal.closeBtn.addEventListener("click", fecharModal);
-      dom.modal.bg.addEventListener("click", (e) => { if(e.target === dom.modal.bg) fecharModal(); });
-      document.addEventListener("keydown", (e) => { if(e.key === "Escape" && dom.modal.bg.style.display === "flex") fecharModal(); });
-      dom.modal.backBtn.addEventListener('click', showDetailsFromGallery);
+      
+      document.addEventListener("keydown", (e) => { 
+          if(e.key === "Escape" && dom.modal.bg.classList.contains("open")) fecharModal(); 
+      });
 
       dom.sideMenu.openBtn.addEventListener('click', openSideMenu);
       dom.sideMenu.closeBtn.addEventListener('click', closeSideMenu);
@@ -912,9 +1051,24 @@ function closeSideMenu() {
       
       dom.sideMenu.favBtn.addEventListener("click", ocultarContador);
       dom.sideMenu.wantBtn.addEventListener("click", ocultarContador);
+
+      const savedTheme = localStorage.getItem('saficos_theme');
+      if (savedTheme === 'light') {
+          document.body.classList.add('light-theme');
+          dom.sideMenu.themeToggle.checked = true;
+      }
+
+      dom.sideMenu.themeToggle.addEventListener('change', (e) => {
+          if (e.target.checked) {
+              document.body.classList.add('light-theme');
+              localStorage.setItem('saficos_theme', 'light');
+          } else {
+              document.body.classList.remove('light-theme');
+              localStorage.setItem('saficos_theme', 'dark');
+          }
+      });
     }
 
-    // Auth listeners
     dom.auth.loginBtn.onclick = async () => {
       dom.auth.errorDisplay.textContent = '';
       try {
@@ -941,6 +1095,7 @@ function closeSideMenu() {
           assistidos: [],
           quero: [],
           estrelas: {},
+          comentarios: [], 
           apelido: "Novo Usuário",
           foto: "https://i.pinimg.com/736x/27/fd/95/27fd95d3bf879bf965f3d1da751d8c84.jpg",
           isPublic: false
@@ -1005,12 +1160,13 @@ function closeSideMenu() {
         const docSnap = await getDoc(userDocRef);
         if (docSnap.exists()) {
           userData = docSnap.data();
+          if (!userData.comentarios) userData.comentarios = []; 
           if (userData.foto) dom.sideMenu.profilePic.src = userData.foto;
           if (userData.apelido) dom.sideMenu.profileName.textContent = userData.apelido;
           dom.sideMenu.visibilityToggle.checked = !!userData.isPublic; 
 
         } else {
-          userData = { favoritos: [], assistidos: [], quero: [], estrelas: {}, apelido: "Novo Usuário", foto: "https://i.pinimg.com/736x/27/fd/95/27fd95d3bf879bf965f3d1da751d8c84.jpg", isPublic: false };
+          userData = { favoritos: [], assistidos: [], quero: [], estrelas: {}, comentarios: [], apelido: "Novo Usuário", foto: "https://i.pinimg.com/736x/27/fd/95/27fd95d3bf879bf965f3d1da751d8c84.jpg", isPublic: false };
           await setDoc(userDocRef, userData);
           dom.sideMenu.visibilityToggle.checked = false;
         }
@@ -1030,7 +1186,7 @@ function closeSideMenu() {
       } else {
         dom.main.style.display = 'none';
         dom.auth.section.style.display = 'flex';
-        userData = { favoritos: [], assistidos: [], quero: [], estrelas: {}, isPublic: false };
+        userData = { favoritos: [], assistidos: [], quero: [], estrelas: {}, comentarios: [], isPublic: false };
       }
     });
 
