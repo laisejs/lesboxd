@@ -1134,6 +1134,14 @@ body.light-theme .sidebar-poster-container img { border: 0px solid #fff; }
 body.light-theme .section-subtitle { border-bottom-color: rgba(0,0,0,0.1); }
 body.light-theme #comment-input { background-color: #fff; border-color: #ccc; color: #111; }
 body.light-theme .comment-bubble, body.light-theme .amigo-recent-comment { background: rgba(0,0,0,0.05); }
+/* --- TROCA DE ÍCONES NO TEMA CLARO --- */
+body.light-theme #main-title {
+    content: url("lily-light.png");
+}
+
+body.light-theme #search-toggle img {
+    content: url("lupa-light.png");
+}
 
 body.light-theme #modal-bg.details-sidebar::-webkit-scrollbar-thumb,
 body.light-theme .amigo-comments-container::-webkit-scrollbar-thumb {

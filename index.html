@@ -55,14 +55,14 @@
     </nav>
     <div class="side-menu-bottom">
         <div id="theme-toggle-container">
-            <label for="theme-toggle">Tema Claro ☀️</label>
+            <label for="theme-toggle">Tema Claro </label>
             <label class="switch">
                 <input type="checkbox" id="theme-toggle">
                 <span class="slider round"></span>
             </label>
         </div>
         <div id="visibility-toggle-container">
-            <label for="visibility-toggle">Perfil Público 👁️</label>
+            <label for="visibility-toggle">Perfil Público </label>
             <label class="switch">
                 <input type="checkbox" id="visibility-toggle">
                 <span class="slider round"></span>
@@ -107,7 +107,7 @@
             <div id="comments-section">
                 <h3 class="section-subtitle">Comentários</h3>
                 <div class="comment-input-area">
-                    <textarea id="comment-input" placeholder="O que você achou deste filme?"></textarea>
+                    <textarea id="comment-input" placeholder="Dê sua opinião."></textarea>
                     <button id="submit-comment-btn">Publicar</button>
                 </div>
                 <div id="comments-list">
@@ -789,7 +789,7 @@
 
             dom.modal.commentsList.innerHTML = '';
             if(todosComentarios.length === 0) {
-                dom.modal.commentsList.innerHTML = '<p style="color:#888; font-size: 13px; font-style: italic;">Ninguém comentou sobre este filme ainda. Seja o primeiro!</p>';
+                dom.modal.commentsList.innerHTML = '<p style="color:#888; font-size: 13px; font-style: italic;">Ninguém comentou sobre ainda. Seja a primeira!</p>';
             } else {
                 todosComentarios.forEach(c => {
                     const div = document.createElement('div');
