@@ -1733,7 +1733,7 @@ body.noscroll {
      text-align: center !important; 
   }
 
-  /* --- CABEÇALHO (Botões com mais espaço do topo) --- */
+  /* --- CABEÇALHO --- */
   .main-header {
     padding: 15px 12px 8px 12px; 
     gap: 8px;
@@ -1812,18 +1812,15 @@ body.noscroll {
   #selected-tags-container::-webkit-scrollbar { display: none; }
   #selected-tags-container { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* Esconde o bloco de tags quando a barra de pesquisa estiver com a classe .show */
+  /* Esconde o bloco de tags quando a barra de pesquisa estiver aberta */
   .main-header:has(#search-wrapper.show) .header-center {
       display: none;
   }
-
-  /* Permite que o lado direito (onde está a lupa) cresça para ocupar o espaço que sobrou */
   .main-header:has(#search-wrapper.show) .header-right {
       flex-grow: 1;
   }
-
   #search-wrapper.show {
-      width: 100%; /* Agora ocupa 100% do espaço livre */
+      width: 100%; 
       position: static; 
       transform: none;
       flex-grow: 1; 
@@ -1930,21 +1927,36 @@ body.noscroll {
   }
 
   /* --- ADAPTAÇÃO DA NOVA SIDEBAR (DETALHES E CHAT) PARA MOBILE --- */
+  
+  /* Usa 'fixed' e '100%' para evitar vazamentos e zoom no Android */
   #modal-bg.details-sidebar.open,
   #chat-sidebar.details-sidebar.open {
-      width: 100vw;
-      max-width: 100vw;
-      position: absolute;
+      width: 100%;
+      height: 100%;
+      position: fixed;
       top: 0;
       left: 0;
       z-index: 2000;
+      overflow: hidden; 
   }
   
   .sidebar-content {
-      width: 100vw !important;
-      max-width: 100vw !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      height: 100%;
       box-sizing: border-box;
       overflow-x: hidden;
+      overflow-y: auto; /* Permite rolar apenas dentro do painel */
+  }
+
+  /* Botões de fechar (X) fixados no topo independentes da rolagem */
+  #modal-close,
+  #chat-close {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      z-index: 2050;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5); /* Destaca o botão para ser fácil de ver */
   }
   
   .sidebar-poster-container {
@@ -1989,8 +2001,6 @@ body.noscroll {
   }
 
   /* --- SEÇÃO AMIGOS --- */
-  
-  /* Pódio menor */
   .podium-wrapper { gap: 8px; margin: 15px 0; }
   .step-1 .podium-pic { width: 50px; height: 50px; } 
   .podium-pic { width: 38px; height: 38px; } 
@@ -2022,7 +2032,6 @@ body.noscroll {
     height: 18px;
   }
 
-  /* Botões da aba amigos bem juntos */
   .amigo-list-selector { 
       display: flex;
       flex-wrap: nowrap; 
@@ -2052,21 +2061,25 @@ body.noscroll {
   
   .ajuda-card { padding: 15px; }
   
-/* --- AJUSTES DO CHAT NO CELULAR --- */
+  /* --- AJUSTES DO CHAT NO CELULAR --- */
+  
+  /* Garante que a área de input não seja empurrada para fora da tela */
   .chat-input-area {
       width: 100%;
-      box-sizing: border-box;
       padding: 10px;
+      box-sizing: border-box;
+      flex-shrink: 0; /* Impede a área de esmagar/encolher no mobile */
   }
   .chat-input-area textarea {
+      font-size: 16px !important; 
       height: 45px;
       padding: 12px 15px;
-      font-size: 16px !important; /* PREVINE O ZOOM NO IPHONE/IOS */
   }
   #send-chat-btn {
       width: 45px;
       height: 45px;
       font-size: 16px;
+      flex-shrink: 0;
   }
   .floating-chat-btn {
       width: 50px;
@@ -2075,13 +2088,4 @@ body.noscroll {
       bottom: 20px;
       right: 20px;
   }
-  
-  /* Ajuste Pódio Celular */
-  .podium-wrapper { gap: 5px; }
-  .step-1 .podium-pic { width: 60px; height: 60px; }
-  .podium-pic { width: 45px; height: 45px; }
-  .step-1 .podium-bar { height: 90px; }
-  .step-2 .podium-bar { height: 60px; }
-  .step-3 .podium-bar { height: 40px; }
-
 }
