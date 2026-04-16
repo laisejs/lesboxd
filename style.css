@@ -1723,29 +1723,29 @@ body.noscroll {
   #app-container {
     padding: 20px 15px 15px 15px; 
   }
-  #filmes-display-area {
-    padding: 0; 
-  }
+  
   .section-title {
-    font-size: 20px; 
-    margin-left: 0; 
-    text-align: left;
+    font-size: 18px; 
+    margin-bottom: 15px;
   }
   .dynamic-title {
      font-size: 16px; 
      text-align: center !important; 
   }
 
-  /* --- CABEÇALHO BEM MENOR --- */
+  /* --- CABEÇALHO (Botões com mais espaço do topo) --- */
   .main-header {
-    padding: 5px 10px; /* Reduzido o espaço interno */
+    padding: 15px 12px 8px 12px; 
     gap: 8px;
+    align-items: center;
   }
+  
   .header-left h1 {
-    font-size: 20px; /* Reduzido */
+    font-size: 20px; 
   }
+  
   #main-title {
-    height: 35px !important; /* Reduz a altura da Logo (a imagem da Lily) */
+    height: 30px !important; 
   }
 
   .header-center {
@@ -1753,9 +1753,10 @@ body.noscroll {
    display: flex;
    flex-wrap: wrap; 
    align-items: center; 
-   gap: 6px; 
+   gap: 5px; 
    min-width: 0; 
   }
+  
   .header-center-top-row { 
     display: flex;
     align-items: center;
@@ -1767,10 +1768,10 @@ body.noscroll {
   .header-center-top-row::-webkit-scrollbar { display: none; }
   .header-center-top-row { -ms-overflow-style: none; scrollbar-width: none; }
 
-  /* Opções clicáveis (Tags) reduzidas */
+  /* Tags e botões de filtro menores */
   .tag, .base-tag, #tag-dropdown-btn {
-    font-size: 12px !important; 
-    padding: 5px 10px !important; 
+    font-size: 11px !important; 
+    padding: 4px 8px !important; 
   }
 
   #fixed-tags-container {
@@ -1823,7 +1824,7 @@ body.noscroll {
       padding: 8px 10px;
   }
   
-  /* Ícones reduzidos */
+  /* Ícones da Direita */
   .header-right {
       gap: 10px; 
       flex-shrink: 0; 
@@ -1832,12 +1833,13 @@ body.noscroll {
       order: 1; 
   }
   #search-toggle img {
-      width: 22px; /* Lupa menor */
-      height: 22px;
+    width: 20px; 
+    height: 20px;
   }
   #hamburger-menu {
-      font-size: 20px; /* Menu hambúrguer menor */
-      order: 2; 
+    font-size: 18px;
+    margin-top: -2px; 
+    order: 2; 
   }
 
   #side-menu {
@@ -1874,9 +1876,10 @@ body.noscroll {
        font-size: 13px;
   }
 
+  /* Grid de Filmes */
   .grid {
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); 
-    gap: 10px; 
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 8px;
   }
   .linha-horizontal {
     gap: 8px; 
@@ -1884,13 +1887,13 @@ body.noscroll {
   }
 
   .card img {
-    height: 160px; 
+    height: 150px; 
   }
   .card .synopsis {
       display: none; 
   }
   .card h3 {
-      font-size: 13px; 
+      font-size: 12px; 
       margin: 8px 0 5px; 
       -webkit-line-clamp: 2; 
       overflow: hidden;
@@ -1920,18 +1923,16 @@ body.noscroll {
   #modal-bg.details-sidebar.open,
   #chat-sidebar.details-sidebar.open {
       width: 100vw;
+      max-width: 100vw;
       position: absolute;
       top: 0;
       left: 0;
       z-index: 2000;
   }
   
-  /* Corrige vazamento lateral (scroll horizontal) */
-  #modal-content.sidebar-content,
-  #chat-sidebar .sidebar-content {
-      width: 100vw;
-      min-width: 100vw;
-      max-width: 100vw;
+  .sidebar-content {
+      width: 100vw !important;
+      max-width: 100vw !important;
       box-sizing: border-box;
       overflow-x: hidden;
   }
@@ -1977,29 +1978,58 @@ body.noscroll {
         gap: 8px;
   }
 
-  /* --- ABA AMIGOS (Botões na mesma linha) --- */
+  /* --- SEÇÃO AMIGOS --- */
+  
+  /* Pódio menor */
+  .podium-wrapper { gap: 8px; margin: 15px 0; }
+  .step-1 .podium-pic { width: 50px; height: 50px; } 
+  .podium-pic { width: 38px; height: 38px; } 
+  .podium-medal { font-size: 18px; top: -12px; }
+  .podium-flag { width: 14px; height: 14px; }
+  .podium-name { font-size: 11px; }
+  .podium-bar span { font-size: 9px; }
+  .step-1 .podium-bar { height: 90px; }
+  .step-2 .podium-bar { height: 60px; }
+  .step-3 .podium-bar { height: 40px; }
+
+  /* Lista de Amigos */
   .amigo-card { padding: 10px; }
   .amigo-profile-info { gap: 10px; align-items: flex-start; margin-bottom: 10px;}
-  .amigo-name { font-size: 16px; }
+  .amigo-name { font-size: 15px; }
   .amigo-watched-count { font-size: 11px; }
   
+  .amigo-pic-wrapper {
+    width: 65px; 
+    height: 65px;
+    margin-left: 10px;
+  }
+  .amigo-profile-pic {
+    width: 55px; 
+    height: 55px;
+  }
+  .amigo-flag-badge {
+    width: 18px; 
+    height: 18px;
+  }
+
+  /* Botões da aba amigos bem juntos */
   .amigo-list-selector { 
       display: flex;
       flex-wrap: nowrap; 
-      overflow-x: auto; /* Permite rolar os botões caso a tela seja muito fina */
-      gap: 6px; 
-      margin-bottom: 8px; 
-      padding-bottom: 8px; 
+      overflow-x: auto; 
+      gap: 4px; 
+      margin-bottom: 10px;
+      padding: 0 5px 8px 5px;
       -ms-overflow-style: none; 
       scrollbar-width: none;
   }
   .amigo-list-selector::-webkit-scrollbar { display: none; }
   
   .amigo-tab-btn { 
-      margin: 0 !important; /* Mata a margem esquerda gigante do PC */
-      padding: 5px 8px; 
-      font-size: 11px; 
-      flex-shrink: 0; /* Impede que os botões se espremam demais */
+      margin: 0 !important; 
+      padding: 4px 8px; 
+      font-size: 10px; 
+      flex-shrink: 0;
   }
 
   #login-box {
@@ -2015,13 +2045,13 @@ body.noscroll {
   /* --- AJUSTES DO CHAT NO CELULAR --- */
   .chat-input-area {
       width: 100%;
-      box-sizing: border-box;
       padding: 10px;
+      box-sizing: border-box;
   }
   .chat-input-area textarea {
+      font-size: 16px !important; /* Tamanho 16px impede o zoom automático do iOS */
       height: 45px;
       padding: 12px 15px;
-      font-size: 16px !important; /* PREVINE O ZOOM NO IPHONE/IOS */
   }
   #send-chat-btn {
       width: 45px;
@@ -2035,13 +2065,4 @@ body.noscroll {
       bottom: 20px;
       right: 20px;
   }
-  
-  /* Ajuste Pódio Celular */
-  .podium-wrapper { gap: 5px; }
-  .step-1 .podium-pic { width: 60px; height: 60px; }
-  .podium-pic { width: 45px; height: 45px; }
-  .step-1 .podium-bar { height: 90px; }
-  .step-2 .podium-bar { height: 60px; }
-  .step-3 .podium-bar { height: 40px; }
-
 }
