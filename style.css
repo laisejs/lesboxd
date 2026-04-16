@@ -1812,12 +1812,22 @@ body.noscroll {
   #selected-tags-container::-webkit-scrollbar { display: none; }
   #selected-tags-container { -ms-overflow-style: none; scrollbar-width: none; }
 
+/* Esconde o bloco de tags quando a barra de pesquisa estiver com a classe .show */
+  .main-header:has(#search-wrapper.show) .header-center {
+      display: none;
+  }
+
+  /* Permite que o lado direito (onde está a lupa) cresça para ocupar o espaço que sobrou */
+  .main-header:has(#search-wrapper.show) .header-right {
+      flex-grow: 1;
+  }
+
   #search-wrapper.show {
-    width: calc(100% - 90px); 
-    position: static; 
-    transform: none;
-    flex-grow: 1; 
-    order: 0; 
+      width: 100%; /* Agora ocupa 100% do espaço livre */
+      position: static; 
+      transform: none;
+      flex-grow: 1; 
+      order: 0; 
   }
   #search-box {
       font-size: 13px;
@@ -2042,16 +2052,16 @@ body.noscroll {
   
   .ajuda-card { padding: 15px; }
   
-  /* --- AJUSTES DO CHAT NO CELULAR --- */
+/* --- AJUSTES DO CHAT NO CELULAR --- */
   .chat-input-area {
       width: 100%;
-      padding: 10px;
       box-sizing: border-box;
+      padding: 10px;
   }
   .chat-input-area textarea {
-      font-size: 16px !important; /* Tamanho 16px impede o zoom automático do iOS */
       height: 45px;
       padding: 12px 15px;
+      font-size: 16px !important; /* PREVINE O ZOOM NO IPHONE/IOS */
   }
   #send-chat-btn {
       width: 45px;
@@ -2065,4 +2075,13 @@ body.noscroll {
       bottom: 20px;
       right: 20px;
   }
+  
+  /* Ajuste Pódio Celular */
+  .podium-wrapper { gap: 5px; }
+  .step-1 .podium-pic { width: 60px; height: 60px; }
+  .podium-pic { width: 45px; height: 45px; }
+  .step-1 .podium-bar { height: 90px; }
+  .step-2 .podium-bar { height: 60px; }
+  .step-3 .podium-bar { height: 40px; }
+
 }
