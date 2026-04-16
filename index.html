@@ -43,6 +43,16 @@
       <div class="profile-pic-container">
         <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png" alt="Foto do Perfil" class="profile-pic" id="profile-pic-element">
         <div class="profile-pic-edit-overlay" id="profile-pic-edit-btn">✎</div>
+        
+        <div id="flag-selector">
+            <img id="current-flag-btn" src="lesbica.png" alt="Sua Bandeira" title="Escolher Bandeira">
+            <div id="flag-dropdown">
+                <img src="lesbica.png" class="flag-option" data-flag="lesbica.png" alt="Lésbica">
+                <img src="bi.png" class="flag-option" data-flag="bi.png" alt="Bissexual">
+                <img src="pan.png" class="flag-option" data-flag="pan.png" alt="Pansexual">
+            </div>
+        </div>
+
       </div>
       <h2 class="profile-name" id="profile-name-element" contenteditable="true" spellcheck="false">NOME</h2>
     </div>
@@ -55,14 +65,14 @@
     </nav>
     <div class="side-menu-bottom">
         <div id="theme-toggle-container">
-            <label for="theme-toggle">Tema Claro </label>
+            <label for="theme-toggle">Tema Claro ☀️</label>
             <label class="switch">
                 <input type="checkbox" id="theme-toggle">
                 <span class="slider round"></span>
             </label>
         </div>
         <div id="visibility-toggle-container">
-            <label for="visibility-toggle">Perfil Público </label>
+            <label for="visibility-toggle">Perfil Público 👁️</label>
             <label class="switch">
                 <input type="checkbox" id="visibility-toggle">
                 <span class="slider round"></span>
@@ -107,7 +117,7 @@
             <div id="comments-section">
                 <h3 class="section-subtitle">Comentários</h3>
                 <div class="comment-input-area">
-                    <textarea id="comment-input" placeholder="Dê sua opinião."></textarea>
+                    <textarea id="comment-input" placeholder="O que você achou deste filme?"></textarea>
                     <button id="submit-comment-btn">Publicar</button>
                 </div>
                 <div id="comments-list">
@@ -225,7 +235,11 @@
         profilePicEditBtn: document.getElementById('profile-pic-edit-btn'),
         watchedCounter: document.getElementById('side-menu-watched-counter'),
         visibilityToggle: document.getElementById('visibility-toggle'),
-        themeToggle: document.getElementById('theme-toggle')
+        themeToggle: document.getElementById('theme-toggle'),
+        // Bandeiras
+        profileFlagBtn: document.getElementById('current-flag-btn'),
+        profileFlagDropdown: document.getElementById('flag-dropdown'),
+        flagOptions: document.querySelectorAll('.flag-option')
       },
       modal: {
         bg: document.getElementById("modal-bg"),
@@ -255,7 +269,7 @@
     let activeTags = new Set();
     let currentView = 'home';
     let userDocRef;
-    let userData = { favoritos: [], assistidos: [], quero: [], estrelas: {}, comentarios: [], isPublic: false };
+    let userData = { favoritos: [], assistidos: [], quero: [], estrelas: {}, comentarios: [], bandeira: "", isPublic: false };
 
     function syncFilmesWithUserData() {
         filmes = filmes.map(filme => ({
@@ -380,7 +394,7 @@
             const usuariosPublicos = [];
             querySnapshot.forEach((doc) => {
                 const data = doc.data();
-                data.uid = doc.id; // Garante que o ID fique salvo na variável para usarmos depois
+                data.uid = doc.id; 
                 if (data.isPublic) {
                     usuariosPublicos.push(data);
                 }
@@ -405,9 +419,16 @@
                 const filmesQuero = mapTitlesToFilmes(amigoData.quero);
                 const comentarios = amigoData.comentarios || [];
 
+                // Lógica de UI da Bandeira e Borda para os Amigos
+                const bandeiraHTML = amigoData.bandeira ? `<img src="${amigoData.bandeira}" class="amigo-flag-badge">` : '';
+                const borderClass = amigoData.bandeira ? 'has-border' : '';
+
                 amigoCard.innerHTML = `
                     <div class="amigo-profile-info">
-                        <img src="${amigoData.foto}" alt="Foto de ${amigoData.apelido}" class="amigo-profile-pic">
+                        <div class="amigo-pic-wrapper">
+                            <img src="${amigoData.foto}" alt="Foto de ${amigoData.apelido}" class="amigo-profile-pic ${borderClass}">
+                            ${bandeiraHTML}
+                        </div>
                         <div>
                             <h3 class="amigo-name">${amigoData.apelido}</h3>
                             <p class="amigo-watched-count">${(amigoData.assistidos || []).length} assistidos</p>
@@ -462,7 +483,6 @@
                              <span class="comment-date">${new Date(c.timestamp).toLocaleDateString('pt-BR')}</span>
                          `;
                          
-                         // Vincula o evento de deletar
                          if (isOwner) {
                              div.querySelector('.delete-comment-btn').onclick = () => deletarComentario(c.timestamp, c.filme);
                          }
@@ -746,7 +766,6 @@
         try {
             await updateDoc(userDocRef, { comentarios: userData.comentarios });
             
-            // Recarrega na interface que estiver aberta
             if (dom.modal.bg.classList.contains("open")) {
                 renderCommentsForMovie(titulo); 
             }
@@ -774,9 +793,9 @@
 
                     movieComments.forEach(c => {
                         todosComentarios.push({
-                            uid: doc.id, // Usado para saber quem é o dono
+                            uid: doc.id,
                             nome: data.apelido || "Anônimo",
-                            foto: data.foto || "https://i.pinimg.com/736x/27/fd/95/27fd95d3bf879bf965f3d1da751d8c84.jpg",
+                            foto: data.foto || "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
                             texto: c.texto,
                             timestamp: c.timestamp,
                             rating: userRating
@@ -989,6 +1008,29 @@
       popularTags();
       mostrarTelaInicial();
 
+      // LÓGICA DO SELETOR DE BANDEIRA
+      dom.sideMenu.profileFlagBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          dom.sideMenu.profileFlagDropdown.classList.toggle('show');
+      });
+
+      dom.sideMenu.flagOptions.forEach(opt => {
+          opt.addEventListener('click', async (e) => {
+              const selectedFlag = e.target.dataset.flag;
+              
+              // Atualiza a foto e a borda na interface
+              dom.sideMenu.profileFlagBtn.src = selectedFlag;
+              dom.sideMenu.profilePic.classList.add('has-border');
+              dom.sideMenu.profileFlagDropdown.classList.remove('show');
+
+              // Salva a nova bandeira no Firebase
+              if (userDocRef) {
+                  await updateDoc(userDocRef, { bandeira: selectedFlag });
+                  userData.bandeira = selectedFlag;
+              }
+          });
+      });
+
       dom.search.box.addEventListener("input", () => applyAllFilters());
       dom.title.addEventListener('click', () => { dom.search.box.value = ""; ocultarContador(); mostrarTelaInicial(); });
 
@@ -1021,6 +1063,8 @@
           e.stopPropagation();
           dom.tags.dropdownContent.classList.toggle('show');
       };
+      
+      // Fechar popups e menus ao clicar fora
       document.addEventListener('click', (e) => {
           if (dom.search.wrapper.classList.contains('show') && !dom.header.contains(e.target)) {
               dom.search.wrapper.classList.remove('show');
@@ -1028,7 +1072,11 @@
           if (!dom.tags.dropdownBtn.contains(e.target) && dom.tags.dropdownContent.classList.contains('show')) {
               dom.tags.dropdownContent.classList.remove('show');
           }
+          if (dom.sideMenu.profileFlagBtn && !dom.sideMenu.profileFlagBtn.contains(e.target) && dom.sideMenu.profileFlagDropdown.classList.contains('show')) {
+              dom.sideMenu.profileFlagDropdown.classList.remove('show');
+          }
       });
+      
       const createSideMenuFilterHandler = (baseFilterText) => () => {
         resetFilters();
         currentBaseFilter = baseFilterText;
@@ -1096,8 +1144,9 @@
           quero: [],
           estrelas: {},
           comentarios: [], 
+          bandeira: "", // Campo novo para salvar a bandeira
           apelido: "Novo Usuário",
-          foto: "https://i.pinimg.com/736x/27/fd/95/27fd95d3bf879bf965f3d1da751d8c84.jpg",
+          foto: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
           isPublic: false
         });
       } catch (e) {
@@ -1156,7 +1205,6 @@
             }
         });
 
-
         const docSnap = await getDoc(userDocRef);
         if (docSnap.exists()) {
           userData = docSnap.data();
@@ -1165,10 +1213,21 @@
           if (userData.apelido) dom.sideMenu.profileName.textContent = userData.apelido;
           dom.sideMenu.visibilityToggle.checked = !!userData.isPublic; 
 
+          // Carrega as informações da bandeira se existirem
+          if (userData.bandeira) {
+              dom.sideMenu.profileFlagBtn.src = userData.bandeira;
+              dom.sideMenu.profilePic.classList.add('has-border');
+          } else {
+              dom.sideMenu.profileFlagBtn.src = 'lesbica.png'; // Bandeira padrão inicial
+              dom.sideMenu.profilePic.classList.remove('has-border');
+          }
+
         } else {
-          userData = { favoritos: [], assistidos: [], quero: [], estrelas: {}, comentarios: [], apelido: "Novo Usuário", foto: "https://i.pinimg.com/736x/27/fd/95/27fd95d3bf879bf965f3d1da751d8c84.jpg", isPublic: false };
+          userData = { favoritos: [], assistidos: [], quero: [], estrelas: {}, comentarios: [], bandeira: "", apelido: "Novo Usuário", foto: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png", isPublic: false };
           await setDoc(userDocRef, userData);
           dom.sideMenu.visibilityToggle.checked = false;
+          dom.sideMenu.profileFlagBtn.src = 'lesbica.png';
+          dom.sideMenu.profilePic.classList.remove('has-border');
         }
         
         try {
@@ -1186,7 +1245,7 @@
       } else {
         dom.main.style.display = 'none';
         dom.auth.section.style.display = 'flex';
-        userData = { favoritos: [], assistidos: [], quero: [], estrelas: {}, comentarios: [], isPublic: false };
+        userData = { favoritos: [], assistidos: [], quero: [], estrelas: {}, comentarios: [], bandeira: "", isPublic: false };
       }
     });
 

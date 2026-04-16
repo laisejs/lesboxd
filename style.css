@@ -233,17 +233,6 @@ h1 {
   text-align: center;
   margin-top: 30px;
 }
-.profile-pic {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  object-fit: cover;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-}
-.profile-name {
-  font-size: 22px;
-  margin-top: 15px;
-}
 .watched-counter-menu {
     text-align: center;
     color: var(--cor-texto-secundario);
@@ -548,13 +537,6 @@ h1 {
     align-items: center;
     gap: 20px;
     margin-bottom: 15px;
-}
-.amigo-profile-pic {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-left: 25px; 
 }
 .amigo-name {
     font-size: 24px;
@@ -973,7 +955,7 @@ h1 {
     font-weight: bold;
     transition: background 0.3s;
 }
-#submit-comment-btn:hover { background: #f087d4; }
+#submit-comment-btn:hover { background: #485951; }
 .comment-bubble {
     display: flex;
     gap: 15px;
@@ -1026,12 +1008,11 @@ h1 {
     display: block;
 }
 
-/* NOVO: Botão de Lixeira */
 .delete-comment-btn {
     background: none;
     border: none;
     cursor: pointer;
-    margin-left: auto; /* Joga a lixeira pro canto direito */
+    margin-left: auto; 
     font-size: 14px;
     opacity: 0.6;
     transition: opacity 0.2s, transform 0.2s;
@@ -1064,17 +1045,44 @@ h1 {
 }
 
 
-/* --- PERFIL --- */
+/* =========================================================================
+   PERFIL (Bandeiras, Borda e Edição)
+   ========================================================================= */
 .profile-pic-container {
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 120px; /* Mais largo para caber a borda */
+  height: 120px;
+  margin: 0 auto;
+}
+
+.profile-pic {
   width: 100px;
   height: 100px;
-  margin: 0 auto;
   border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+  transition: all 0.3s ease;
+  box-sizing: content-box; /* IMPORTANTE: Garante que a borda deixe a foto maior */
 }
+
+/* Quando a pessoa escolhe a bandeira, a foto ganha este estilo */
+.profile-pic.has-border {
+  border: 3px solid var(--cor-principal);
+  padding: 4px; /* O espacinho entre a imagem e a borda */
+  background-color: var(--cor-fundo);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.7); /* Sombra abaixo de tudo */
+}
+
 .profile-pic-edit-overlay {
   position: absolute;
-  inset: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100px;
+  height: 100px;
   background: rgba(0,0,0,0.5);
   color: white;
   display: flex;
@@ -1089,6 +1097,110 @@ h1 {
 .profile-pic-container:hover .profile-pic-edit-overlay {
   opacity: 1;
 }
+.profile-name {
+  font-size: 22px;
+  margin-top: 15px;
+}
+
+/* --- SELETOR DE BANDEIRA NO PERFIL --- */
+#flag-selector {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    z-index: 10;
+}
+
+#current-flag-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 3px solid var(--cor-fundo);
+    background-color: #444; 
+    cursor: pointer;
+    object-fit: cover;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+    transition: transform 0.2s;
+    display: block;
+}
+#current-flag-btn:hover {
+    transform: scale(1.1);
+}
+
+#flag-dropdown {
+    display: none;
+    position: absolute;
+    top: 40px;
+    right: -10px;
+    background: var(--cor-card);
+    padding: 8px;
+    border-radius: 20px;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.6);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+#flag-dropdown.show {
+    display: flex;
+    animation: fadeIn 0.2s ease-in-out;
+}
+
+.flag-option {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    cursor: pointer;
+    object-fit: cover;
+    transition: transform 0.2s;
+    border: 2px solid transparent;
+}
+.flag-option:hover {
+    transform: scale(1.2);
+    border-color: var(--cor-principal);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- BANDEIRAS NA ABA AMIGOS --- */
+.amigo-pic-wrapper {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 95px;
+    height: 95px;
+    margin-left: 25px; /* Empurra o bloco inteiro para a direita */
+}
+
+.amigo-profile-pic {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-sizing: content-box;
+}
+
+.amigo-profile-pic.has-border {
+    border: 3px solid var(--cor-principal);
+    padding: 3px;
+    background-color: var(--cor-fundo);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.6);
+}
+
+.amigo-flag-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid var(--cor-card);
+    background-color: #444;
+    object-fit: cover;
+}
+
 
 /* --- ESTILO DO BOTÃO DE TEMA E TEMA CLARO --- */
 #theme-toggle-container {
@@ -1103,9 +1215,9 @@ h1 {
 
 body.light-theme {
   --cor-fundo: #f4f4f9;
-  --cor-card: #bed5c1;
+  --cor-card: #a4b8a6;
   --cor-texto: #111111;
-  --cor-texto-secundario: #555555;
+  --cor-texto-secundario: #3d3d3d;
   background-image: radial-gradient(circle at center, transparent 40%, rgba(0, 0, 0, 0.08) 120%);
 }
 
@@ -1134,6 +1246,14 @@ body.light-theme .sidebar-poster-container img { border: 0px solid #fff; }
 body.light-theme .section-subtitle { border-bottom-color: rgba(0,0,0,0.1); }
 body.light-theme #comment-input { background-color: #fff; border-color: #ccc; color: #111; }
 body.light-theme .comment-bubble, body.light-theme .amigo-recent-comment { background: rgba(0,0,0,0.05); }
+
+/* Cores de Tema Claro para o Perfil e Borda */
+body.light-theme .profile-pic.has-border { background-color: #fff; }
+body.light-theme .amigo-profile-pic.has-border { background-color: #fff; }
+body.light-theme #current-flag-btn { border-color: #fff; }
+body.light-theme .amigo-flag-badge { border-color: #fff; }
+
+
 /* --- TROCA DE ÍCONES NO TEMA CLARO --- */
 body.light-theme #main-title {
     content: url("lily-light.png");
@@ -1320,7 +1440,6 @@ body.noscroll {
     padding: 15px;
   }
   #side-menu.open { right: 0; }
-  .profile-pic { width: 70px; height: 70px; }
   .profile-name { font-size: 16px; }
   .menu-nav-button { padding: 10px; font-size: 14px; }
 
@@ -1446,7 +1565,6 @@ body.noscroll {
 
   .amigo-card { padding: 10px; }
   .amigo-profile-info { gap: 10px; align-items: flex-start; margin-bottom: 10px;}
-  .amigo-profile-pic { width: 50px; height: 50px; }
   .amigo-name { font-size: 16px; }
   .amigo-watched-count { font-size: 11px; }
   .amigo-list-selector { gap: 6px; margin-bottom: 8px; padding-bottom: 8px; }
