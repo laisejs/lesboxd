@@ -52,17 +52,44 @@ input, textarea, [contenteditable="true"] {
     background-color: rgba(255, 255, 255, 0.4); 
 }
 
-/* --- NOTIFICAÇÃO DO CHAT --- */
+/* --- BOTÃO FLUTUANTE DO CHAT --- */
+.floating-chat-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: var(--cor-principal);
+    color: white;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    z-index: 1500;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.3s;
+}
+.floating-chat-btn:hover {
+    transform: scale(1.1);
+}
 #chat-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
     background: #e74c3c;
     color: white;
     border-radius: 50%;
-    padding: 2px 7px;
+    padding: 2px 6px;
     font-size: 12px;
     font-weight: bold;
-    margin-left: auto;
+    border: 2px solid var(--cor-fundo);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-
 
 /* --- LAYOUT WRAPPER E MAIN CONTENT --- */
 #layout-container {
@@ -540,7 +567,95 @@ h1 {
   border-radius: 4px;
 }
 
-/* --- SEÇÃO AMIGOS --- */
+
+/* --- SEÇÃO AMIGOS (PÓDIO E LISTA) --- */
+.amigos-divider {
+    border: 0;
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+    margin: 20px 0;
+    width: 100%;
+}
+
+.podium-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 15px;
+    margin: 30px 0 40px 0;
+}
+.podium-step-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100px;
+}
+.podium-step-container.empty {
+    visibility: hidden;
+}
+.podium-avatar-wrapper {
+    position: relative;
+    margin-bottom: 10px;
+}
+.podium-medal {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 24px;
+    z-index: 5;
+}
+.podium-pic {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    box-sizing: content-box;
+}
+.step-1 .podium-pic { width: 80px; height: 80px; border: 3px solid #ffd700; }
+.step-2 .podium-pic { border: 3px solid #c0c0c0; }
+.step-3 .podium-pic { border: 3px solid #cd7f32; }
+
+.podium-flag {
+    position: absolute;
+    bottom: 0;
+    right: -5px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #444;
+    border: 2px solid var(--cor-fundo);
+}
+.podium-name {
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    margin-bottom: 5px;
+    color: var(--cor-texto);
+}
+.podium-bar {
+    width: 100%;
+    background: var(--cor-principal);
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 10px;
+    color: white;
+    font-weight: bold;
+    font-size: 12px;
+    box-shadow: inset 0 5px 10px rgba(0,0,0,0.2);
+}
+.step-1 .podium-bar { height: 120px; background: linear-gradient(to top, var(--cor-principal), #ffd700); color: #111;}
+.step-2 .podium-bar { height: 80px; background: linear-gradient(to top, var(--cor-principal), #c0c0c0); color: #111;}
+.step-3 .podium-bar { height: 50px; background: linear-gradient(to top, var(--cor-principal), #cd7f32); color: #111;}
+
+
 #amigos-section {
     display: flex;
     flex-direction: column;
@@ -1032,83 +1147,114 @@ h1 {
     transform: scale(1.05);
 }
 
+/* --- CONTAINER PRINCIPAL --- */
 .chat-msg {
     display: flex;
-    gap: 10px;
-    align-items: flex-end;
+    gap: 12px;
+    align-items: flex-start; /* MUDANÇA: Agora tudo se alinha pelo topo */
+    margin-bottom: 15px;
 }
 .chat-msg.own {
     flex-direction: row-reverse;
 }
+
+/* --- COLUNA DA FOTO E NOME --- */
+.chat-user-profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centraliza o nome exatamente embaixo da foto */
+    flex-shrink: 0;
+}
+
 .chat-pic-wrapper {
     position: relative;
     width: 35px;
     height: 35px;
-    flex-shrink: 0;
 }
 .chat-pic {
     width: 100%;
     height: 100%;
     border-radius: 50%;
     object-fit: cover;
-    box-sizing: content-box;
+    box-sizing: border-box;
 }
 .chat-pic.has-border {
     border: 2px solid var(--cor-principal);
     padding: 2px;
-    margin: -4px; 
 }
 .chat-flag {
     position: absolute;
-    top: -4px;
-    right: -4px;
-    width: 14px;
-    height: 14px;
+    top: 0px;
+    right: 0px;
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
-    border: 1px solid var(--cor-card);
+    border: 2px solid var(--cor-card);
     background: #444;
 }
+
+/* Nome embaixo da foto */
+.chat-name {
+    font-size: 11px;
+    color: var(--cor-texto-secundario);
+    margin-top: 6px; /* Distância entre a foto e o nome */
+    white-space: nowrap; /* Evita que nomes grandes quebrem em duas linhas */
+}
+
+/* --- COLUNA DO BALÃO E HORÁRIO --- */
 .chat-bubble-container {
     max-width: 75%;
     display: flex;
     flex-direction: column;
+    align-items: flex-start; /* Balão e hora alinhados à esquerda (outro usuário) */
 }
 .chat-msg.own .chat-bubble-container {
-    align-items: flex-end;
+    align-items: flex-end; /* Balão e hora alinhados à direita (você) */
 }
-.chat-name {
-    font-size: 11px;
-    color: var(--cor-texto-secundario);
-    margin-bottom: 4px;
-    margin-left: 2px;
-}
-.chat-msg.own .chat-name {
-    margin-right: 2px;
-    margin-left: 0;
-}
+
+/* --- BALÃO COM PONTA NO TOPO --- */
 .chat-bubble {
-    background: #444; /* Cor moderna pro balão do outro */
+    background: #444;
     padding: 12px 16px;
-    border-radius: 18px 18px 18px 4px; /* Ponta inferior esquerda reta */
+    /* MUDANÇA: A ponta reta agora é na SUPERIOR ESQUERDA */
+    border-radius: 4px 18px 18px 18px; 
     font-size: 14px;
     line-height: 1.4;
     color: #fff;
     word-wrap: break-word;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2); /* Sombra suave */
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
 .chat-msg.own .chat-bubble {
-    background: var(--cor-principal); /* Cor principal pro seu balão */
-    border-radius: 18px 18px 4px 18px; /* Ponta inferior direita reta */
-    color: #fff;
+    background: var(--cor-principal); 
+    /* MUDANÇA: A ponta reta agora é na SUPERIOR DIREITA */
+    border-radius: 18px 4px 18px 18px; 
 }
+
+/* --- HORÁRIO BEM PEQUENO EMBAIXO --- */
 .chat-time {
-    font-size: 10px;
-    color: #666;
-    margin-top: 4px;
-    margin-left: 2px;
+    font-size: 9px; /* MUDANÇA: Fonte bem menor */
+    color: #888;
+    margin-top: 4px; /* Distância entre o balão e o horário */
 }
 .chat-msg.own .chat-time {
     margin-right: 2px;
+}
+
+.chat-header {
+    text-align: center; /* Centraliza o título e o parágrafo */
+    padding: 20px 15px; /* Adiciona um espaço interno para não ficar colado no topo */
+    border-bottom: 1px solid rgba(255,255,255,0.1); /* Opcional: uma linha fina para separar do chat */
+}
+
+.chat-header h2 {
+    margin: 0; /* Remove margens padrão que podem desalinhá-lo */
+    font-size: 18px;
+}
+
+.chat-header p {
+    margin: 5px 0 0; /* Pequeno espaço acima do subtítulo */
+    font-size: 12px;
+    color: var(--cor-texto-secundario);
 }
 
 
@@ -1493,6 +1639,7 @@ body.light-theme .chat-input-area textarea { background: #fff; border-color: #cc
 body.light-theme .chat-bubble { background: #d4d4d4; color: #111; }
 body.light-theme .chat-msg.own .chat-bubble { background: var(--cor-principal); color: #fff; }
 body.light-theme .chat-pic.has-border { background-color: #fff; }
+body.light-theme #chat-badge { border-color: #f4f4f9; }
 
 /* --- TROCA DE ÍCONES NO TEMA CLARO --- */
 body.light-theme #main-title {
@@ -1589,12 +1736,16 @@ body.noscroll {
      text-align: center !important; 
   }
 
+  /* --- CABEÇALHO BEM MENOR --- */
   .main-header {
-    padding: 8px 15px; 
-    gap: 10px;
+    padding: 5px 10px; /* Reduzido o espaço interno */
+    gap: 8px;
   }
   .header-left h1 {
-    font-size: 28px; 
+    font-size: 20px; /* Reduzido */
+  }
+  #main-title {
+    height: 35px !important; /* Reduz a altura da Logo (a imagem da Lily) */
   }
 
   .header-center {
@@ -1602,13 +1753,13 @@ body.noscroll {
    display: flex;
    flex-wrap: wrap; 
    align-items: center; 
-   gap: 8px; 
+   gap: 6px; 
    min-width: 0; 
   }
   .header-center-top-row { 
     display: flex;
     align-items: center;
-    gap: 10px; 
+    gap: 6px; 
     width: 100%; 
     overflow-x: auto; 
     padding-bottom: 5px; 
@@ -1616,9 +1767,15 @@ body.noscroll {
   .header-center-top-row::-webkit-scrollbar { display: none; }
   .header-center-top-row { -ms-overflow-style: none; scrollbar-width: none; }
 
+  /* Opções clicáveis (Tags) reduzidas */
+  .tag, .base-tag, #tag-dropdown-btn {
+    font-size: 12px !important; 
+    padding: 5px 10px !important; 
+  }
+
   #fixed-tags-container {
     display: flex;
-    gap: 10px;
+    gap: 6px;
   }
   #fixed-tags-container.search-active {
     display: none;
@@ -1655,7 +1812,7 @@ body.noscroll {
   #selected-tags-container { -ms-overflow-style: none; scrollbar-width: none; }
 
   #search-wrapper.show {
-    width: calc(100% - 110px); 
+    width: calc(100% - 90px); 
     position: static; 
     transform: none;
     flex-grow: 1; 
@@ -1665,16 +1822,21 @@ body.noscroll {
       font-size: 13px;
       padding: 8px 10px;
   }
+  
+  /* Ícones reduzidos */
   .header-right {
       gap: 10px; 
       flex-shrink: 0; 
   }
   #search-toggle {
-      font-size: 20px;
       order: 1; 
   }
+  #search-toggle img {
+      width: 22px; /* Lupa menor */
+      height: 22px;
+  }
   #hamburger-menu {
-      font-size: 22px;
+      font-size: 20px; /* Menu hambúrguer menor */
       order: 2; 
   }
 
@@ -1763,11 +1925,17 @@ body.noscroll {
       left: 0;
       z-index: 2000;
   }
+  
+  /* Corrige vazamento lateral (scroll horizontal) */
   #modal-content.sidebar-content,
   #chat-sidebar .sidebar-content {
       width: 100vw;
       min-width: 100vw;
+      max-width: 100vw;
+      box-sizing: border-box;
+      overflow-x: hidden;
   }
+  
   .sidebar-poster-container {
       padding: 20px 20px 10px 20px;
   }
@@ -1809,12 +1977,30 @@ body.noscroll {
         gap: 8px;
   }
 
+  /* --- ABA AMIGOS (Botões na mesma linha) --- */
   .amigo-card { padding: 10px; }
   .amigo-profile-info { gap: 10px; align-items: flex-start; margin-bottom: 10px;}
   .amigo-name { font-size: 16px; }
   .amigo-watched-count { font-size: 11px; }
-  .amigo-list-selector { gap: 6px; margin-bottom: 8px; padding-bottom: 8px; }
-  .amigo-tab-btn { padding: 5px 10px; font-size: 12px; }
+  
+  .amigo-list-selector { 
+      display: flex;
+      flex-wrap: nowrap; 
+      overflow-x: auto; /* Permite rolar os botões caso a tela seja muito fina */
+      gap: 6px; 
+      margin-bottom: 8px; 
+      padding-bottom: 8px; 
+      -ms-overflow-style: none; 
+      scrollbar-width: none;
+  }
+  .amigo-list-selector::-webkit-scrollbar { display: none; }
+  
+  .amigo-tab-btn { 
+      margin: 0 !important; /* Mata a margem esquerda gigante do PC */
+      padding: 5px 8px; 
+      font-size: 11px; 
+      flex-shrink: 0; /* Impede que os botões se espremam demais */
+  }
 
   #login-box {
       width: 90%; 
@@ -1826,15 +2012,36 @@ body.noscroll {
   
   .ajuda-card { padding: 15px; }
   
-  /* Ajustes do Chat no Celular */
+  /* --- AJUSTES DO CHAT NO CELULAR --- */
+  .chat-input-area {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 10px;
+  }
   .chat-input-area textarea {
       height: 45px;
       padding: 12px 15px;
+      font-size: 16px !important; /* PREVINE O ZOOM NO IPHONE/IOS */
   }
   #send-chat-btn {
       width: 45px;
       height: 45px;
       font-size: 16px;
   }
+  .floating-chat-btn {
+      width: 50px;
+      height: 50px;
+      font-size: 20px;
+      bottom: 20px;
+      right: 20px;
+  }
+  
+  /* Ajuste Pódio Celular */
+  .podium-wrapper { gap: 5px; }
+  .step-1 .podium-pic { width: 60px; height: 60px; }
+  .podium-pic { width: 45px; height: 45px; }
+  .step-1 .podium-bar { height: 90px; }
+  .step-2 .podium-bar { height: 60px; }
+  .step-3 .podium-bar { height: 40px; }
 
 }

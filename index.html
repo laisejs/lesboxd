@@ -61,21 +61,19 @@
       <button class="menu-nav-button" id="show-favorites-btn">Favoritos</button>
       <button class="menu-nav-button" id="show-watched-btn">Assistidos</button>
       <button class="menu-nav-button" id="show-want-btn">Quero Assistir</button>
-      <button class="menu-nav-button" id="show-amigos-btn" style="display: flex; align-items: center;">
-          Amigos <span id="chat-badge" style="display:none;">0</span>
-      </button>
-      <button class="menu-nav-button" id="show-help-btn">Ajuda</button>
+      <button class="menu-nav-button" id="show-amigos-btn">Amigos</button>
+      <button class="menu-nav-button" id="show-help-btn">Ajuda ❓</button>
     </nav>
     <div class="side-menu-bottom">
         <div id="theme-toggle-container">
-            <label for="theme-toggle">Tema Claro</label>
+            <label for="theme-toggle">Tema Claro ☀️</label>
             <label class="switch">
                 <input type="checkbox" id="theme-toggle">
                 <span class="slider round"></span>
             </label>
         </div>
         <div id="visibility-toggle-container">
-            <label for="visibility-toggle">Perfil Público</label>
+            <label for="visibility-toggle">Perfil Público 👁️</label>
             <label class="switch">
                 <input type="checkbox" id="visibility-toggle">
                 <span class="slider round"></span>
@@ -84,6 +82,11 @@
         <button id="logout-btn">Sair</button>
     </div>
   </aside>
+
+  <button id="floating-chat-btn" class="floating-chat-btn" title="Chat Global" style="display: none;">
+      💬
+      <span id="chat-badge" style="display:none;">0</span>
+  </button>
 
   <div id="layout-container">
     
@@ -123,8 +126,7 @@
                     <textarea id="comment-input" placeholder="O que você achou deste filme?"></textarea>
                     <button id="submit-comment-btn">Publicar</button>
                 </div>
-                <div id="comments-list">
-                </div>
+                <div id="comments-list"></div>
             </div>
 
           </div>
@@ -135,16 +137,16 @@
     <aside id="chat-sidebar" class="details-sidebar">
       <div class="sidebar-content" style="display: flex; flex-direction: column; height: 100vh; background-color: var(--cor-card);">
         <button id="chat-close">×</button>
-        <div style="padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); flex-shrink: 0;">
-            <h2 style="margin: 0; font-size: 22px;">CHAT GLOBAL</h2>
+        <div class="chat-header">
+            <h2>CHAT GLOBAL</h2>
         </div>
         
         <div id="chat-messages" class="chat-messages-container">
             </div>
 
         <div class="chat-input-area">
-            <textarea id="chat-input" placeholder="Digite sua mensagem..."></textarea>
-            <button id="send-chat-btn">➤</button>
+            <textarea id="chat-input" placeholder="Mensagem..."></textarea>
+            <button id="send-chat-btn" title="Enviar">➤</button>
         </div>
       </div>
     </aside>
@@ -285,6 +287,7 @@
         commentsList: document.getElementById("comments-list")
       },
       chat: {
+        floatingBtn: document.getElementById("floating-chat-btn"),
         sidebar: document.getElementById("chat-sidebar"),
         closeBtn: document.getElementById("chat-close"),
         messagesContainer: document.getElementById("chat-messages"),
@@ -300,7 +303,6 @@
     let userDocRef;
     let userData = { favoritos: [], assistidos: [], quero: [], estrelas: {}, comentarios: [], bandeira: "", isPublic: false };
 
-    // Variáveis Globais para o Chat
     let chatMessages = [];
     let lastReadChatTime = parseInt(localStorage.getItem('saficos_last_read_chat')) || 0;
     let unsubscribeChat = null;
@@ -450,9 +452,9 @@
                 <div class="ajuda-card">
                     <h3>⭐ Avaliações, Comentários e Chat</h3>
                     <ul>
-                        <li><strong>Como dar Nota:</strong> Nos detalhes do filme, clique nas estrelinhas abaixo dos botões (1 a 5 estrelas). Clique novamente na mesma estrela para remover a nota.</li>
+                        <li><strong>Como dar Nota:</strong> Nos detalhes do filme, clique nas estrelinhas abaixo dos botões (1 a 5 estrelas). Ao avaliar um filme, ele é automaticamente marcado como "Assistido"!</li>
                         <li><strong>Como Comentar:</strong> Role os detalhes do filme até a aba "Comentários". Escreva sua opinião e clique em Publicar. Você pode excluir seu próprio comentário clicando na lixeira (🗑️).</li>
-                        <li><strong>Chat Global:</strong> Na aba "Amigos", clique em "💬 Abrir Chat Global" para conversar com todo mundo do site. Uma bolinha vermelha no menu vai te avisar quando tiver mensagens novas!</li>
+                        <li><strong>Chat Global:</strong> Clique no botão flutuante redondo (💬) no canto inferior direito da tela para conversar com todo mundo. Uma bolinha com o número de mensagens não lidas te avisa se tiver novidades!</li>
                     </ul>
                 </div>
             </div>
@@ -466,16 +468,6 @@
         dom.displayArea.className = '';
         ocultarContador();
 
-        // Cabeçalho da área com o botão do Chat Global
-        dom.displayArea.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px;">
-                <h2 class="section-title dynamic-title" style="margin:0;">Amigos</h2>
-                <button id="open-global-chat-btn" class="modal-button" style="background-color: var(--cor-principal); color: white; padding: 10px 20px; font-size: 16px;">CHAT GLOBAL</button>
-            </div>
-        `;
-        
-        document.getElementById('open-global-chat-btn').addEventListener('click', abrirChat);
-
         try {
             const querySnapshot = await getDocs(collection(db, "usuarios"));
             const usuariosPublicos = [];
@@ -488,9 +480,55 @@
             });
 
             if (usuariosPublicos.length === 0) {
-                dom.displayArea.innerHTML += '<p>Nenhum usuário com perfil público encontrado.</p>';
+                dom.displayArea.innerHTML = '<h2 class="section-title dynamic-title">Amigos</h2><p>Nenhum usuário com perfil público encontrado.</p>';
                 return;
             }
+            
+            // Lógica do Pódio
+            const sortedByWatched = [...usuariosPublicos].sort((a,b) => (b.assistidos?.length || 0) - (a.assistidos?.length || 0));
+            const top3 = sortedByWatched.slice(0, 3);
+            
+            let podiumHTML = '';
+            if (top3.length > 0) {
+                const getPodiumUser = (user, rank) => {
+                    if(!user) return `<div class="podium-step-container step-${rank} empty"></div>`;
+                    const count = (user.assistidos || []).length;
+                    const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : '🥉';
+                    const pic = user.foto || 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png';
+                    const flag = user.bandeira ? `<img src="${user.bandeira}" class="podium-flag">` : '';
+                    const borderClass = user.bandeira ? 'has-border' : '';
+                    return `
+                        <div class="podium-step-container step-${rank}">
+                            <div class="podium-avatar-wrapper">
+                                <span class="podium-medal">${medal}</span>
+                                <img src="${pic}" class="podium-pic ${borderClass}">
+                                ${flag}
+                            </div>
+                            <span class="podium-name">${user.apelido}</span>
+                            <div class="podium-bar">
+                                <span class="podium-score">${count} assistidos</span>
+                            </div>
+                        </div>
+                    `;
+                };
+
+                podiumHTML = `
+                    <div class="podium-wrapper">
+                        ${getPodiumUser(top3[1], 2)}
+                        ${getPodiumUser(top3[0], 1)}
+                        ${getPodiumUser(top3[2], 3)}
+                    </div>
+                `;
+            }
+
+            dom.displayArea.innerHTML = `
+                <div class="amigos-header">
+                    <h2 class="section-title dynamic-title" style="margin:0;"></h2>
+                </div>
+                ${podiumHTML}
+                <hr class="amigos-divider">
+                <h2 class="section-title dynamic-title" style="margin-top:20px;">Todos os Amigos</h2>
+            `;
 
             const amigosContainer = document.createElement('div');
             amigosContainer.id = 'amigos-section';
@@ -635,7 +673,7 @@
         const unreadCount = chatMessages.filter(m => m.timestamp > lastReadChatTime).length;
         if (unreadCount > 0) {
             dom.chat.badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
-            dom.chat.badge.style.display = 'inline-block';
+            dom.chat.badge.style.display = 'flex';
         } else {
             dom.chat.badge.style.display = 'none';
         }
@@ -687,20 +725,28 @@
         chatMessages.forEach(m => {
             const isOwn = m.uid === auth.currentUser?.uid;
             const date = new Date(m.timestamp);
-            const timeStr = date.toLocaleDateString('pt-BR') + ' ' + date.getHours().toString().padStart(2, '0') + ':' + date.getMinutes().toString().padStart(2, '0');
+            const dia = date.getDate().toString().padStart(2, '0');
+            const mes = (date.getMonth() + 1).toString().padStart(2, '0');
+            const horas = date.getHours().toString().padStart(2, '0');
+            const minutos = date.getMinutes().toString().padStart(2, '0');
             
+            // Montando o texto final (ex: "16/04 às 15:30")
+            const timeStr = `${dia}/${mes} às ${horas}:${minutos}`;
             const flagHtml = m.bandeira ? `<img src="${m.bandeira}" class="chat-flag">` : '';
             const borderClass = m.bandeira ? 'has-border' : '';
             const bubbleClass = isOwn ? 'chat-msg own' : 'chat-msg';
 
-            const html = `
+const html = `
                 <div class="${bubbleClass}">
-                    <div class="chat-pic-wrapper">
-                        <img src="${m.foto}" class="chat-pic ${borderClass}">
-                        ${flagHtml}
-                    </div>
-                    <div class="chat-bubble-container">
+                    <div class="chat-user-profile">
+                        <div class="chat-pic-wrapper">
+                            <img src="${m.foto}" class="chat-pic ${borderClass}">
+                            ${flagHtml}
+                        </div>
                         <div class="chat-name">${m.nome}</div>
+                    </div>
+                    
+                    <div class="chat-bubble-container">
                         <div class="chat-bubble">${m.texto}</div>
                         <div class="chat-time">${timeStr}</div>
                     </div>
@@ -709,12 +755,10 @@
             dom.chat.messagesContainer.insertAdjacentHTML('beforeend', html);
         });
         
-        // Mantém a barra em baixo se o chat estiver aberto
         if (dom.chat.sidebar.classList.contains('open')) {
             dom.chat.messagesContainer.scrollTop = dom.chat.messagesContainer.scrollHeight;
         }
     }
-
 
     function createDurationDotsHTML(screentime) {
       if (!screentime) return '';
@@ -916,17 +960,32 @@
     async function setUserRating(titulo, rating) {
       const currentRating = userData.estrelas[titulo] || 0;
       userData.estrelas[titulo] = currentRating === rating ? 0 : rating;
-      await updateDoc(userDocRef, { estrelas: userData.estrelas });
+      
+      let marcouComoAssistido = false;
+      let assistidosAtualizados = userData.assistidos;
+
+      // NOVO: Adiciona automaticamente aos assistidos se der uma nota e ainda não estiver
+      if (rating > 0 && !userData.assistidos.includes(titulo)) {
+          assistidosAtualizados.push(titulo);
+          marcouComoAssistido = true;
+      }
+
+      await updateDoc(userDocRef, { 
+          estrelas: userData.estrelas,
+          assistidos: assistidosAtualizados
+      });
+
       syncFilmesWithUserData();
       const index = filmes.findIndex(f => f.titulo === titulo);
       if (dom.modal.bg.classList.contains("open")) {
           renderStarsInModal(index);
+          if(marcouComoAssistido) updateModalButtons(index);
           renderCommentsForMovie(titulo); 
       }
+      if(marcouComoAssistido) updateWatchedCounters();
       render();
     }
 
-    // --- LÓGICA DE COMENTÁRIOS E EXCLUSÃO (Filmes) ---
     async function adicionarComentario(titulo) {
         const texto = dom.modal.commentInput.value.trim();
         if(!texto) return;
@@ -1041,12 +1100,16 @@
       dom.sideMenu.menu.classList.add('open'); 
       dom.sideMenu.overlay.style.display = 'block'; 
       document.body.classList.add('noscroll'); 
+      // Esconde botão flutuante quando menu abre
+      dom.chat.floatingBtn.style.display = 'none';
     }
 
     function closeSideMenu() { 
       dom.sideMenu.menu.classList.remove('open'); 
       dom.sideMenu.overlay.style.display = 'none'; 
       document.body.classList.remove('noscroll'); 
+      // Mostra botão flutuante quando menu fecha
+      if(auth.currentUser) dom.chat.floatingBtn.style.display = 'flex';
     }
     
     function ocultarContador() {
@@ -1120,7 +1183,7 @@
     }
 
     function abrirModal(index) {
-      fecharChat(); // Fecha chat se estiver aberto
+      fecharChat(); 
       syncFilmesWithUserData();
       const f = filmes[index];
       dom.modal.poster.src = f.imagem;
@@ -1201,24 +1264,19 @@
       updateWatchedCounters(); 
       popularTags();
       mostrarTelaInicial();
-
-// --- COLE ESTE BLOCO AQUI PARA O CHAT FUNCIONAR ---
-      // Lógica de clicar no botão enviar
-      dom.chat.sendBtn.addEventListener('click', enviarMensagemChat);
       
-      // Lógica de apertar a tecla "Enter" no teclado para enviar
+      if(auth.currentUser) dom.chat.floatingBtn.style.display = 'flex';
+
+      dom.chat.floatingBtn.addEventListener('click', abrirChat);
+      dom.chat.sendBtn.addEventListener('click', enviarMensagemChat);
       dom.chat.input.addEventListener('keydown', (e) => {
           if(e.key === 'Enter' && !e.shiftKey) {
               e.preventDefault();
               enviarMensagemChat();
           }
       });
-      
-      // Lógica de fechar o chat no "X"
       dom.chat.closeBtn.addEventListener('click', fecharChat);
-      // ------------------------------------------------
 
-      // LÓGICA DO SELETOR DE BANDEIRA
       dom.sideMenu.profileFlagBtn.addEventListener('click', (e) => {
           e.stopPropagation();
           dom.sideMenu.profileFlagDropdown.classList.toggle('show');
@@ -1442,7 +1500,6 @@
           dom.sideMenu.profilePic.classList.remove('has-border');
         }
         
-        // INICIA O OUVINTE DO CHAT GLOBAL
         initChatListener();
         
         try {
@@ -1461,6 +1518,7 @@
         dom.main.style.display = 'none';
         dom.auth.section.style.display = 'flex';
         userData = { favoritos: [], assistidos: [], quero: [], estrelas: {}, comentarios: [], bandeira: "", isPublic: false };
+        if (dom.chat.floatingBtn) dom.chat.floatingBtn.style.display = 'none';
         if (unsubscribeChat) unsubscribeChat();
       }
     });
