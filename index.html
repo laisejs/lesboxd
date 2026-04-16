@@ -61,18 +61,21 @@
       <button class="menu-nav-button" id="show-favorites-btn">Favoritos</button>
       <button class="menu-nav-button" id="show-watched-btn">Assistidos</button>
       <button class="menu-nav-button" id="show-want-btn">Quero Assistir</button>
-      <button class="menu-nav-button" id="show-amigos-btn">Amigos</button>
+      <button class="menu-nav-button" id="show-amigos-btn" style="display: flex; align-items: center;">
+          Amigos <span id="chat-badge" style="display:none;">0</span>
+      </button>
+      <button class="menu-nav-button" id="show-help-btn">Ajuda</button>
     </nav>
     <div class="side-menu-bottom">
         <div id="theme-toggle-container">
-            <label for="theme-toggle">Tema Claro ☀️</label>
+            <label for="theme-toggle">Tema Claro</label>
             <label class="switch">
                 <input type="checkbox" id="theme-toggle">
                 <span class="slider round"></span>
             </label>
         </div>
         <div id="visibility-toggle-container">
-            <label for="visibility-toggle">Perfil Público 👁️</label>
+            <label for="visibility-toggle">Perfil Público</label>
             <label class="switch">
                 <input type="checkbox" id="visibility-toggle">
                 <span class="slider round"></span>
@@ -121,13 +124,31 @@
                     <button id="submit-comment-btn">Publicar</button>
                 </div>
                 <div id="comments-list">
-                    </div>
+                </div>
             </div>
 
           </div>
         </div>
       </div>
     </aside>
+
+    <aside id="chat-sidebar" class="details-sidebar">
+      <div class="sidebar-content" style="display: flex; flex-direction: column; height: 100vh; background-color: var(--cor-card);">
+        <button id="chat-close">×</button>
+        <div style="padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); flex-shrink: 0;">
+            <h2 style="margin: 0; font-size: 22px;">CHAT GLOBAL</h2>
+        </div>
+        
+        <div id="chat-messages" class="chat-messages-container">
+            </div>
+
+        <div class="chat-input-area">
+            <textarea id="chat-input" placeholder="Digite sua mensagem..."></textarea>
+            <button id="send-chat-btn">➤</button>
+        </div>
+      </div>
+    </aside>
+
 
     <main id="main-content">
       <header class="main-header" id="main-header">
@@ -174,7 +195,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-analytics.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyAb2eewnWnHU3xN3Pxio-Hy55SDz_W3zfI",
@@ -229,6 +250,7 @@
         watchBtn: document.getElementById("show-watched-btn"),
         wantBtn: document.getElementById("show-want-btn"),
         amigosBtn: document.getElementById('show-amigos-btn'),
+        helpBtn: document.getElementById('show-help-btn'), 
         logoutBtn: document.getElementById("logout-btn"),
         profileName: document.getElementById('profile-name-element'),
         profilePic: document.getElementById('profile-pic-element'),
@@ -236,7 +258,6 @@
         watchedCounter: document.getElementById('side-menu-watched-counter'),
         visibilityToggle: document.getElementById('visibility-toggle'),
         themeToggle: document.getElementById('theme-toggle'),
-        // Bandeiras
         profileFlagBtn: document.getElementById('current-flag-btn'),
         profileFlagDropdown: document.getElementById('flag-dropdown'),
         flagOptions: document.querySelectorAll('.flag-option')
@@ -262,6 +283,14 @@
         commentInput: document.getElementById("comment-input"),
         submitCommentBtn: document.getElementById("submit-comment-btn"),
         commentsList: document.getElementById("comments-list")
+      },
+      chat: {
+        sidebar: document.getElementById("chat-sidebar"),
+        closeBtn: document.getElementById("chat-close"),
+        messagesContainer: document.getElementById("chat-messages"),
+        input: document.getElementById("chat-input"),
+        sendBtn: document.getElementById("send-chat-btn"),
+        badge: document.getElementById("chat-badge")
       }
     };
 
@@ -270,6 +299,11 @@
     let currentView = 'home';
     let userDocRef;
     let userData = { favoritos: [], assistidos: [], quero: [], estrelas: {}, comentarios: [], bandeira: "", isPublic: false };
+
+    // Variáveis Globais para o Chat
+    let chatMessages = [];
+    let lastReadChatTime = parseInt(localStorage.getItem('saficos_last_read_chat')) || 0;
+    let unsubscribeChat = null;
 
     function syncFilmesWithUserData() {
         filmes = filmes.map(filme => ({
@@ -296,8 +330,9 @@
         applyAllFilters();
       } else if (currentView === 'amigos') {
          mostrarAmigos();
-      }
-      else if (currentView === 'home') {
+      } else if (currentView === 'ajuda') {
+         mostrarAjuda();
+      } else if (currentView === 'home') {
         mostrarTelaInicial();
       }
     }
@@ -382,12 +417,64 @@
       dom.displayArea.appendChild(grid); 
     }
 
+    function mostrarAjuda() {
+        currentView = 'ajuda';
+        dom.destaque.style.display = 'none';
+        dom.displayArea.innerHTML = '';
+        dom.displayArea.className = 'ajuda-wrapper';
+        ocultarContador();
+
+        const ajudaHTML = `
+            <div class="ajuda-container">
+                <h2 class="section-title dynamic-title">Ajuda & Tutoriais</h2>
+                
+                <div class="ajuda-card">
+                    <h3>👤 Perfil e Amigos</h3>
+                    <ul>
+                        <li><strong>Como ser visto na aba Amigos:</strong> Para interagir e ter o seu perfil listado, abra o menu lateral (☰), vá até o final e ative <strong>Perfil Público 👁️</strong>.</li>
+                        <li><strong>Como mudar a foto de perfil:</strong> Abra o menu lateral e clique no ícone de lápis (✎) sobre a sua foto.</li>
+                        <li><strong>Como colar o URL da foto:</strong> Ao clicar no lápis, vá no Google ou Pinterest, clique com o botão direito na foto escolhida e clique em <em>"Copiar endereço da imagem"</em>. Cole esse texto no site.</li>
+                        <li><strong>Como escolher sua bandeira:</strong> Clique no pequeno círculo colado na sua foto de perfil para expandir e escolher a bandeira que te representa. Isso vai adicionar uma borda bonita na sua foto!</li>
+                    </ul>
+                </div>
+
+                <div class="ajuda-card">
+                    <h3>🔍 Pesquisa e Filtros</h3>
+                    <ul>
+                        <li><strong>Filtros por Clique:</strong> Ao abrir os detalhes de um filme, clique no <strong>Ano, País, Plataforma ou Elenco</strong> para filtrar todos os filmes relacionados automaticamente!</li>
+                        <li><strong>Como pesquisar:</strong> Clique na lupa no topo direito para buscar por título, ator ou sinopse.</li>
+                        <li><strong>Como usar as Tags:</strong> Use o menu central lá em cima para filtrar "Séries" ou "Filmes". Clique na setinha para baixo (▼) para escolher gêneros.</li>
+                    </ul>
+                </div>
+
+                <div class="ajuda-card">
+                    <h3>⭐ Avaliações, Comentários e Chat</h3>
+                    <ul>
+                        <li><strong>Como dar Nota:</strong> Nos detalhes do filme, clique nas estrelinhas abaixo dos botões (1 a 5 estrelas). Clique novamente na mesma estrela para remover a nota.</li>
+                        <li><strong>Como Comentar:</strong> Role os detalhes do filme até a aba "Comentários". Escreva sua opinião e clique em Publicar. Você pode excluir seu próprio comentário clicando na lixeira (🗑️).</li>
+                        <li><strong>Chat Global:</strong> Na aba "Amigos", clique em "💬 Abrir Chat Global" para conversar com todo mundo do site. Uma bolinha vermelha no menu vai te avisar quando tiver mensagens novas!</li>
+                    </ul>
+                </div>
+            </div>
+        `;
+        dom.displayArea.innerHTML = ajudaHTML;
+    }
+
     async function mostrarAmigos() {
         currentView = 'amigos';
         dom.destaque.style.display = 'none';
-        dom.displayArea.innerHTML = `<h2 class="section-title dynamic-title">Amigos</h2>`;
         dom.displayArea.className = '';
         ocultarContador();
+
+        // Cabeçalho da área com o botão do Chat Global
+        dom.displayArea.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px;">
+                <h2 class="section-title dynamic-title" style="margin:0;">Amigos</h2>
+                <button id="open-global-chat-btn" class="modal-button" style="background-color: var(--cor-principal); color: white; padding: 10px 20px; font-size: 16px;">CHAT GLOBAL</button>
+            </div>
+        `;
+        
+        document.getElementById('open-global-chat-btn').addEventListener('click', abrirChat);
 
         try {
             const querySnapshot = await getDocs(collection(db, "usuarios"));
@@ -419,7 +506,6 @@
                 const filmesQuero = mapTitlesToFilmes(amigoData.quero);
                 const comentarios = amigoData.comentarios || [];
 
-                // Lógica de UI da Bandeira e Borda para os Amigos
                 const bandeiraHTML = amigoData.bandeira ? `<img src="${amigoData.bandeira}" class="amigo-flag-badge">` : '';
                 const borderClass = amigoData.bandeira ? 'has-border' : '';
 
@@ -522,6 +608,113 @@
             dom.displayArea.innerHTML += '<p>Ocorreu um erro ao carregar a lista de amigos.</p>';
         }
     }
+
+    // --- FUNÇÕES DO CHAT GLOBAL ---
+    function initChatListener() {
+        if (unsubscribeChat) unsubscribeChat();
+        const q = query(collection(db, "mensagens"), orderBy("timestamp", "asc"));
+        
+        unsubscribeChat = onSnapshot(q, (snapshot) => {
+            chatMessages = [];
+            snapshot.forEach((doc) => {
+                chatMessages.push({ id: doc.id, ...doc.data() });
+            });
+            renderChatMessages();
+            updateChatBadge();
+        });
+    }
+
+    function updateChatBadge() {
+        if (dom.chat.sidebar.classList.contains('open')) {
+            lastReadChatTime = Date.now();
+            localStorage.setItem('saficos_last_read_chat', lastReadChatTime);
+            dom.chat.badge.style.display = 'none';
+            return;
+        }
+        
+        const unreadCount = chatMessages.filter(m => m.timestamp > lastReadChatTime).length;
+        if (unreadCount > 0) {
+            dom.chat.badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+            dom.chat.badge.style.display = 'inline-block';
+        } else {
+            dom.chat.badge.style.display = 'none';
+        }
+    }
+
+    function abrirChat() {
+        fecharModal(); 
+        dom.chat.sidebar.classList.add('open');
+        lastReadChatTime = Date.now();
+        localStorage.setItem('saficos_last_read_chat', lastReadChatTime);
+        updateChatBadge();
+        renderChatMessages();
+        
+        setTimeout(() => {
+            dom.chat.messagesContainer.scrollTop = dom.chat.messagesContainer.scrollHeight;
+        }, 100);
+        
+        dom.chat.input.focus();
+    }
+
+    function fecharChat() {
+        dom.chat.sidebar.classList.remove('open');
+        lastReadChatTime = Date.now();
+        localStorage.setItem('saficos_last_read_chat', lastReadChatTime);
+        updateChatBadge();
+    }
+
+    async function enviarMensagemChat() {
+        const texto = dom.chat.input.value.trim();
+        if (!texto) return;
+        
+        dom.chat.input.value = ''; 
+        try {
+            await addDoc(collection(db, "mensagens"), {
+                uid: auth.currentUser.uid,
+                nome: userData.apelido || "Anônimo",
+                foto: userData.foto || "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
+                bandeira: userData.bandeira || "",
+                texto: texto,
+                timestamp: Date.now()
+            });
+        } catch(e) {
+            console.error("Erro ao enviar mensagem no chat:", e);
+        }
+    }
+
+    function renderChatMessages() {
+        dom.chat.messagesContainer.innerHTML = '';
+        chatMessages.forEach(m => {
+            const isOwn = m.uid === auth.currentUser?.uid;
+            const date = new Date(m.timestamp);
+            const timeStr = date.toLocaleDateString('pt-BR') + ' ' + date.getHours().toString().padStart(2, '0') + ':' + date.getMinutes().toString().padStart(2, '0');
+            
+            const flagHtml = m.bandeira ? `<img src="${m.bandeira}" class="chat-flag">` : '';
+            const borderClass = m.bandeira ? 'has-border' : '';
+            const bubbleClass = isOwn ? 'chat-msg own' : 'chat-msg';
+
+            const html = `
+                <div class="${bubbleClass}">
+                    <div class="chat-pic-wrapper">
+                        <img src="${m.foto}" class="chat-pic ${borderClass}">
+                        ${flagHtml}
+                    </div>
+                    <div class="chat-bubble-container">
+                        <div class="chat-name">${m.nome}</div>
+                        <div class="chat-bubble">${m.texto}</div>
+                        <div class="chat-time">${timeStr}</div>
+                    </div>
+                </div>
+            `;
+            dom.chat.messagesContainer.insertAdjacentHTML('beforeend', html);
+        });
+        
+        // Mantém a barra em baixo se o chat estiver aberto
+        if (dom.chat.sidebar.classList.contains('open')) {
+            dom.chat.messagesContainer.scrollTop = dom.chat.messagesContainer.scrollHeight;
+        }
+    }
+
 
     function createDurationDotsHTML(screentime) {
       if (!screentime) return '';
@@ -733,7 +926,7 @@
       render();
     }
 
-    // --- LÓGICA DE COMENTÁRIOS E EXCLUSÃO ---
+    // --- LÓGICA DE COMENTÁRIOS E EXCLUSÃO (Filmes) ---
     async function adicionarComentario(titulo) {
         const texto = dom.modal.commentInput.value.trim();
         if(!texto) return;
@@ -927,6 +1120,7 @@
     }
 
     function abrirModal(index) {
+      fecharChat(); // Fecha chat se estiver aberto
       syncFilmesWithUserData();
       const f = filmes[index];
       dom.modal.poster.src = f.imagem;
@@ -1008,6 +1202,22 @@
       popularTags();
       mostrarTelaInicial();
 
+// --- COLE ESTE BLOCO AQUI PARA O CHAT FUNCIONAR ---
+      // Lógica de clicar no botão enviar
+      dom.chat.sendBtn.addEventListener('click', enviarMensagemChat);
+      
+      // Lógica de apertar a tecla "Enter" no teclado para enviar
+      dom.chat.input.addEventListener('keydown', (e) => {
+          if(e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              enviarMensagemChat();
+          }
+      });
+      
+      // Lógica de fechar o chat no "X"
+      dom.chat.closeBtn.addEventListener('click', fecharChat);
+      // ------------------------------------------------
+
       // LÓGICA DO SELETOR DE BANDEIRA
       dom.sideMenu.profileFlagBtn.addEventListener('click', (e) => {
           e.stopPropagation();
@@ -1017,13 +1227,10 @@
       dom.sideMenu.flagOptions.forEach(opt => {
           opt.addEventListener('click', async (e) => {
               const selectedFlag = e.target.dataset.flag;
-              
-              // Atualiza a foto e a borda na interface
               dom.sideMenu.profileFlagBtn.src = selectedFlag;
               dom.sideMenu.profilePic.classList.add('has-border');
               dom.sideMenu.profileFlagDropdown.classList.remove('show');
 
-              // Salva a nova bandeira no Firebase
               if (userDocRef) {
                   await updateDoc(userDocRef, { bandeira: selectedFlag });
                   userData.bandeira = selectedFlag;
@@ -1045,7 +1252,10 @@
       dom.modal.closeBtn.addEventListener("click", fecharModal);
       
       document.addEventListener("keydown", (e) => { 
-          if(e.key === "Escape" && dom.modal.bg.classList.contains("open")) fecharModal(); 
+          if(e.key === "Escape") {
+              if (dom.modal.bg.classList.contains("open")) fecharModal(); 
+              if (dom.chat.sidebar.classList.contains("open")) fecharChat(); 
+          }
       });
 
       dom.sideMenu.openBtn.addEventListener('click', openSideMenu);
@@ -1064,7 +1274,6 @@
           dom.tags.dropdownContent.classList.toggle('show');
       };
       
-      // Fechar popups e menus ao clicar fora
       document.addEventListener('click', (e) => {
           if (dom.search.wrapper.classList.contains('show') && !dom.header.contains(e.target)) {
               dom.search.wrapper.classList.remove('show');
@@ -1090,6 +1299,10 @@
       dom.sideMenu.wantBtn.onclick = createSideMenuFilterHandler('Quero Assistir');
       dom.sideMenu.amigosBtn.onclick = () => {
           mostrarAmigos();
+          closeSideMenu();
+      };
+      dom.sideMenu.helpBtn.onclick = () => {
+          mostrarAjuda();
           closeSideMenu();
       };
 
@@ -1144,7 +1357,7 @@
           quero: [],
           estrelas: {},
           comentarios: [], 
-          bandeira: "", // Campo novo para salvar a bandeira
+          bandeira: "", 
           apelido: "Novo Usuário",
           foto: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
           isPublic: false
@@ -1213,12 +1426,11 @@
           if (userData.apelido) dom.sideMenu.profileName.textContent = userData.apelido;
           dom.sideMenu.visibilityToggle.checked = !!userData.isPublic; 
 
-          // Carrega as informações da bandeira se existirem
           if (userData.bandeira) {
               dom.sideMenu.profileFlagBtn.src = userData.bandeira;
               dom.sideMenu.profilePic.classList.add('has-border');
           } else {
-              dom.sideMenu.profileFlagBtn.src = 'lesbica.png'; // Bandeira padrão inicial
+              dom.sideMenu.profileFlagBtn.src = 'lesbica.png'; 
               dom.sideMenu.profilePic.classList.remove('has-border');
           }
 
@@ -1229,6 +1441,9 @@
           dom.sideMenu.profileFlagBtn.src = 'lesbica.png';
           dom.sideMenu.profilePic.classList.remove('has-border');
         }
+        
+        // INICIA O OUVINTE DO CHAT GLOBAL
+        initChatListener();
         
         try {
             const response = await fetch('filmes.json');
@@ -1246,6 +1461,7 @@
         dom.main.style.display = 'none';
         dom.auth.section.style.display = 'flex';
         userData = { favoritos: [], assistidos: [], quero: [], estrelas: {}, comentarios: [], bandeira: "", isPublic: false };
+        if (unsubscribeChat) unsubscribeChat();
       }
     });
 

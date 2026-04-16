@@ -27,21 +27,40 @@ input, textarea, [contenteditable="true"] {
 
 /* --- BARRAS DE ROLAGEM MINIMALISTAS --- */
 #modal-bg.details-sidebar::-webkit-scrollbar,
-.amigo-comments-container::-webkit-scrollbar {
+#chat-sidebar.details-sidebar::-webkit-scrollbar,
+.amigo-comments-container::-webkit-scrollbar,
+.chat-messages-container::-webkit-scrollbar {
     width: 6px; 
 }
 #modal-bg.details-sidebar::-webkit-scrollbar-track,
-.amigo-comments-container::-webkit-scrollbar-track {
+#chat-sidebar.details-sidebar::-webkit-scrollbar-track,
+.amigo-comments-container::-webkit-scrollbar-track,
+.chat-messages-container::-webkit-scrollbar-track {
     background: transparent; 
 }
 #modal-bg.details-sidebar::-webkit-scrollbar-thumb,
-.amigo-comments-container::-webkit-scrollbar-thumb {
+#chat-sidebar.details-sidebar::-webkit-scrollbar-thumb,
+.amigo-comments-container::-webkit-scrollbar-thumb,
+.chat-messages-container::-webkit-scrollbar-thumb {
     background-color: rgba(255, 255, 255, 0.2); 
     border-radius: 10px; 
 }
 #modal-bg.details-sidebar::-webkit-scrollbar-thumb:hover,
-.amigo-comments-container::-webkit-scrollbar-thumb:hover {
+#chat-sidebar.details-sidebar::-webkit-scrollbar-thumb:hover,
+.amigo-comments-container::-webkit-scrollbar-thumb:hover,
+.chat-messages-container::-webkit-scrollbar-thumb:hover {
     background-color: rgba(255, 255, 255, 0.4); 
+}
+
+/* --- NOTIFICAÇÃO DO CHAT --- */
+#chat-badge {
+    background: #e74c3c;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 7px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-left: auto;
 }
 
 
@@ -727,7 +746,7 @@ h1 {
 }
 
 /* =========================================================================
-   SIDEBAR LATERAL ESQUERDA PARA DETALHES
+   ABAS LATERAIS (Filme e Chat Global)
    ========================================================================= */
 
 #modal-bg.details-sidebar {
@@ -742,9 +761,26 @@ h1 {
     flex-shrink: 0;
     display: block; 
 }
+#chat-sidebar.details-sidebar {
+    width: 0;
+    height: 100vh;
+    background: var(--cor-card);
+    overflow-y: hidden;
+    overflow-x: hidden;
+    transition: width 0.3s ease;
+    border-right: 1px solid rgba(255,255,255,0.1);
+    z-index: 1000;
+    flex-shrink: 0;
+    display: block; 
+}
 
+/* LARGURA QUANDO ABERTOS NO PC */
 #modal-bg.details-sidebar.open {
     width: 380px;
+    overflow-y: auto;
+}
+#chat-sidebar.details-sidebar.open {
+    width: 500px; /* CHAT FICOU MAIS LARGO NO PC */
     overflow-y: auto;
 }
 
@@ -761,13 +797,28 @@ h1 {
     opacity: 0;
     transition: opacity 0.2s;
 }
+#chat-sidebar .sidebar-content {
+    width: 500px; /* CHAT MAIS LARGO NO PC */
+    min-width: 500px;
+    background: transparent;
+    border-radius: 0;
+    padding: 0;
+    color: var(--cor-texto);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
 
-#modal-bg.details-sidebar.open #modal-content.sidebar-content {
+#modal-bg.details-sidebar.open #modal-content.sidebar-content,
+#chat-sidebar.details-sidebar.open .sidebar-content {
     opacity: 1;
     transition: opacity 0.3s 0.1s;
 }
 
-#modal-close {
+#modal-close,
+#chat-close {
     position: absolute;
     top: 15px;
     right: 15px;
@@ -785,7 +836,8 @@ h1 {
     z-index: 10;
     border: none;
 }
-#modal-close:hover {
+#modal-close:hover,
+#chat-close:hover {
     background: rgba(0,0,0,0.9);
 }
 
@@ -920,7 +972,148 @@ h1 {
 }
 
 /* =========================================================================
-   ESTILIZAÇÃO DOS COMENTÁRIOS E BOTÃO EXCLUIR
+   CHAT GLOBAL (NOVO DESIGN MODERNO)
+   ========================================================================= */
+.chat-messages-container {
+    flex-grow: 1; /* Ocupa todo o espaço vertical disponível */
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.chat-input-area {
+    display: flex;
+    flex-direction: row; /* Alinha horizontalmente */
+    align-items: center;
+    gap: 12px;
+    padding: 15px 20px;
+    background: var(--cor-fundo); /* Fundo mais escuro para a base */
+    border-top: 1px solid rgba(255,255,255,0.05);
+    flex-shrink: 0; /* Impede a área de digitar de encolher */
+}
+.chat-input-area textarea {
+    flex-grow: 1;
+    height: 50px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 25px; /* Formato de pílula */
+    color: var(--cor-texto);
+    padding: 14px 20px;
+    resize: none;
+    box-sizing: border-box;
+    font-family: inherit;
+    font-size: 14px;
+}
+.chat-input-area textarea:focus {
+    outline: none;
+    border-color: var(--cor-principal);
+}
+
+#send-chat-btn {
+    align-self: center;
+    background: var(--cor-principal);
+    color: white;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%; /* Botão perfeitamente redondo */
+    font-size: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.3s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+#send-chat-btn:hover { 
+    background: #485951; 
+    transform: scale(1.05);
+}
+
+.chat-msg {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+}
+.chat-msg.own {
+    flex-direction: row-reverse;
+}
+.chat-pic-wrapper {
+    position: relative;
+    width: 35px;
+    height: 35px;
+    flex-shrink: 0;
+}
+.chat-pic {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    box-sizing: content-box;
+}
+.chat-pic.has-border {
+    border: 2px solid var(--cor-principal);
+    padding: 2px;
+    margin: -4px; 
+}
+.chat-flag {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 1px solid var(--cor-card);
+    background: #444;
+}
+.chat-bubble-container {
+    max-width: 75%;
+    display: flex;
+    flex-direction: column;
+}
+.chat-msg.own .chat-bubble-container {
+    align-items: flex-end;
+}
+.chat-name {
+    font-size: 11px;
+    color: var(--cor-texto-secundario);
+    margin-bottom: 4px;
+    margin-left: 2px;
+}
+.chat-msg.own .chat-name {
+    margin-right: 2px;
+    margin-left: 0;
+}
+.chat-bubble {
+    background: #444; /* Cor moderna pro balão do outro */
+    padding: 12px 16px;
+    border-radius: 18px 18px 18px 4px; /* Ponta inferior esquerda reta */
+    font-size: 14px;
+    line-height: 1.4;
+    color: #fff;
+    word-wrap: break-word;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2); /* Sombra suave */
+}
+.chat-msg.own .chat-bubble {
+    background: var(--cor-principal); /* Cor principal pro seu balão */
+    border-radius: 18px 18px 4px 18px; /* Ponta inferior direita reta */
+    color: #fff;
+}
+.chat-time {
+    font-size: 10px;
+    color: #666;
+    margin-top: 4px;
+    margin-left: 2px;
+}
+.chat-msg.own .chat-time {
+    margin-right: 2px;
+}
+
+
+/* =========================================================================
+   ESTILIZAÇÃO DOS COMENTÁRIOS DE FILME (Aba Lateral Filme)
    ========================================================================= */
 #comments-section {
     margin-top: 10px;
@@ -1053,7 +1246,7 @@ h1 {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 120px; /* Mais largo para caber a borda */
+  width: 120px; 
   height: 120px;
   margin: 0 auto;
 }
@@ -1065,15 +1258,14 @@ h1 {
   object-fit: cover;
   box-shadow: 0 4px 15px rgba(0,0,0,0.4);
   transition: all 0.3s ease;
-  box-sizing: content-box; /* IMPORTANTE: Garante que a borda deixe a foto maior */
+  box-sizing: content-box; 
 }
 
-/* Quando a pessoa escolhe a bandeira, a foto ganha este estilo */
 .profile-pic.has-border {
   border: 3px solid var(--cor-principal);
-  padding: 4px; /* O espacinho entre a imagem e a borda */
+  padding: 4px; 
   background-color: var(--cor-fundo);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.7); /* Sombra abaixo de tudo */
+  box-shadow: 0 8px 25px rgba(0,0,0,0.7); 
 }
 
 .profile-pic-edit-overlay {
@@ -1171,7 +1363,7 @@ h1 {
     align-items: center;
     width: 95px;
     height: 95px;
-    margin-left: 25px; /* Empurra o bloco inteiro para a direita */
+    margin-left: 25px; 
 }
 
 .amigo-profile-pic {
@@ -1199,6 +1391,49 @@ h1 {
     border: 2px solid var(--cor-card);
     background-color: #444;
     object-fit: cover;
+}
+
+/* =========================================================================
+   TELA DE AJUDA & TUTORIAIS
+   ========================================================================= */
+.ajuda-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+.ajuda-container {
+    max-width: 800px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 40px;
+}
+.ajuda-card {
+    background-color: var(--cor-card);
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+.ajuda-card h3 {
+    color: var(--cor-principal);
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 10px;
+}
+.ajuda-card ul {
+    margin: 0;
+    padding-left: 20px;
+}
+.ajuda-card li {
+    margin-bottom: 12px;
+    line-height: 1.6;
+    color: var(--cor-texto-secundario);
+}
+.ajuda-card strong {
+    color: var(--cor-texto);
 }
 
 
@@ -1247,12 +1482,17 @@ body.light-theme .section-subtitle { border-bottom-color: rgba(0,0,0,0.1); }
 body.light-theme #comment-input { background-color: #fff; border-color: #ccc; color: #111; }
 body.light-theme .comment-bubble, body.light-theme .amigo-recent-comment { background: rgba(0,0,0,0.05); }
 
-/* Cores de Tema Claro para o Perfil e Borda */
+/* Cores de Tema Claro para o Perfil, Ajuda, Chat e Borda */
 body.light-theme .profile-pic.has-border { background-color: #fff; }
 body.light-theme .amigo-profile-pic.has-border { background-color: #fff; }
 body.light-theme #current-flag-btn { border-color: #fff; }
-body.light-theme .amigo-flag-badge { border-color: #fff; }
-
+body.light-theme .amigo-flag-badge, body.light-theme .chat-flag { border-color: #fff; }
+body.light-theme .ajuda-card h3 { border-bottom-color: rgba(0,0,0,0.1); }
+body.light-theme .chat-input-area { background: #eaeaea; border-top-color: #ccc; }
+body.light-theme .chat-input-area textarea { background: #fff; border-color: #ccc; color: #111; }
+body.light-theme .chat-bubble { background: #d4d4d4; color: #111; }
+body.light-theme .chat-msg.own .chat-bubble { background: var(--cor-principal); color: #fff; }
+body.light-theme .chat-pic.has-border { background-color: #fff; }
 
 /* --- TROCA DE ÍCONES NO TEMA CLARO --- */
 body.light-theme #main-title {
@@ -1264,11 +1504,15 @@ body.light-theme #search-toggle img {
 }
 
 body.light-theme #modal-bg.details-sidebar::-webkit-scrollbar-thumb,
-body.light-theme .amigo-comments-container::-webkit-scrollbar-thumb {
+body.light-theme #chat-sidebar.details-sidebar::-webkit-scrollbar-thumb,
+body.light-theme .amigo-comments-container::-webkit-scrollbar-thumb,
+body.light-theme .chat-messages-container::-webkit-scrollbar-thumb {
     background-color: rgba(0, 0, 0, 0.2);
 }
 body.light-theme #modal-bg.details-sidebar::-webkit-scrollbar-thumb:hover,
-body.light-theme .amigo-comments-container::-webkit-scrollbar-thumb:hover {
+body.light-theme #chat-sidebar.details-sidebar::-webkit-scrollbar-thumb:hover,
+body.light-theme .amigo-comments-container::-webkit-scrollbar-thumb:hover,
+body.light-theme .chat-messages-container::-webkit-scrollbar-thumb:hover {
     background-color: rgba(0, 0, 0, 0.4);
 }
 
@@ -1510,15 +1754,17 @@ body.noscroll {
       width: 24px; height: 24px; font-size: 14px; top: 5px; right: 5px;
   }
 
-  /* --- ADAPTAÇÃO DA NOVA SIDEBAR (DETALHES) PARA MOBILE --- */
-  #modal-bg.details-sidebar.open {
+  /* --- ADAPTAÇÃO DA NOVA SIDEBAR (DETALHES E CHAT) PARA MOBILE --- */
+  #modal-bg.details-sidebar.open,
+  #chat-sidebar.details-sidebar.open {
       width: 100vw;
       position: absolute;
       top: 0;
       left: 0;
       z-index: 2000;
   }
-  #modal-content.sidebar-content {
+  #modal-content.sidebar-content,
+  #chat-sidebar .sidebar-content {
       width: 100vw;
       min-width: 100vw;
   }
@@ -1576,6 +1822,19 @@ body.noscroll {
       margin: 0 auto; 
       padding: 20px; 
       box-sizing: border-box; 
+  }
+  
+  .ajuda-card { padding: 15px; }
+  
+  /* Ajustes do Chat no Celular */
+  .chat-input-area textarea {
+      height: 45px;
+      padding: 12px 15px;
+  }
+  #send-chat-btn {
+      width: 45px;
+      height: 45px;
+      font-size: 16px;
   }
 
 }
