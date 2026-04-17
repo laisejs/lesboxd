@@ -1812,20 +1812,26 @@ body.noscroll {
   #selected-tags-container::-webkit-scrollbar { display: none; }
   #selected-tags-container { -ms-overflow-style: none; scrollbar-width: none; }
 
-  /* Esconde o bloco de tags quando a barra de pesquisa estiver aberta */
-  .main-header:has(#search-wrapper.show) .header-center {
-      display: none;
-  }
-  .main-header:has(#search-wrapper.show) .header-right {
-      flex-grow: 1;
+  /* CORREÇÃO DA PESQUISA COBRINDO OS BOTÕES */
+  #search-wrapper {
+      pointer-events: none; /* Quando fechada, ela é "fantasma" e não rouba cliques */
   }
   #search-wrapper.show {
+      pointer-events: auto; /* Quando aberta, volta a receber cliques */
       width: 100%; 
       position: static; 
       transform: none;
       flex-grow: 1; 
       order: 0; 
   }
+
+  .main-header:has(#search-wrapper.show) .header-center {
+      display: none;
+  }
+  .main-header:has(#search-wrapper.show) .header-right {
+      flex-grow: 1;
+  }
+
   #search-box {
       font-size: 13px;
       padding: 8px 10px;
@@ -1833,20 +1839,28 @@ body.noscroll {
   
   /* Ícones da Direita */
   .header-right {
-      gap: 10px; 
+      gap: 5px; /* Reduzi o gap para não espaçar muito os botões */
       flex-shrink: 0; 
   }
   #search-toggle {
       order: 1; 
+      padding: 10px; /* Aumenta a área de toque da lupa */
+      position: relative;
+      z-index: 10;
   }
   #search-toggle img {
     width: 20px; 
     height: 20px;
   }
+
+  /* CORREÇÃO DO MENU HAMBÚRGUER */
   #hamburger-menu {
     font-size: 18px;
     margin-top: -2px; 
     order: 2; 
+    padding: 15px; /* Aumenta consideravelmente a área de "sensor" do toque */
+    position: relative;
+    z-index: 10;
   }
 
   #side-menu {
@@ -1928,35 +1942,39 @@ body.noscroll {
 
   /* --- ADAPTAÇÃO DA NOVA SIDEBAR (DETALHES E CHAT) PARA MOBILE --- */
   
-  /* Usa 'fixed' e '100%' para evitar vazamentos e zoom no Android */
+  /* CORREÇÃO DO VAZAMENTO DA TELA DE CHAT E FILMES */
   #modal-bg.details-sidebar.open,
   #chat-sidebar.details-sidebar.open {
-      width: 100%;
-      height: 100%;
-      position: fixed;
+      position: fixed !important; /* Força posição fixa na tela inteira */
       top: 0;
       left: 0;
+      right: 0; /* Prende na direita */
+      bottom: 0; /* Prende em baixo */
+      width: 100vw !important;
+      max-width: 100% !important; /* Impede o scroll horizontal */
+      height: 100vh !important;
       z-index: 2000;
       overflow: hidden; 
+      box-sizing: border-box;
+      border: none !important; /* Remove qualquer borda que estivesse empurrando a tela */
   }
   
   .sidebar-content {
       width: 100% !important;
       max-width: 100% !important;
-      height: 100%;
+      height: 100% !important;
       box-sizing: border-box;
       overflow-x: hidden;
-      overflow-y: auto; /* Permite rolar apenas dentro do painel */
+      overflow-y: auto; 
   }
 
-  /* Botões de fechar (X) fixados no topo independentes da rolagem */
   #modal-close,
   #chat-close {
       position: fixed;
       top: 15px;
       right: 15px;
       z-index: 2050;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.5); /* Destaca o botão para ser fácil de ver */
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5); 
   }
   
   .sidebar-poster-container {
@@ -2012,7 +2030,6 @@ body.noscroll {
   .step-2 .podium-bar { height: 60px; }
   .step-3 .podium-bar { height: 40px; }
 
-  /* Lista de Amigos */
   .amigo-card { padding: 10px; }
   .amigo-profile-info { gap: 10px; align-items: flex-start; margin-bottom: 10px;}
   .amigo-name { font-size: 15px; }
@@ -2062,13 +2079,11 @@ body.noscroll {
   .ajuda-card { padding: 15px; }
   
   /* --- AJUSTES DO CHAT NO CELULAR --- */
-  
-  /* Garante que a área de input não seja empurrada para fora da tela */
   .chat-input-area {
       width: 100%;
       padding: 10px;
       box-sizing: border-box;
-      flex-shrink: 0; /* Impede a área de esmagar/encolher no mobile */
+      flex-shrink: 0; 
   }
   .chat-input-area textarea {
       font-size: 16px !important; 
