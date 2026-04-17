@@ -1943,24 +1943,28 @@ body.noscroll {
   /* --- ADAPTAÇÃO DA NOVA SIDEBAR (DETALHES E CHAT) PARA MOBILE --- */
   
   /* CORREÇÃO DO VAZAMENTO DA TELA DE CHAT E FILMES */
+/* --- ADAPTAÇÃO DA NOVA SIDEBAR (DETALHES E CHAT) PARA MOBILE --- */
+  
   #modal-bg.details-sidebar.open,
   #chat-sidebar.details-sidebar.open {
-      position: fixed !important; /* Força posição fixa na tela inteira */
+      position: fixed !important; 
       top: 0;
       left: 0;
-      right: 0; /* Prende na direita */
-      bottom: 0; /* Prende em baixo */
-      width: 100vw !important;
-      max-width: 100% !important; /* Impede o scroll horizontal */
-      height: 100vh !important;
+      right: 0; 
+      bottom: 0; 
+      width: 100% !important; /* Usa % em vez de vw para evitar bug de scroll */
+      height: 100% !important; /* Usa % em vez de vh para não cortar o input de texto no Android/iOS */
       z-index: 2000;
       overflow: hidden; 
       box-sizing: border-box;
-      border: none !important; /* Remove qualquer borda que estivesse empurrando a tela */
+      border: none !important; 
   }
   
-  .sidebar-content {
+  /* Adicionado seletores específicos para anular o min-width do PC */
+  #modal-content.sidebar-content,
+  #chat-sidebar .sidebar-content {
       width: 100% !important;
+      min-width: 0 !important; /* A MÁGICA ESTÁ AQUI: Remove a trava de 500px do computador */
       max-width: 100% !important;
       height: 100% !important;
       box-sizing: border-box;
@@ -2103,4 +2107,11 @@ body.noscroll {
       bottom: 20px;
       right: 20px;
   }
+}
+/* Faz a imagem do botão preencher o círculo perfeitamente */
+.chat-btn-image {
+    width: 60%;
+    height: 50%;
+    object-fit: cover; 
+    border-radius: %; /* Arredonda a imagem para caber no botão */
 }
