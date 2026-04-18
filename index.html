@@ -61,7 +61,7 @@
       <button class="menu-nav-button" id="show-favorites-btn">Favoritos</button>
       <button class="menu-nav-button" id="show-watched-btn">Assistidos</button>
       <button class="menu-nav-button" id="show-want-btn">Quero Assistir</button>
-      <button class="menu-nav-button" id="show-amigos-btn">Amigos</button>
+      <button class="menu-nav-button" id="show-amigos-btn">Social</button>
       <button class="menu-nav-button" id="show-help-btn">Ajuda</button>
     </nav>
     <div class="side-menu-bottom">
@@ -528,7 +528,7 @@
                 </div>
                 ${podiumHTML}
                 <hr class="amigos-divider">
-                <h2 class="section-title dynamic-title" style="margin-top:20px;">Todos os Amigos</h2>
+                <h2 class="section-title dynamic-title" style="margin-top:20px;"></h2>
             `;
 
             const amigosContainer = document.createElement('div');
@@ -663,7 +663,7 @@
         });
     }
 
-    function updateChatBadge() {
+function updateChatBadge() {
         if (dom.chat.sidebar.classList.contains('open')) {
             lastReadChatTime = Date.now();
             localStorage.setItem('saficos_last_read_chat', lastReadChatTime);
@@ -673,8 +673,8 @@
         
         const unreadCount = chatMessages.filter(m => m.timestamp > lastReadChatTime).length;
         if (unreadCount > 0) {
-            dom.chat.badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
-            dom.chat.badge.style.display = 'flex';
+            dom.chat.badge.textContent = ''; // <- Mudamos para vazio
+            dom.chat.badge.style.display = 'block'; 
         } else {
             dom.chat.badge.style.display = 'none';
         }
@@ -801,15 +801,26 @@ const html = `
               : ''}
             </div>
         `;
-        const favButton = document.createElement('button');
-        favButton.className = `favorite-heart ${filme.favorito ? 'favorited' : ''}`;
-        favButton.innerHTML = '❤';
-        favButton.title = "Favoritar";
-        favButton.onclick = (e) => {
-            e.stopPropagation();
-            toggleFavorite(filme.titulo);
-        };
-        card.prepend(favButton);
+const favButton = document.createElement('button');
+// Verifica se o filme é favorito para escolher a imagem inicial
+const heartImg = filme.favorito ? 'heart-green.png' : 'heart-white.png';
+favButton.className = `favorite-heart ${filme.favorito ? 'favorited' : ''}`;
+favButton.innerHTML = '❤︎';
+favButton.title = "Favoritar";
+
+favButton.onclick = (e) => {
+    e.stopPropagation();
+    toggleFavorite(filme.titulo);
+    
+    // Troca a imagem visualmente na hora do clique
+    const img = favButton.querySelector('.heart-icon');
+    if (img.src.includes('heart-white.png')) {
+        img.src = 'heart-green.png';
+    } else {
+        img.src = 'heart-white.png';
+    }
+};
+card.prepend(favButton);
         card.onclick = () => {
              const index = filmes.findIndex(f => f.titulo === filme.titulo);
              abrirModal(index);
@@ -1235,7 +1246,7 @@ const html = `
     function updateModalButtons(index){
       const f = filmes[index];
       dom.modal.favBtn.classList.toggle('active', f.favorito);
-      dom.modal.favBtn.textContent = '❤';
+      dom.modal.favBtn.innerHTML = '❤︎';
       dom.modal.watchBtn.classList.toggle('active', f.assistido);
       dom.modal.watchBtn.textContent = f.assistido ? 'Assistido' : 'Marcar como assistido';
       dom.modal.wantBtn.classList.toggle('active', f.queroAssistir);
@@ -1523,6 +1534,49 @@ const html = `
         if (unsubscribeChat) unsubscribeChat();
       }
     });
+
+// --- MAGIA PARA O BOTÃO VOLTAR DO CELULAR ---
+    (function controleBotaoVoltar() {
+        // Empurra um "estado invisível" assim que o site carrega para servir de armadilha
+        window.history.pushState({ trava: true }, "");
+
+        // Fica vigiando o botão de voltar (hardware/gesto do celular)
+        window.addEventListener('popstate', function() {
+            let fechouAlgo = false;
+
+            // Verifica um por um e fecha (a ordem importa, do mais por cima pro mais base)
+            if (dom.modal.bg.classList.contains('open')) {
+                fecharModal();
+                fechouAlgo = true;
+            } 
+            else if (dom.sideMenu.menu.classList.contains('open')) {
+                closeSideMenu();
+                fechouAlgo = true;
+            } 
+            else if (dom.chat.sidebar.classList.contains('open')) {
+                fecharChat();
+                fechouAlgo = true;
+            } 
+            else if (dom.search.wrapper.classList.contains('show')) {
+                dom.search.wrapper.classList.remove('show');
+                fechouAlgo = true;
+            }
+
+            // Se fechamos alguma janela, salvamos o usuário de sair do site.
+            // Como a "armadilha" foi gasta, armamos ela de novo:
+            if (fechouAlgo) {
+                window.history.pushState({ trava: true }, "");
+            }
+        });
+        
+        // Se o usuário fechar a janela clicando no "X" ao invés de usar o botão voltar,
+        // garantimos que a armadilha continue ativa pra quando ele estiver na Home
+        document.addEventListener('click', () => {
+             if (!window.history.state || !window.history.state.trava) {
+                 window.history.pushState({ trava: true }, "");
+             }
+        });
+    })();
 
   </script>
 </body>
