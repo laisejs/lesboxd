@@ -216,7 +216,7 @@ h1 {
   margin-top: 10px;
 }
 #login-btn:hover, #register-btn:hover {
-  background-color: #f087d4;
+  background-color: #485951;
 }
 #auth-error {
   color: var(--cor-principal);
@@ -547,7 +547,7 @@ h1 {
   transition: background 0.3s;
 }
 .destaque-info a:hover {
-  background: #f087d4;
+  background: #39463d;
 }
 
 /* --- SEÇÕES E GRIDS DE FILMES --- */
@@ -1068,13 +1068,13 @@ h1 {
     background: #666;
 }
 .modal-button.active:hover {
-    background: #f087d4;
+    background: #485951;
 }
 #modal-youtube-link {
-    background-color: #399f53;
+    background: var(--cor-principal);
 }
 #modal-youtube-link:hover {
-    background-color: #82ce86;
+    background: #485951;
 }
 .star-rating {
     display: flex;
@@ -1395,7 +1395,7 @@ h1 {
     padding-right: 8px; 
 }
 .amigo-recent-comment {
-    background: rgba(0,0,0,0.2);
+    background: rgba(2, 2, 2, 0.231); /* Fundo escuro e legível */
     padding: 15px;
     border-radius: 8px;
     border-left: 3px solid var(--cor-principal);
@@ -1649,7 +1649,7 @@ body.light-theme #logout-btn:hover { background: #c7c7c7; }
 body.light-theme .sidebar-poster-container img { border: 0px solid #fff; }
 body.light-theme .section-subtitle { border-bottom-color: rgba(0,0,0,0.1); }
 body.light-theme #comment-input { background-color: #fff; border-color: #ccc; color: #111; }
-body.light-theme .comment-bubble, body.light-theme .amigo-recent-comment { background: rgba(0,0,0,0.05); }
+body.light-theme .comment-bubble, body.light-theme .amigo-recent-comment { background: rgba(255, 255, 255, 0.288); }
 
 /* Cores de Tema Claro para o Perfil, Ajuda, Chat e Borda */
 body.light-theme .profile-pic.has-border { background-color: #fff; }
@@ -2182,5 +2182,5 @@ body.noscroll {
     width: 60%;
     height: 50%;
     object-fit: cover; 
-    border-radius: 50%; 
+    border-radius: 0%; 
 }
