@@ -7,6 +7,51 @@
   --cor-texto: #f8fafc;
   --cor-texto-secundario: #94a3b8;
 }
+/* =========================================
+   MOBILE RESET (SENSAÇÃO DE APP NATIVO)
+   ========================================= */
+* {
+    /* 1. Adeus quadrado azul irritante ao tocar em qualquer coisa */
+    -webkit-tap-highlight-color: transparent !important;
+    
+    /* 2. Remove o pequeno "engasgo" de 300ms que o navegador dá 
+          à espera de um duplo-clique para dar zoom na tela */
+    touch-action: manipulation;
+}
+
+/* 3. Garante que os campos de texto e caixas de pesquisa 
+      continuem a funcionar normalmente, já que o resto do site 
+      está bloqueado para não ser "selecionável" */
+input, textarea, [contenteditable="true"] {
+    user-select: auto !important;
+    -webkit-user-select: auto !important;
+}
+
+/* 4. Tira a elasticidade (efeito elástico/bouncing) do fundo do 
+      site no telemóvel para parecer uma janela de sistema fixa */
+html, body {
+    overscroll-behavior-y: none;
+}
+/* =========================================
+   MOBILE RESET (SENSAÇÃO DE APP NATIVO)
+   ========================================= */
+* {
+    /* Adeus quadrado azul irritante ao tocar em botões */
+    -webkit-tap-highlight-color: transparent !important;
+    
+    /* Remove o engasgo de 300ms, deixando o clique instantâneo */
+    touch-action: manipulation;
+}
+
+input, textarea, [contenteditable="true"] {
+    user-select: auto !important;
+    -webkit-user-select: auto !important;
+}
+
+html, body {
+    /* Tira o "fundo de elástico" do navegador ao fazer scroll */
+    overscroll-behavior-y: none;
+}
 
 body {
   margin: 0;
@@ -1991,29 +2036,38 @@ body.noscroll {
 
   /* --- ADAPTAÇÃO DA NOVA SIDEBAR (DETALHES E CHAT) PARA MOBILE --- */
   
-  /* CORREÇÃO DO VAZAMENTO DA TELA DE CHAT E FILMES */
 /* --- ADAPTAÇÃO DA NOVA SIDEBAR (DETALHES E CHAT) PARA MOBILE --- */
   
-  #modal-bg.details-sidebar.open,
-  #chat-sidebar.details-sidebar.open {
+  /* 1. O Estado Fechado: Preparado do lado direito do ecrã */
+  #modal-bg.details-sidebar,
+  #chat-sidebar.details-sidebar {
       position: fixed !important; 
       top: 0;
       left: 0;
-      right: 0; 
-      bottom: 0; 
-      width: 100% !important; /* Usa % em vez de vw para evitar bug de scroll */
-      height: 100% !important; /* Usa % em vez de vh para não cortar o input de texto no Android/iOS */
+      width: 100% !important; 
+      height: 100% !important; 
       z-index: 2000;
-      overflow: hidden; 
       box-sizing: border-box;
       border: none !important; 
+      
+      /* A MÁGICA DA PLACA DE VÍDEO: Empurra a janela para fora do ecrã */
+      transform: translateX(100%);
+      /* Cria o deslize perfeito de 60 quadros por segundo */
+      transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  }
+
+  /* 2. O Estado Aberto: Desliza para dentro */
+  #modal-bg.details-sidebar.open,
+  #chat-sidebar.details-sidebar.open {
+      transform: translateX(0);
+      overflow: hidden; 
   }
   
-  /* Adicionado seletores específicos para anular o min-width do PC */
+  /* 3. Ajuste do Conteúdo Interno */
   #modal-content.sidebar-content,
   #chat-sidebar .sidebar-content {
       width: 100% !important;
-      min-width: 0 !important; /* A MÁGICA ESTÁ AQUI: Remove a trava de 500px do computador */
+      min-width: 0 !important; 
       max-width: 100% !important;
       height: 100% !important;
       box-sizing: border-box;
