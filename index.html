@@ -241,20 +241,19 @@
     <div class="admin-modal-content minimalist">
         <button id="admin-close" class="admin-close-btn">×</button>
       
-<!-- CABEÇALHO DO MODAL ADMIN -->
-<div style="display: flex; justify-content: flex-start; align-items: center; gap: 40px; margin-bottom: 25px; text-align: left;">
-        <div>
-          <h2 style="font-size: 24px; color: var(--cor-principal); margin: 0 0 5px 0;">Cadastrar no Catálogo</h2>
-          <p style="color: var(--cor-texto-secundario); font-size: 13px; margin: 0;">Adicione um novo título de forma rápida.</p>
+<div class="admin-modal-header">
+        <div class="admin-modal-title-area">
+          <h2>Cadastrar no Catálogo</h2>
+          <p>Adicione um novo título de forma rápida.</p>
         </div>
         
-        <div style="display: flex; align-items: center; gap: 10px;">
+        <div class="admin-modal-actions">
           <select id="admin-categoria" class="category-select" title="Categoria Principal">
               <option value="Filmes">Filme</option>
               <option value="Series">Série</option>
               <option value="Livros">Livro</option>
           </select>
-          <button id="salvar-novo-filme" class="minimalist-btn" style="margin: 0;">Salvar Catálogo</button>
+          <button id="salvar-novo-filme" class="minimalist-btn">Salvar Catálogo</button>
         </div>
       </div>
       <div class="admin-form-grid minimalist-grid">
