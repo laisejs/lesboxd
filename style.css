@@ -1031,8 +1031,10 @@ body.light-theme #modal-close:hover, body.light-theme #chat-close:hover {
     word-break: break-word;
 }
 #modal-duration-dots {
-    display: flex;
-    gap: 5px;
+    color: var(--cor-texto-secundario);
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 2px;
 }
 #modal-info {
     font-size: 14px;

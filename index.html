@@ -288,7 +288,7 @@
           <div class="admin-row-2">
             <div class="input-group minimalist-input">
               <label>Tags</label>
-              <input type="text" id="admin-tags" placeholder="Ex: Drama, Romance, Filmes">
+              <input type="text" id="admin-tags" placeholder="Ex: Drama, Romance, Ação">
             </div>
             <div class="input-group minimalist-input">
               <label>Tempo de tela</label>
@@ -311,8 +311,8 @@
               <input type="text" id="admin-plataforma" placeholder="Ex: Drive, Netflix">
             </div>
             <div class="input-group minimalist-input">
-              <label>Trailer (Opcional)</label>
-              <input type="text" id="admin-youtube" placeholder="URL do YouTube">
+              <label>Assistir</label>
+              <input type="text" id="admin-youtube" placeholder="Link">
             </div>
           </div>
         </div>
@@ -1107,15 +1107,13 @@ const html = `
         }
     }
 
-    function createDurationDotsHTML(screentime) {
+function formatScreentimeText(screentime) {
       if (!screentime) return '';
-      let dotCount = 0;
-      const lowerScreentime = screentime.toLowerCase();
-
-      if (lowerScreentime === 'long' || lowerScreentime === 'high') dotCount = 3;
-      else if (lowerScreentime === 'medium') dotCount = 2;
-      else if (lowerScreentime === 'short') dotCount = 1;
-      return dotCount > 0 ? '<div class="duration-dot"></div>'.repeat(dotCount) : '';
+      const lower = screentime.toLowerCase();
+      if (lower === 'long' || lower === 'longo') return 'Longo';
+      if (lower === 'medium' || lower === 'medio' || lower === 'médio') return 'Médio';
+      if (lower === 'short' || lower === 'curto') return 'Curto';
+      return screentime;
     }
 
     function createStarsHTML(rating) {
@@ -1136,7 +1134,6 @@ const html = `
         card.innerHTML = `
             <div class="card-image-wrapper">
                 <img src="${filme.imagem}" alt="${filme.titulo}" />
-                <div class="duration-dots-container">${createDurationDotsHTML(filme.screentime)}</div>
             </div>
             <div class="card-content">
               <h3>${filme.titulo}</h3>
@@ -1647,7 +1644,7 @@ let heroInterval; // Controla a troca de imagens da galeria
 
       dom.modal.poster.src = f.imagem;
       dom.modal.title.textContent = f.titulo;
-      dom.modal.modalDurationDots.innerHTML = createDurationDotsHTML(f.screentime);
+      dom.modal.modalDurationDots.textContent = formatScreentimeText(f.screentime);
       dom.modal.sinopse.textContent = f.sinopse;
 
     const isLivro = f.tags && f.tags.includes('Livros');
