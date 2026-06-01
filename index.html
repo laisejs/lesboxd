@@ -3,10 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LESBOXD</title>
+  <title>Lilies</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <link rel="icon" type="image/png" href="lily.png">
   <link rel="stylesheet" href="style.css">
   <link rel="manifest" href="/manifest.json">
+  
     <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -22,17 +25,90 @@
   </script>
 </head>
 
-<body>
+<body class="light-theme">
 
-  <div id="auth-section">
-    <div id="login-box">
-      <h2>Login / Cadastro</h2>
-      <input type="email" id="auth-email" class="login-input" placeholder="Email" required>
-      <input type="password" id="auth-password" class="login-input" placeholder="Senha" required>
-      <div id="auth-error"></div>
-      <button id="login-btn">Entrar</button>
-      <button id="register-btn">Cadastrar</button>
-      <p><a href="#" id="forgot-password">Esqueci minha senha</a></p>
+<div id="auth-section">
+    <div class="split-visual auth-image-side">
+        <div class="visual-content">
+            <h1>Bem-vinda<br>ao Lilies.</h1>
+            <p>A sua biblioteca pessoal de conteúdo sáfico. Entre para gerenciar seu catálogo, favoritar e descobrir o que suas amigas estão consumindo.</p>
+        </div>
+        <div style="opacity: 0.5; font-size: 0.8rem;">© 2026 ise</div>
+    </div>
+
+    <div class="split-form">
+        <div id="login-form-container" class="form-container">
+            <div class="logo-mobile">
+                <img src="lily-light.png" alt="Lily"> 
+                <span>LILIES</span>
+            </div>
+
+            <div class="form-header">
+                <h2>Acesse sua conta</h2>
+                <p>Entre com seus dados de acesso</p>
+            </div>
+
+            <div class="input-group">
+                <label>E-mail</label>
+                <div class="input-wrapper">
+                    <i data-lucide="mail" class="input-icon"></i>
+                    <input type="email" id="auth-email" placeholder="exemplo@email.com" required>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Senha</label>
+                <div class="input-wrapper">
+                    <i data-lucide="lock" class="input-icon"></i>
+                    <input type="password" id="auth-password" placeholder="••••••••" required>
+                </div>
+                <a href="#" id="forgot-password" class="forgot-pass">Esqueceu a senha?</a>
+            </div>
+
+            <div id="auth-error" class="error-msg"></div>
+
+            <button id="login-btn" class="btn-submit">ENTRAR</button>
+
+            <div class="form-footer">
+                Não tem uma conta? <a href="#" id="go-to-register">Cadastre-se agora</a>
+            </div>
+        </div>
+
+        <div id="register-form-container" class="form-container" style="display: none;">
+            <div class="logo-mobile">
+                <img src="lily-light.png" alt="Lily"> 
+                <span>LILIES</span>
+            </div>
+
+            <div class="form-header">
+                <h2>Criar Conta</h2>
+                <p>Junte-se à nós!</p>
+            </div>
+
+            <div class="input-group">
+                <label>E-mail</label>
+                <div class="input-wrapper">
+                    <i data-lucide="mail" class="input-icon"></i>
+                    <input type="email" id="reg-email" placeholder="seu@email.com" required>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Senha</label>
+                <div class="input-wrapper">
+                    <i data-lucide="lock" class="input-icon"></i>
+                    <input type="password" id="reg-password" placeholder="Mínimo 6 caracteres" required>
+                </div>
+            </div>
+
+            <div id="reg-error" class="error-msg"></div>
+
+            <button id="register-btn" class="btn-submit">CADASTRAR</button>
+
+            <div class="form-footer">
+                Já tem uma conta? <a href="#" id="go-to-login">Fazer Login</a>
+            </div>
+        </div>
     </div>
   </div>
 
@@ -56,17 +132,19 @@
       </div>
       <h2 class="profile-name" id="profile-name-element" contenteditable="true" spellcheck="false">NOME</h2>
     </div>
-    <div id="side-menu-watched-counter" class="watched-counter-menu"></div>
-    <nav class="menu-nav">
+<nav class="menu-nav">
       <button class="menu-nav-button" id="show-favorites-btn">Favoritos</button>
+      
       <button class="menu-nav-button" id="show-watched-btn">Assistidos</button>
-      <button class="menu-nav-button" id="show-want-btn">Quero Assistir</button>
+      <button class="menu-nav-button" id="show-lidos-btn">Lidos</button>
+      
+      <button class="menu-nav-button" id="show-want-btn">Lista</button>
       <button class="menu-nav-button" id="show-amigos-btn">Social</button>
       <button class="menu-nav-button" id="show-help-btn">Ajuda</button>
-    </nav>
+      <button class="menu-nav-button" id="show-aprovacoes-btn" style="display: none; background-color: #b8860b; color: white;">Pendentes</button>
     <div class="side-menu-bottom">
         <div id="theme-toggle-container">
-            <label for="theme-toggle">Tema Claro</label>
+            <label for="theme-toggle">Tema Escuro</label>
             <label class="switch">
                 <input type="checkbox" id="theme-toggle">
                 <span class="slider round"></span>
@@ -82,7 +160,7 @@
         <button id="logout-btn">Sair</button>
     </div>
   </aside>
-
+<button id="btn-add-filme" class="floating-add-btn" title="Adicionar Filme" style="display: none;">+</button>
 <button id="floating-chat-btn" class="floating-chat-btn" title="Chat Global" style="display: none;">
       <img src="chat.png" alt="Chat" class="chat-btn-image">
       
@@ -91,36 +169,45 @@
 
   <div id="layout-container">
     
-    <aside id="modal-bg" class="details-sidebar">
+<aside id="modal-bg" class="details-sidebar">
       <div id="modal-content" class="sidebar-content">
         <button id="modal-close">×</button>
         
-        <div class="modal-left sidebar-poster-container">
-          <img id="modal-poster" src="" alt="Pôster do filme">
+<!-- BANNER HBO/NETFLIX (Fundo da Galeria) -->
+        <div id="modal-hero" class="modal-hero">
+            <div class="modal-hero-gradient"></div>
+            <!-- NOVO BOTÃO DE PRÓXIMA IMAGEM -->
+            <button id="hero-next-btn" class="hero-nav-btn" style="display: none;">&#10095;</button>
         </div>
         
-        <div class="modal-right sidebar-details-container">
-          <div id="modal-details-view">
-            <div class="modal-title-container">
-              <h2 id="modal-title"></h2>
-              <div id="modal-duration-dots"></div>
+        <div class="modal-body">
+            
+            <div class="modal-header-flex">
+                <img id="modal-poster" src="" alt="Pôster do filme">
+                <div class="modal-title-area">
+                    <h2 id="modal-title"></h2>
+                    <div id="modal-duration-dots"></div>
+                    <div id="modal-stars" class="star-rating"></div>
+                </div>
             </div>
+            
             <div class="modal-actions">
               <button id="modal-fav-btn" class="modal-button">Favoritar</button>
               <button id="modal-watch-btn" class="modal-button">Assistido</button>
               <button id="modal-want-btn" class="modal-button">+</button>
+              
+              <button id="modal-play-btn" class="modal-button" style="display: none; background-color: var(--cor-principal); color: white;">▶ Assistir</button>
+              <button id="modal-edit-btn" class="modal-button" style="display: none; background-color: #b8860b; color: white;">Editar</button>
+              <button id="modal-delete-btn" class="modal-button" style="display: none; background-color: #8b0000; color: white;">Excluir</button>
             </div>
-            <div id="modal-stars" class="star-rating"></div>
+            
             <p id="modal-info"></p>
             <p id="modal-sinopse"></p>
             
-            <div id="inline-gallery-container" style="display: none; margin-bottom: 25px;">
-               <h3 class="section-subtitle">Galeria</h3>
+            <div id="inline-gallery-container" style="display: none;">
                <div id="gallery-image-container"></div>
             </div>
-
-            <a id="modal-youtube-link" href="#" target="_blank" class="modal-button" style="margin-bottom: 30px;">Assistir Trailer</a>
-
+            
             <div id="comments-section">
                 <h3 class="section-subtitle">Comentários</h3>
                 <div class="comment-input-area">
@@ -129,8 +216,6 @@
                 </div>
                 <div id="comments-list"></div>
             </div>
-
-          </div>
         </div>
       </div>
     </aside>
@@ -152,7 +237,150 @@
       </div>
     </aside>
 
+<div id="modal-admin-bg" class="admin-modal-overlay" style="display: none;">
+    <div class="admin-modal-content minimalist">
+        <button id="admin-close" class="admin-close-btn">×</button>
+      
+<!-- CABEÇALHO DO MODAL ADMIN -->
+<div style="display: flex; justify-content: flex-start; align-items: center; gap: 40px; margin-bottom: 25px; text-align: left;">
+        <div>
+          <h2 style="font-size: 24px; color: var(--cor-principal); margin: 0 0 5px 0;">Cadastrar no Catálogo</h2>
+          <p style="color: var(--cor-texto-secundario); font-size: 13px; margin: 0;">Adicione um novo título de forma rápida.</p>
+        </div>
+        
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <select id="admin-categoria" class="category-select" title="Categoria Principal">
+              <option value="Filmes">Filme</option>
+              <option value="Series">Série</option>
+              <option value="Livros">Livro</option>
+          </select>
+          <button id="salvar-novo-filme" class="minimalist-btn" style="margin: 0;">Salvar Catálogo</button>
+        </div>
+      </div>
+      <div class="admin-form-grid minimalist-grid">
+        <div class="admin-col-poster">
+          <div class="poster-placeholder mini">
+            <i data-lucide="image" style="width: 24px; height: 24px; opacity: 0.5; margin-bottom: 5px;"></i>
+            <span style="font-size: 11px;">Pôster Preview</span>
+            <img id="preview-poster" src="" alt="Preview Pôster" style="display: none;">
+          </div>
+          <div class="input-group minimalist-input">
+            <input type="text" id="admin-imagem" placeholder="URL do Pôster Principal">
+          </div>
+        </div>
 
+        <div class="admin-col-details">
+          <div class="input-group minimalist-input">
+            <label>Título</label>
+            <input type="text" id="admin-titulo" placeholder="Ex: Retrato de uma Jovem em Chamas">
+          </div>
+          
+          <div class="admin-row-2">
+            <div class="input-group minimalist-input">
+              <label>Ano</label>
+              <input type="text" id="admin-ano" placeholder="Ex: 2019">
+            </div>
+            <div class="input-group minimalist-input">
+              <label>País</label>
+              <input type="text" id="admin-pais" placeholder="Ex: França">
+            </div>
+          </div>
+
+          <div class="admin-row-2">
+            <div class="input-group minimalist-input">
+              <label>Tags</label>
+              <input type="text" id="admin-tags" placeholder="Ex: Drama, Romance, Filmes">
+            </div>
+            <div class="input-group minimalist-input">
+              <label>Tempo de tela</label>
+              <select id="admin-screentime">
+                  <option value="Curto">Curto</option>
+                  <option value="Medium" selected>Médio</option>
+                  <option value="Long">Longo</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="input-group minimalist-input">
+            <label>Elenco / Autor </label>
+            <input type="text" id="admin-elenco" placeholder="Atores separados por vírgula">
+          </div>
+
+          <div class="admin-row-2">
+            <div class="input-group minimalist-input">
+              <label>Onde Assistir? / Editora</label>
+              <input type="text" id="admin-plataforma" placeholder="Ex: Drive, Netflix">
+            </div>
+            <div class="input-group minimalist-input">
+              <label>Trailer (Opcional)</label>
+              <input type="text" id="admin-youtube" placeholder="URL do YouTube">
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-col-extra">
+          <div class="input-group minimalist-input" style="flex-grow: 1; display: flex; flex-direction: column;">
+            <label>Sinopse</label>
+            <textarea id="admin-sinopse" placeholder="Escreva a sinopse..." style="flex-grow: 1; min-height: 100px; resize: none;"></textarea>
+          </div>
+
+          <div class="input-group minimalist-input" style="margin-top: 15px;">
+            <label>Galeria (Opcional)</label>
+            <div class="admin-gallery-mini-grid">
+              
+              <div class="gallery-item-mini">
+                <div class="gallery-placeholder mini">
+                  <i data-lucide="image" style="opacity: 0.5; width: 18px;"></i>
+                  <img id="preview-g1" src="" style="display: none;">
+                </div>
+                <input type="text" id="admin-gallery-1" placeholder="URL Cena 1">
+              </div>
+
+              <div class="gallery-item-mini">
+                <div class="gallery-placeholder mini">
+                  <i data-lucide="image" style="opacity: 0.5; width: 18px;"></i>
+                  <img id="preview-g2" src="" style="display: none;">
+                </div>
+                <input type="text" id="admin-gallery-2" placeholder="URL Cena 2">
+              </div>
+
+              <div class="gallery-item-mini">
+                <div class="gallery-placeholder mini">
+                  <i data-lucide="image" style="opacity: 0.5; width: 18px;"></i>
+                  <img id="preview-g3" src="" style="display: none;">
+                </div>
+                <input type="text" id="admin-gallery-3" placeholder="URL Cena 3">
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+    </aside>
+<div id="modal-profile-pic-bg" class="admin-modal-overlay" style="display: none;">
+        <div class="admin-modal-content minimalist" style="max-width: 400px; text-align: center; padding: 35px 30px;">
+            <button id="profile-pic-close" class="admin-close-btn">×</button>
+            <h2 style="font-size: 22px; color: var(--cor-principal); margin: 0 0 25px 0;">Editar Foto de Perfil</h2>
+            
+            <div class="profile-pic-preview-container">
+                <img id="profile-pic-preview" src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png">
+            </div>
+
+            <div class="input-group minimalist-input" style="text-align: left;">
+                <label>URL da Imagem</label>
+                <input type="text" id="profile-pic-input" placeholder="Cole o link da imagem aqui...">
+            </div>
+            
+            <p style="font-size: 13px; color: var(--cor-texto-secundario); margin: 12px 0 25px 0; line-height: 1.5;">
+                Copie o "endereço de imagem" em uma foto do Google, Pinterest, etc.
+            </p>
+
+            <button id="save-profile-pic-btn" class="minimalist-btn" style="width: 100%;">Salvar Foto</button>
+        </div>
+    </div>
     <main id="main-content">
       <header class="main-header" id="main-header">
         <div class="header-left">
@@ -198,7 +426,10 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-analytics.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, addDoc, deleteDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+    
+    let isAdmin = false;
+    let editingFilmeId = null; // Vai guardar o ID do filme quando formos editar
 
     const firebaseConfig = {
         apiKey: "AIzaSyAb2eewnWnHU3xN3Pxio-Hy55SDz_W3zfI",
@@ -218,11 +449,14 @@
     let filmes = []; 
 
     const dom = {
-      auth: {
+auth: {
           section: document.getElementById('auth-section'),
           emailInput: document.getElementById('auth-email'),
           passwordInput: document.getElementById('auth-password'),
+          regEmailInput: document.getElementById('reg-email'), // NOVO
+          regPasswordInput: document.getElementById('reg-password'), // NOVO
           errorDisplay: document.getElementById('auth-error'),
+          regErrorDisplay: document.getElementById('reg-error'), // NOVO
           loginBtn: document.getElementById('login-btn'),
           registerBtn: document.getElementById('register-btn'),
           forgotPasswordLink: document.getElementById('forgot-password')
@@ -251,9 +485,11 @@
         closeBtn: document.getElementById("close-menu"),
         favBtn: document.getElementById("show-favorites-btn"),
         watchBtn: document.getElementById("show-watched-btn"),
+        lidosBtn: document.getElementById("show-lidos-btn"), // <-- ADICIONE ESTA LINHA
         wantBtn: document.getElementById("show-want-btn"),
         amigosBtn: document.getElementById('show-amigos-btn'),
         helpBtn: document.getElementById('show-help-btn'), 
+        aprovacoesBtn: document.getElementById('show-aprovacoes-btn'), // <-- NOVA LINHA 
         logoutBtn: document.getElementById("logout-btn"),
         profileName: document.getElementById('profile-name-element'),
         profilePic: document.getElementById('profile-pic-element'),
@@ -269,6 +505,9 @@
         bg: document.getElementById("modal-bg"),
         content: document.getElementById("modal-content"),
         closeBtn: document.getElementById("modal-close"),
+        playBtn: document.getElementById("modal-play-btn"),
+        editBtn: document.getElementById("modal-edit-btn"),
+        deleteBtn: document.getElementById("modal-delete-btn"),
         poster: document.getElementById("modal-poster"),
         detailsView: document.getElementById("modal-details-view"),
         title: document.getElementById("modal-title"),
@@ -299,6 +538,7 @@
     };
 
     let currentBaseFilter = 'Todos';
+    let currentMenuFilter = 'Todos';
     let activeTags = new Set();
     let currentView = 'home';
     let userDocRef;
@@ -365,8 +605,10 @@
         };
     }
     
-    function mostrarTelaInicial() {
+    
+function mostrarTelaInicial() {
       currentView = 'home';
+      currentMenuFilter = 'Todos'; // <-- ISSO CORRIGE O BUG! Zera o filtro lateral ao ir pra Home
       dom.displayArea.innerHTML = "";
       dom.displayArea.className = '';
       resetFilters();
@@ -462,8 +704,100 @@
         `;
         dom.displayArea.innerHTML = ajudaHTML;
     }
+async function mostrarAprovacoes() {
+        if (!isAdmin) return;
+        currentView = 'aprovacoes';
+        dom.destaque.style.display = 'none';
+        ocultarContador();
+        
+        dom.displayArea.innerHTML = '<div class="ajuda-container"><h2 class="section-title dynamic-title">Sugestões Pendentes</h2><p style="text-align: center;">Procurando na gaveta secreta...</p></div>';
+        dom.displayArea.className = 'ajuda-wrapper'; 
 
-    async function mostrarAmigos() {
+        try {
+            const querySnapshot = await getDocs(collection(db, "sugestoes"));
+            const sugestoes = [];
+            querySnapshot.forEach((doc) => sugestoes.push({ id: doc.id, ...doc.data() }));
+
+            if (sugestoes.length === 0) {
+                dom.displayArea.innerHTML = '<div class="ajuda-container"><h2 class="section-title dynamic-title">Sugestões Pendentes</h2><p style="text-align: center; color: var(--cor-texto-secundario);">A fila está limpa! Nenhuma sugestão pendente no momento.</p></div>';
+                return;
+            }
+
+            let html = '<div class="ajuda-container"><h2 class="section-title dynamic-title">Sugestões Pendentes</h2>';
+            
+            sugestoes.forEach(s => {
+                const isLivro = s.tags.includes('Livros');
+                const cat = isLivro ? 'Livro' : s.tags.includes('Series') ? 'Série' : 'Filme';
+                const autor = isLivro ? 'Autor(a):' : 'Elenco:';
+                const capa = s.imagem || 'https://via.placeholder.com/100x150?text=Sem+Capa';
+                
+                html += `
+                    <div class="ajuda-card sugestao-card" id="sugestao-${s.id}">
+                        <img src="${capa}">
+                        <div class="sugestao-info">
+                            <h3 style="margin:0 0 5px 0; border:none; padding:0; font-size:22px;">
+                                ${s.titulo} <span style="font-size:11px; background:var(--cor-principal); padding:2px 8px; border-radius:10px; color:white; vertical-align:middle; font-weight:bold;">${cat}</span>
+                            </h3>
+                            <p style="font-size:14px; color:var(--cor-texto-secundario); margin:0 0 10px 0;">Sugerido por: <strong style="color:var(--cor-principal);">${s.sugeridoPor}</strong></p>
+                            <p style="font-size:13px; margin:0 0 5px 0;"><strong>${autor}</strong> ${s.elenco || 'Não informado'}</p>
+                            <p style="font-size:13px; margin:0 0 5px 0;"><strong>Onde Ver/Editora:</strong> ${s.plataforma || 'Não informado'}</p>
+                            <p style="font-size:13px; margin:0 0 10px 0;"><strong>Tags:</strong> ${s.tags.join(', ')}</p>
+                            <div class="sugestao-actions">
+                                <button class="btn-aprovar" onclick="aprovarSugestao('${s.id}')">Aprovar e Publicar</button>
+                                <button class="btn-rejeitar" onclick="rejeitarSugestao('${s.id}')">Rejeitar</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            dom.displayArea.innerHTML = html;
+        } catch (e) {
+            console.error(e);
+            dom.displayArea.innerHTML = '<p>Erro ao carregar a fila de aprovação.</p>';
+        }
+    }
+
+    // Comandos de ação que os botões vão chamar
+    window.aprovarSugestao = async function(id) {
+        if(!confirm("Deseja aprovar e enviar este título para o catálogo de todas?")) return;
+        try {
+            const docRef = doc(db, "sugestoes", id);
+            const docSnap = await getDoc(docRef);
+            if(docSnap.exists()){
+                const data = docSnap.data();
+                delete data.sugeridoPor; // Limpa o "Sugerido por" antes de jogar pro catálogo oficial
+                
+                // Transfere para os filmes
+                const novoRef = await addDoc(collection(db, "filmes"), data);
+                data.id = novoRef.id;
+                filmes.push(data);
+                filmes.sort((a, b) => a.titulo.localeCompare(b.titulo));
+                popularTags();
+                
+                // Exclui da fila pendente e some da tela
+                await deleteDoc(docRef); 
+                document.getElementById('sugestao-'+id).remove();
+                
+                // Se a fila ficar vazia, mostra a mensagem
+                if(!document.querySelector('.sugestao-card')) mostrarAprovacoes(); 
+            }
+        } catch(e) {
+            alert("Erro ao aprovar.");
+        }
+    };
+
+    window.rejeitarSugestao = async function(id) {
+        if(!confirm("Tem certeza que deseja apagar esta sugestão?")) return;
+        try {
+            await deleteDoc(doc(db, "sugestoes", id));
+            document.getElementById('sugestao-'+id).remove();
+            if(!document.querySelector('.sugestao-card')) mostrarAprovacoes(); 
+        } catch(e) {
+            alert("Erro ao rejeitar.");
+        }
+    };
+ async function mostrarAmigos() {
         currentView = 'amigos';
         dom.destaque.style.display = 'none';
         dom.displayArea.className = '';
@@ -475,9 +809,7 @@
             querySnapshot.forEach((doc) => {
                 const data = doc.data();
                 data.uid = doc.id; 
-                if (data.isPublic) {
-                    usuariosPublicos.push(data);
-                }
+                if (data.isPublic) usuariosPublicos.push(data);
             });
 
             if (usuariosPublicos.length === 0) {
@@ -485,50 +817,67 @@
                 return;
             }
             
-            // Lógica do Pódio
-            const sortedByWatched = [...usuariosPublicos].sort((a,b) => (b.assistidos?.length || 0) - (a.assistidos?.length || 0));
-            const top3 = sortedByWatched.slice(0, 3);
-            
-            let podiumHTML = '';
-            if (top3.length > 0) {
-                const getPodiumUser = (user, rank) => {
-                    if(!user) return `<div class="podium-step-container step-${rank} empty"></div>`;
-                    const count = (user.assistidos || []).length;
-                    const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : '🥉';
-                    const pic = user.foto || 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png';
-                    const flag = user.bandeira ? `<img src="${user.bandeira}" class="podium-flag">` : '';
-                    const borderClass = user.bandeira ? 'has-border' : '';
-                    return `
-                        <div class="podium-step-container step-${rank}">
-                            <div class="podium-avatar-wrapper">
-                                <span class="podium-medal">${medal}</span>
-                                <img src="${pic}" class="podium-pic ${borderClass}">
-                                ${flag}
-                            </div>
-                            <span class="podium-name">${user.apelido}</span>
-                            <div class="podium-bar">
-                                <span class="podium-score">${count} assistidos</span>
-                            </div>
-                        </div>
-                    `;
-                };
+            // Lógica do Duplo Pódio
+            const usersStats = usuariosPublicos.map(u => {
+                const mapTitles = (u.assistidos || []).map(t => filmes.find(f => f.titulo === t)).filter(Boolean);
+                const countAssistidos = mapTitles.filter(f => !f.tags.includes('Livros')).length;
+                const countLidos = mapTitles.filter(f => f.tags.includes('Livros')).length;
+                return { ...u, countAssistidos, countLidos };
+            });
 
-                podiumHTML = `
-                    <div class="podium-wrapper">
-                        ${getPodiumUser(top3[1], 2)}
-                        ${getPodiumUser(top3[0], 1)}
-                        ${getPodiumUser(top3[2], 3)}
+            const topAssistidos = [...usersStats].sort((a,b) => b.countAssistidos - a.countAssistidos).slice(0, 3);
+            const topLidos = [...usersStats].sort((a,b) => b.countLidos - a.countLidos).slice(0, 3);
+            
+            const getPodiumUser = (user, rank, type) => {
+                if(!user || user[type] === 0) return `<div class="podium-step-container step-${rank} empty"></div>`;
+                const count = user[type];
+                const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : '🥉';
+                const pic = user.foto || 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png';
+                const flag = user.bandeira ? `<img src="${user.bandeira}" class="podium-flag">` : '';
+                const borderClass = user.bandeira ? 'has-border' : '';
+                const label = type === 'countAssistidos' ? 'assistidos' : 'lidos';
+                return `
+                    <div class="podium-step-container step-${rank}">
+                        <div class="podium-avatar-wrapper">
+                            <span class="podium-medal">${medal}</span>
+                            <img src="${pic}" class="podium-pic ${borderClass}">
+                            ${flag}
+                        </div>
+                        <span class="podium-name">${user.apelido}</span>
+                        <div class="podium-bar">
+                            <span class="podium-score">${count} ${label}</span>
+                        </div>
                     </div>
                 `;
-            }
+            };
+
+            const podiumAssistidosHTML = `
+                <div class="podium-section">
+                    <div class="podium-wrapper">
+                        ${getPodiumUser(topAssistidos[1], 2, 'countAssistidos')}
+                        ${getPodiumUser(topAssistidos[0], 1, 'countAssistidos')}
+                        ${getPodiumUser(topAssistidos[2], 3, 'countAssistidos')}
+                    </div>
+                </div>`;
+                
+            const podiumLidosHTML = `
+                <div class="podium-section">
+                    <div class="podium-wrapper">
+                        ${getPodiumUser(topLidos[1], 2, 'countLidos')}
+                        ${getPodiumUser(topLidos[0], 1, 'countLidos')}
+                        ${getPodiumUser(topLidos[2], 3, 'countLidos')}
+                    </div>
+                </div>`;
 
             dom.displayArea.innerHTML = `
                 <div class="amigos-header">
                     <h2 class="section-title dynamic-title" style="margin:0;"></h2>
                 </div>
-                ${podiumHTML}
+                <div class="double-podium-container">
+                    ${podiumAssistidosHTML}
+                    ${podiumLidosHTML}
+                </div>
                 <hr class="amigos-divider">
-                <h2 class="section-title dynamic-title" style="margin-top:20px;"></h2>
             `;
 
             const amigosContainer = document.createElement('div');
@@ -541,7 +890,11 @@
 
                 const mapTitlesToFilmes = (titles) => (titles || []).map(titulo => filmes.find(f => f.titulo === titulo)).filter(Boolean);
                 const filmesFavoritos = mapTitlesToFilmes(amigoData.favoritos);
-                const filmesAssistidos = mapTitlesToFilmes(amigoData.assistidos);
+                
+                const allAssistidos = mapTitlesToFilmes(amigoData.assistidos);
+                const filmesAssistidos = allAssistidos.filter(f => !f.tags.includes('Livros'));
+                const livrosLidos = allAssistidos.filter(f => f.tags.includes('Livros'));
+                
                 const filmesQuero = mapTitlesToFilmes(amigoData.quero);
                 const comentarios = amigoData.comentarios || [];
 
@@ -556,13 +909,14 @@
                         </div>
                         <div>
                             <h3 class="amigo-name">${amigoData.apelido}</h3>
-                            <p class="amigo-watched-count">${(amigoData.assistidos || []).length} assistidos</p>
+                            <p class="amigo-watched-count">${filmesAssistidos.length} assistidos | ${livrosLidos.length} lidos</p>
                         </div>
                     </div>
                      <div class="amigo-list-selector">
                         <button class="amigo-tab-btn active" data-list="favoritos">Favoritos</button>
                         <button class="amigo-tab-btn" data-list="assistidos">Assistidos</button>
-                        <button class="amigo-tab-btn" data-list="quero">Quero Assistir</button>
+                        <button class="amigo-tab-btn" data-list="lidos">Lidos</button>
+                        <button class="amigo-tab-btn" data-list="quero">Lista</button>
                         <button class="amigo-tab-btn" data-list="comentarios">Comentários</button>
                     </div>`;
 
@@ -583,6 +937,7 @@
 
                 const favContainer = createListContainer('favoritos', filmesFavoritos);
                 const watchedContainer = createListContainer('assistidos', filmesAssistidos);
+                const lidosContainer = createListContainer('lidos', livrosLidos);
                 const wantContainer = createListContainer('quero', filmesQuero);
                 
                 const commentsContainer = document.createElement('div');
@@ -593,25 +948,16 @@
                     const sortedComments = [...comentarios].sort((a,b) => b.timestamp - a.timestamp);
                     sortedComments.forEach(c => {
                          const rating = (amigoData.estrelas && amigoData.estrelas[c.filme]) ? amigoData.estrelas[c.filme] : 0;
-                         const isOwner = amigoData.uid === auth.currentUser.uid;
-                         const deleteBtnHtml = isOwner ? `<button class="delete-comment-btn" title="Excluir">🗑️</button>` : '';
-
                          const div = document.createElement('div');
                          div.className = 'amigo-recent-comment';
                          div.innerHTML = `
                              <div class="comment-header">
                                 <strong style="color: var(--cor-principal); font-size: 16px;">${c.filme}</strong>
                                 <span class="comment-stars">${createStarsHTML(rating)}</span>
-                                ${deleteBtnHtml}
                              </div>
                              <p>"${c.texto}"</p>
                              <span class="comment-date">${new Date(c.timestamp).toLocaleDateString('pt-BR')}</span>
                          `;
-                         
-                         if (isOwner) {
-                             div.querySelector('.delete-comment-btn').onclick = () => deletarComentario(c.timestamp, c.filme);
-                         }
-
                          commentsContainer.appendChild(div);
                     });
                 } else {
@@ -619,11 +965,13 @@
                 }
 
                 watchedContainer.style.display = 'none';
+                lidosContainer.style.display = 'none';
                 wantContainer.style.display = 'none';
                 commentsContainer.style.display = 'none';
 
                 amigoCard.appendChild(favContainer);
                 amigoCard.appendChild(watchedContainer);
+                amigoCard.appendChild(lidosContainer);
                 amigoCard.appendChild(wantContainer);
                 amigoCard.appendChild(commentsContainer);
                 amigosContainer.appendChild(amigoCard);
@@ -644,7 +992,6 @@
 
         } catch (error) {
             console.error("Erro ao buscar usuários:", error);
-            dom.displayArea.innerHTML += '<p>Ocorreu um erro ao carregar a lista de amigos.</p>';
         }
     }
 
@@ -828,9 +1175,9 @@ card.prepend(favButton);
         return card;
     }
 
-    function popularTags() {
+function popularTags() {
         dom.tags.fixedContainer.innerHTML = '';
-        ['Todos', 'Series', 'Filmes'].forEach(tagText => {
+        ['Todos', 'Series', 'Filmes', 'Livros'].forEach(tagText => { // <-- Livros Adicionado!
             const el = document.createElement("span");
             el.className = "tag base-tag";
             el.textContent = tagText;
@@ -838,7 +1185,7 @@ card.prepend(favButton);
             dom.tags.fixedContainer.appendChild(el);
         });
         const allOtherTags = new Set(filmes.flatMap(f => f.tags));
-        ['Series', 'Filmes', 'Adult'].forEach(t => allOtherTags.delete(t));
+        ['Series', 'Filmes', 'Livros', 'Adult'].forEach(t => allOtherTags.delete(t));
         dom.tags.dropdownContent.innerHTML = '';
         allOtherTags.forEach(tagText => {
             const el = document.createElement("a");
@@ -846,9 +1193,7 @@ card.prepend(favButton);
             el.className = "dropdown-tag";
             el.textContent = tagText;
             el.onclick = (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                toggleTagFilter(tagText);
+                e.preventDefault(); e.stopPropagation(); toggleTagFilter(tagText);
             };
             dom.tags.dropdownContent.appendChild(el);
         });
@@ -890,20 +1235,28 @@ card.prepend(favButton);
         });
     }
 
-    function applyAllFilters() {
+function applyAllFilters() {
       let filteredList = [...filmes];
       syncFilmesWithUserData();
 
+      // 1. FILTRO DO MENU LATERAL (Status)
+      if (currentMenuFilter === 'Favoritos') {
+          filteredList = filteredList.filter(f => f.favorito);
+      } else if (currentMenuFilter === 'Assistidos') {
+          filteredList = filteredList.filter(f => f.assistido && !f.tags.includes('Livros'));
+      } else if (currentMenuFilter === 'Lidos') {
+          filteredList = filteredList.filter(f => f.assistido && f.tags.includes('Livros'));
+      } else if (currentMenuFilter === 'Lista') {
+          filteredList = filteredList.filter(f => f.queroAssistir);
+      }
+
+      // 2. FILTRO DO TOPO (Categoria) - FUNCIONA JUNTO COM O DE CIMA!
       if (currentBaseFilter === 'Series') {
           filteredList = filteredList.filter(f => f.tags.includes('Series'));
       } else if (currentBaseFilter === 'Filmes') {
-          filteredList = filteredList.filter(f => !f.tags.includes('Series'));
-      } else if (currentBaseFilter === 'Favoritos') {
-          filteredList = filteredList.filter(f => f.favorito);
-      } else if (currentBaseFilter === 'Assistidos') {
-          filteredList = filteredList.filter(f => f.assistido);
-      } else if (currentBaseFilter === 'Quero Assistir') {
-          filteredList = filteredList.filter(f => f.queroAssistir);
+          filteredList = filteredList.filter(f => !f.tags.includes('Series') && !f.tags.includes('Livros'));
+      } else if (currentBaseFilter === 'Livros') {
+          filteredList = filteredList.filter(f => f.tags.includes('Livros'));
       }
 
       if (activeTags.size > 0) {
@@ -918,15 +1271,20 @@ card.prepend(favButton);
             const titulo = (f.titulo || '').toLowerCase();
             const sinopse = (f.sinopse || '').toLowerCase();
             const elenco = (Array.isArray(f.elenco) ? f.elenco.join(', ') : (f.elenco || '')).toLowerCase();
-
-            return titulo.includes(searchTerm) ||
-                   elenco.includes(searchTerm) ||
-                   sinopse.includes(searchTerm);
+            return titulo.includes(searchTerm) || elenco.includes(searchTerm) || sinopse.includes(searchTerm);
           });
       }
 
       mostrarFilmesGrid(filteredList);
       updateTagUI();
+      
+      // Escreve o título da página
+      if (currentMenuFilter !== 'Todos') {
+          const title = document.createElement('h2');
+          title.className = 'section-title dynamic-title';
+          title.textContent = currentMenuFilter;
+          dom.displayArea.prepend(title);
+      }
     }
 
     function resetFilters() {
@@ -1129,19 +1487,37 @@ card.prepend(favButton);
         if (counter) counter.style.display = 'none';
     }
 
-    function updateWatchedCounters() {
-        const watchedCount = userData.assistidos.length;
-        const totalCount = filmes.length;
-        const text = `Assistidos: ${watchedCount} / ${totalCount}`;
+// Função global para clicar no número e abrir a lista
+    window.abrirListaMenu = function(lista) {
+        currentMenuFilter = lista;
+        currentBaseFilter = 'Todos'; // Reseta o topo
+        activeTags.clear();
+        currentView = 'grid';
+        document.getElementById('watched-counter').style.display = 'block';
+        applyAllFilters();
+        if(dom.sideMenu.menu.classList.contains('open')) closeSideMenu();
+    };
+
+function updateWatchedCounters() {
+        syncFilmesWithUserData();
+        const assistidosFilmesSeries = filmes.filter(f => f.assistido && !f.tags.includes('Livros')).length;
+        const totalFilmesSeries = filmes.filter(f => !f.tags.includes('Livros')).length;
         
-        if (dom.sideMenu.watchedCounter) {
-            dom.sideMenu.watchedCounter.textContent = text;
+        const lidosLivros = filmes.filter(f => f.assistido && f.tags.includes('Livros')).length;
+        const totalLivros = filmes.filter(f => f.tags.includes('Livros')).length;
+        
+        // Atualiza os botões do Menu Lateral para mostrar os números encostados na direita
+        if(dom.sideMenu.watchBtn) {
+            dom.sideMenu.watchBtn.innerHTML = `Assistidos <span style="float:right; opacity:0.7; font-size:13px; font-weight:normal;">${assistidosFilmesSeries} / ${totalFilmesSeries}</span>`;
+        }
+        if(dom.sideMenu.lidosBtn) {
+            dom.sideMenu.lidosBtn.innerHTML = `Lidos <span style="float:right; opacity:0.7; font-size:13px; font-weight:normal;">${lidosLivros} / ${totalLivros}</span>`;
         }
 
+        // Atualiza a barrinha de contagem da página principal (caso ativada)
+        const mainHtml = `<span class="clickable-counter" onclick="abrirListaMenu('Assistidos')">Assistidos: ${assistidosFilmesSeries} / ${totalFilmesSeries}</span> &nbsp;&nbsp;|&nbsp;&nbsp; <span class="clickable-counter" onclick="abrirListaMenu('Lidos')">Lidos: ${lidosLivros} / ${totalLivros}</span>`;
         const mainCounter = document.getElementById('watched-counter');
-        if (mainCounter) {
-            mainCounter.textContent = text;
-        }
+        if (mainCounter) mainCounter.innerHTML = mainHtml;
     }
 
     function createClickableFilterHTML(type, data, joiner = ', ') {
@@ -1194,40 +1570,102 @@ card.prepend(favButton);
         ocultarContador();
     }
 
+let heroInterval; // Controla a troca de imagens da galeria
+
     function abrirModal(index) {
       fecharChat(); 
       syncFilmesWithUserData();
       const f = filmes[index];
+
+// --- MÁGICA DA GALERIA HBO/NETFLIX (FADE SUAVE + BOTÃO) ---
+      const heroEl = document.getElementById('modal-hero');
+      const btnNextHero = document.getElementById('hero-next-btn'); // O novo botão
+      
+      if (heroInterval) clearInterval(heroInterval); 
+      
+      if (f.galleryImages && f.galleryImages.length > 0) {
+          let currentImg = 0;
+          heroEl.style.opacity = 1;
+          heroEl.style.backgroundImage = `url('${f.galleryImages[currentImg]}')`;
+          
+          if (f.galleryImages.length > 1) {
+              btnNextHero.style.display = 'flex'; // Mostra a setinha se tiver + de 1 foto
+              
+              // Função isolada que faz a troca com fade
+              const advanceImage = () => {
+                  heroEl.style.opacity = 0; // 1. Escurece
+                  setTimeout(() => {
+                      currentImg = (currentImg + 1) % f.galleryImages.length; // Looping circular!
+                      heroEl.style.backgroundImage = `url('${f.galleryImages[currentImg]}')`;
+                      heroEl.style.opacity = 1; // 2. Clareia
+                  }, 400);
+              };
+
+              // O carrossel automático a cada 10s
+              heroInterval = setInterval(advanceImage, 10000); 
+
+              // Quando você clica na setinha manualmente:
+              btnNextHero.onclick = () => {
+                  advanceImage(); 
+                  // Zera o cronômetro para não pular de foto 1 segundo depois de você clicar
+                  clearInterval(heroInterval);
+                  heroInterval = setInterval(advanceImage, 10000);
+              };
+
+          } else {
+              btnNextHero.style.display = 'none'; // Esconde o botão se só tiver 1 foto
+          }
+      } else {
+          heroEl.style.opacity = 1;
+          heroEl.style.backgroundImage = `url('${f.imagem}')`; 
+          if(btnNextHero) btnNextHero.style.display = 'none';
+      }
+
+      const btnPlay = document.getElementById("modal-play-btn");
+      const btnEdit = document.getElementById("modal-edit-btn");
+      const btnDelete = document.getElementById("modal-delete-btn");
+
+      if (btnPlay) {
+          if (f.youtubeLink) {
+              btnPlay.style.display = 'inline-block';
+              btnPlay.onclick = () => window.open(f.youtubeLink, '_blank');
+          } else {
+              btnPlay.style.display = 'none';
+          }
+      }
+
+      if (btnEdit && btnDelete) {
+          if (isAdmin) {
+              btnEdit.style.display = 'inline-block';
+              btnDelete.style.display = 'inline-block';
+              btnEdit.onclick = () => abrirModalEdicao(index);
+              btnDelete.onclick = () => deletarFilme(index);
+          } else {
+              btnEdit.style.display = 'none';
+              btnDelete.style.display = 'none';
+          }
+      }
+
       dom.modal.poster.src = f.imagem;
       dom.modal.title.textContent = f.titulo;
       dom.modal.modalDurationDots.innerHTML = createDurationDotsHTML(f.screentime);
       dom.modal.sinopse.textContent = f.sinopse;
+
+    const isLivro = f.tags && f.tags.includes('Livros');
+      const elencoLabel = isLivro ? 'Autor(a)' : 'Elenco';
+      const plataformaLabel = isLivro ? 'Editora' : 'Plataforma';
 
       const anoHTML = createClickableFilterHTML('ano', f.ano);
       const paisHTML = createClickableFilterHTML('pais', f.pais);
       const plataformaHTML = createClickableFilterHTML('plataforma', f.plataforma, ' / ');
       const elencoHTML = createClickableFilterHTML('elenco', f.elenco, ', ');
 
-      dom.modal.info.innerHTML = `<strong>Ano:</strong> ${anoHTML} | <strong>País:</strong> ${paisHTML}<br><strong>Plataforma:</strong> ${plataformaHTML}<br><strong>Elenco:</strong> ${elencoHTML || 'Não informado'}`;
+      dom.modal.info.innerHTML = `<strong>Ano:</strong> ${anoHTML} | <strong>País:</strong> ${paisHTML}<br><strong>${plataformaLabel}:</strong> ${plataformaHTML}<br><strong>${elencoLabel}:</strong> ${elencoHTML || 'Não informado'}`;
       
       updateModalButtons(index);
 
-      dom.modal.youtubeLink.style.display = f.youtubeLink ? 'inline-block' : 'none';
-      if(f.youtubeLink) dom.modal.youtubeLink.href = f.youtubeLink;
-
-      // PREENCHER A GALERIA INLINE 
-      const hasImages = f.galleryImages && f.galleryImages.length > 0;
-      if(hasImages) {
-        dom.modal.inlineGalleryWrapper.style.display = 'block';
-        dom.modal.galleryContainer.innerHTML = '';
-        f.galleryImages.forEach(imgUrl => {
-            const img = document.createElement('img');
-            img.src = imgUrl;
-            dom.modal.galleryContainer.appendChild(img);
-        });
-      } else {
-        dom.modal.inlineGalleryWrapper.style.display = 'none';
-      }
+      // Desliga a galeria antiga para não duplicar fotos
+      dom.modal.inlineGalleryWrapper.style.display = 'none';
 
       dom.modal.favBtn.onclick = () => toggleFavorite(f.titulo);
       dom.modal.watchBtn.onclick = () => toggleAssistido(f.titulo);
@@ -1243,14 +1681,15 @@ card.prepend(favButton);
       dom.modal.closeBtn.focus();
     }
 
-    function updateModalButtons(index){
+function updateModalButtons(index){
       const f = filmes[index];
+      const isLivro = f.tags && f.tags.includes('Livros');
       dom.modal.favBtn.classList.toggle('active', f.favorito);
       dom.modal.favBtn.innerHTML = '❤︎';
       dom.modal.watchBtn.classList.toggle('active', f.assistido);
-      dom.modal.watchBtn.textContent = f.assistido ? 'Assistido' : 'Marcar como assistido';
+      dom.modal.watchBtn.textContent = f.assistido ? (isLivro ? 'Lido' : 'Assistido') : (isLivro ? 'Marcar como lido' : 'Marcar como assistido');
       dom.modal.wantBtn.classList.toggle('active', f.queroAssistir);
-      dom.modal.wantBtn.textContent = f.queroAssistir ? 'Na Lista' : '+';
+      dom.modal.wantBtn.textContent = f.queroAssistir ? 'Lista' : '+';
     }
 
     function renderStarsInModal(index) {
@@ -1267,10 +1706,78 @@ card.prepend(favButton);
     }
     
     function fecharModal() {
-      dom.modal.bg.classList.remove("open");
+        dom.modal.bg.classList.remove("open");
+        if (typeof heroInterval !== 'undefined') clearInterval(heroInterval);
+    }
+    async function deletarFilme(index) {
+        const f = filmes[index];
+        if (!confirm(`Tem certeza que deseja excluir o filme "${f.titulo}" do catálogo?`)) return;
+
+        try {
+            dom.modal.deleteBtn.textContent = 'Excluindo...';
+            await deleteDoc(doc(db, "filmes", f.id)); // Deleta do Google
+            filmes.splice(index, 1); // Deleta da tela
+            alert("Excluído com sucesso!");
+            fecharModal();
+            mostrarTelaInicial(); 
+        } catch (error) {
+            console.error("Erro ao excluir:", error);
+            alert("Erro ao excluir.");
+        } finally {
+            dom.modal.deleteBtn.textContent = 'Excluir';
+        }
+    }
+
+    function abrirModalEdicao(index) {
+        const f = filmes[index];
+        editingFilmeId = f.id; // Salva o ID que estamos editando
+        
+        // Preenche tudo no formulário do Administrador
+        document.getElementById('admin-titulo').value = f.titulo || '';
+        document.getElementById('admin-ano').value = f.ano || '';
+        document.getElementById('admin-pais').value = f.pais || '';
+        document.getElementById('admin-imagem').value = f.imagem || '';
+        // Puxa as tags e descobre a categoria do item
+        let tagsDoFilme = [...(f.tags || [])];
+        let categoriaSelecionada = 'Filmes';
+        
+        if (tagsDoFilme.includes('Livros')) {
+            categoriaSelecionada = 'Livros';
+            tagsDoFilme = tagsDoFilme.filter(t => t !== 'Livros');
+        } else if (tagsDoFilme.includes('Series')) {
+            categoriaSelecionada = 'Series';
+            tagsDoFilme = tagsDoFilme.filter(t => t !== 'Series');
+        } else {
+            tagsDoFilme = tagsDoFilme.filter(t => t !== 'Filmes'); // Limpa se for filme normal
+        }
+        
+        document.getElementById('admin-categoria').value = categoriaSelecionada;
+        document.getElementById('admin-tags').value = tagsDoFilme.join(', ');
+        document.getElementById('admin-screentime').value = f.screentime || 'Medium';
+        document.getElementById('admin-elenco').value = f.elenco || '';
+        document.getElementById('admin-plataforma').value = f.plataforma || '';
+        document.getElementById('admin-youtube').value = f.youtubeLink || '';
+        document.getElementById('admin-sinopse').value = f.sinopse || '';
+        
+        document.getElementById('admin-gallery-1').value = f.galleryImages && f.galleryImages[0] ? f.galleryImages[0] : '';
+        document.getElementById('admin-gallery-2').value = f.galleryImages && f.galleryImages[1] ? f.galleryImages[1] : '';
+        document.getElementById('admin-gallery-3').value = f.galleryImages && f.galleryImages[2] ? f.galleryImages[2] : '';
+        
+        // Simula a digitação para as imagens aparecerem
+        ['admin-imagem', 'admin-gallery-1', 'admin-gallery-2', 'admin-gallery-3'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.dispatchEvent(new Event('input'));
+        });
+
+        document.querySelector('#modal-admin-bg h2').textContent = "Editar";
+        document.getElementById('salvar-novo-filme').textContent = "Atualizar";
+
+        fecharModal(); 
+        document.getElementById('modal-admin-bg').style.display = 'flex';
     }
 
     function init() {
+    dom.auth.section.style.display = "none";
       dom.main.style.display = "block";
       syncFilmesWithUserData();
       updateWatchedCounters(); 
@@ -1278,6 +1785,132 @@ card.prepend(favButton);
       mostrarTelaInicial();
       
       if(auth.currentUser) dom.chat.floatingBtn.style.display = 'flex';
+       // EVENTOS DO PAINEL ADMIN
+      const btnAddFilme = document.getElementById('btn-add-filme');
+      const modalAdmin = document.getElementById('modal-admin-bg');
+      const btnCloseAdmin = document.getElementById('admin-close');
+      const btnSalvarAdmin = document.getElementById('salvar-novo-filme');
+        // FUNÇÃO DE PREVIEW DE IMAGENS (ADMIN)
+      const setupPreview = (inputId, previewId) => {
+          const input = document.getElementById(inputId);
+          const preview = document.getElementById(previewId);
+          if(input && preview) {
+              input.addEventListener('input', () => {
+                  if (input.value.trim() !== "") {
+                      preview.src = input.value;
+                      preview.style.display = 'block';
+                  } else {
+                      preview.style.display = 'none';
+                  }
+              });
+          }
+      };
+      setupPreview('admin-imagem', 'preview-poster');
+      setupPreview('admin-gallery-1', 'preview-g1');
+      setupPreview('admin-gallery-2', 'preview-g2');
+      setupPreview('admin-gallery-3', 'preview-g3');
+if (btnAddFilme) {
+          btnAddFilme.onclick = () => {
+              editingFilmeId = null; // Garante que é um novo
+              document.querySelector('#modal-admin-bg h2').textContent = isAdmin ? "Cadastrar no Catálogo" : "Sugerir Título";
+              btnSalvarAdmin.textContent = isAdmin ? "Salvar no Catálogo" : "Enviar Sugestão";
+              document.querySelectorAll('#modal-admin-bg input, #modal-admin-bg textarea').forEach(input => input.value = '');
+    
+              document.getElementById('admin-categoria').value = 'Filmes';
+              
+              document.querySelectorAll('#modal-admin-bg img').forEach(img => img.style.display = 'none');
+              
+              // A MÁGICA VOLTOU AQUI: Este comando faz a janela aparecer!
+              modalAdmin.style.display = 'flex'; 
+              
+              closeSideMenu();
+          };
+      }
+      
+      if (btnCloseAdmin) {
+          btnCloseAdmin.onclick = () => {
+              modalAdmin.style.display = 'none';
+          };
+      }
+
+ if (btnSalvarAdmin) {
+          btnSalvarAdmin.onclick = async () => {
+              const titulo = document.getElementById('admin-titulo').value.trim();
+              if (!titulo) return alert("O título é obrigatório!");
+              
+              const categoriaSelecionada = document.getElementById('admin-categoria').value;
+              const tagsArray = document.getElementById('admin-tags').value.split(',').map(tag => tag.trim()).filter(tag => tag !== "");
+              
+              // A MÁGICA: Embutir a categoria secreta nas tags
+              if (!tagsArray.includes(categoriaSelecionada)) {
+                  tagsArray.push(categoriaSelecionada);
+              }
+              
+              const urlsGaleria = [
+                  document.getElementById('admin-gallery-1').value.trim(),
+                  document.getElementById('admin-gallery-2').value.trim(),
+                  document.getElementById('admin-gallery-3').value.trim()
+              ].filter(url => url !== "");
+
+              const novoFilme = {
+                  titulo: titulo,
+                  ano: document.getElementById('admin-ano').value.trim(),
+                  pais: document.getElementById('admin-pais').value.trim(),
+                  imagem: document.getElementById('admin-imagem').value.trim(),
+                  tags: tagsArray,
+                  screentime: document.getElementById('admin-screentime').value,
+                  elenco: document.getElementById('admin-elenco').value.trim(),
+                  plataforma: document.getElementById('admin-plataforma').value.trim(),
+                  sinopse: document.getElementById('admin-sinopse').value.trim(),
+                  youtubeLink: document.getElementById('admin-youtube').value.trim(),
+                  galleryImages: urlsGaleria,
+                  favorito: false, 
+                  assistido: false,
+                  userRating: 0,
+                  queroAssistir: false
+              };
+
+              try {
+                  btnSalvarAdmin.textContent = "Salvando...";
+                  
+                  if (isAdmin) {
+                      if (editingFilmeId) {
+                          await updateDoc(doc(db, "filmes", editingFilmeId), novoFilme);
+                          novoFilme.id = editingFilmeId;
+                          const idx = filmes.findIndex(f => f.id === editingFilmeId);
+                          if (idx !== -1) filmes[idx] = novoFilme;
+                          alert("Atualizado com sucesso!");
+                      } else {
+                          const docRef = await addDoc(collection(db, "filmes"), novoFilme);
+                          novoFilme.id = docRef.id;
+                          filmes.push(novoFilme);
+                          alert("Adicionado ao catálogo com sucesso!");
+                      }
+                      filmes.sort((a, b) => a.titulo.localeCompare(b.titulo));
+                      popularTags();
+                      mostrarTelaInicial(); 
+                  } else {
+                      novoFilme.sugeridoPor = userData.apelido || "Anônimo";
+                      await addDoc(collection(db, "sugestoes"), novoFilme);
+                      alert("Sua sugestão foi enviada para aprovação! Obrigada ❤");
+                  }
+                  
+                  document.querySelectorAll('#modal-admin-bg input, #modal-admin-bg textarea').forEach(input => input.value = '');
+                  document.querySelectorAll('#modal-admin-bg img').forEach(img => img.style.display = 'none');
+                  modalAdmin.style.display = 'none';
+
+              } catch (e) {
+                  console.error("Erro: ", e);
+                  alert("Erro ao enviar. Tente novamente.");
+              } finally {
+                  btnSalvarAdmin.textContent = isAdmin ? "Salvar no Catálogo" : "Enviar Sugestão";
+              }
+          }; // <-- CHAVE 1 (FECHA A FUNÇÃO DO CLIQUE)
+      } // <-- CHAVE 2 (FECHA A VERIFICAÇÃO DO BOTÃO)
+
+      // EVENTOS DO CHAT
+      dom.chat.floatingBtn.addEventListener('click', abrirChat);
+      dom.chat.sendBtn.addEventListener('click', enviarMensagemChat);
 
       dom.chat.floatingBtn.addEventListener('click', abrirChat);
       dom.chat.sendBtn.addEventListener('click', enviarMensagemChat);
@@ -1356,23 +1989,34 @@ card.prepend(favButton);
           }
       });
       
-      const createSideMenuFilterHandler = (baseFilterText) => () => {
-        resetFilters();
-        currentBaseFilter = baseFilterText;
+const createSideMenuFilterHandler = (statusText) => () => {
+        currentMenuFilter = statusText;
+        currentBaseFilter = 'Todos'; // Reseta o topo para mesclar certinho
+        activeTags.clear();
         currentView = 'grid';
+        if (statusText === 'Assistidos' || statusText === 'Lidos') {
+            document.getElementById('watched-counter').style.display = 'block';
+        } else {
+            ocultarContador();
+        }
         applyAllFilters();
         closeSideMenu();
       };
 
       dom.sideMenu.favBtn.onclick = createSideMenuFilterHandler('Favoritos');
       dom.sideMenu.watchBtn.onclick = createSideMenuFilterHandler('Assistidos');
-      dom.sideMenu.wantBtn.onclick = createSideMenuFilterHandler('Quero Assistir');
+      dom.sideMenu.lidosBtn.onclick = createSideMenuFilterHandler('Lidos');
+      dom.sideMenu.wantBtn.onclick = createSideMenuFilterHandler('Lista');
       dom.sideMenu.amigosBtn.onclick = () => {
           mostrarAmigos();
           closeSideMenu();
       };
       dom.sideMenu.helpBtn.onclick = () => {
           mostrarAjuda();
+          closeSideMenu();
+      };
+      dom.sideMenu.aprovacoesBtn.onclick = () => {
+          mostrarAprovacoes();
           closeSideMenu();
       };
 
@@ -1382,25 +2026,54 @@ card.prepend(favButton);
       
       dom.sideMenu.favBtn.addEventListener("click", ocultarContador);
       dom.sideMenu.wantBtn.addEventListener("click", ocultarContador);
+      dom.sideMenu.lidosBtn.addEventListener("click", () => {
+        document.getElementById('watched-counter').style.display = 'block';
+      });
 
+// --- LÓGICA INVERTIDA DO TEMA ---
       const savedTheme = localStorage.getItem('saficos_theme');
-      if (savedTheme === 'light') {
-          document.body.classList.add('light-theme');
+      
+      // Se a pessoa tinha salvo o escuro antes, liga o botão e tira o claro
+      if (savedTheme === 'dark') {
+          document.body.classList.remove('light-theme');
           dom.sideMenu.themeToggle.checked = true;
+      } else {
+          // Por padrão (ou se salvou claro), garante que o claro está ativo e o botão desligado
+          document.body.classList.add('light-theme');
+          dom.sideMenu.themeToggle.checked = false;
       }
 
+      // Quando clica no interruptor
       dom.sideMenu.themeToggle.addEventListener('change', (e) => {
           if (e.target.checked) {
-              document.body.classList.add('light-theme');
-              localStorage.setItem('saficos_theme', 'light');
-          } else {
+              // Se ligou o botão, tira a classe clara (o site volta ao CSS escuro base)
               document.body.classList.remove('light-theme');
               localStorage.setItem('saficos_theme', 'dark');
+          } else {
+              // Se desligou o botão, adiciona a classe clara
+              document.body.classList.add('light-theme');
+              localStorage.setItem('saficos_theme', 'light');
           }
       });
+
     }
 
+// --- ALTERNAR ENTRE LOGIN E CADASTRO ---
+    document.getElementById('go-to-register').onclick = (e) => {
+        e.preventDefault();
+        document.getElementById('login-form-container').style.display = 'none';
+        document.getElementById('register-form-container').style.display = 'block';
+    };
+    
+    document.getElementById('go-to-login').onclick = (e) => {
+        e.preventDefault();
+        document.getElementById('register-form-container').style.display = 'none';
+        document.getElementById('login-form-container').style.display = 'block';
+    };
+
+    // --- FUNÇÃO DE LOGIN ---
     dom.auth.loginBtn.onclick = async () => {
+      dom.auth.errorDisplay.style.color = '#db1f20'; // Garante a cor vermelha para erros
       dom.auth.errorDisplay.textContent = '';
       try {
         await signInWithEmailAndPassword(auth, dom.auth.emailInput.value, dom.auth.passwordInput.value);
@@ -1417,10 +2090,11 @@ card.prepend(favButton);
       }
     };
 
+    // --- FUNÇÃO DE CADASTRO ---
     dom.auth.registerBtn.onclick = async () => {
-      dom.auth.errorDisplay.textContent = '';
+      dom.auth.regErrorDisplay.textContent = '';
       try {
-        const cred = await createUserWithEmailAndPassword(auth, dom.auth.emailInput.value, dom.auth.passwordInput.value);
+        const cred = await createUserWithEmailAndPassword(auth, dom.auth.regEmailInput.value, dom.auth.regPasswordInput.value);
         await setDoc(doc(db, "usuarios", cred.user.uid), {
           favoritos: [],
           assistidos: [],
@@ -1435,35 +2109,60 @@ card.prepend(favButton);
       } catch (e) {
          switch(e.code) {
             case 'auth/email-already-in-use':
-                dom.auth.errorDisplay.textContent = 'Este email já está em uso.';
+                dom.auth.regErrorDisplay.textContent = 'Este email já está em uso.';
                 break;
             case 'auth/weak-password':
-                dom.auth.errorDisplay.textContent = 'A senha deve ter no mínimo 6 caracteres.';
+                dom.auth.regErrorDisplay.textContent = 'A senha deve ter no mínimo 6 caracteres.';
                 break;
             default:
-                dom.auth.errorDisplay.textContent = 'Erro no cadastro: ' + e.message;
+                dom.auth.regErrorDisplay.textContent = 'Erro no cadastro: ' + e.message;
         }
       }
     };
 
-    dom.auth.forgotPasswordLink.onclick = async () => {
-      dom.auth.errorDisplay.textContent = '';
-      if (!dom.auth.emailInput.value) {
-          alert("Por favor, digite seu e-mail no campo correspondente.");
+    // --- FUNÇÃO DE RECUPERAR SENHA (MODERNA E CORRIGIDA) ---
+    dom.auth.forgotPasswordLink.onclick = async (e) => {
+      e.preventDefault(); 
+      
+      const emailDigitado = dom.auth.emailInput.value.trim();
+      
+      if (!emailDigitado) {
+          dom.auth.errorDisplay.style.color = '#db1f20'; // Vermelho
+          dom.auth.errorDisplay.textContent = 'Por favor, digite seu e-mail no campo acima para recuperar a senha.';
           return;
       }
+      
       try {
-        await sendPasswordResetEmail(auth, dom.auth.emailInput.value);
-        alert("Email de recuperação de senha enviado para " + dom.auth.emailInput.value);
+        dom.auth.errorDisplay.style.color = '#709e75'; // Verde Lily
+        dom.auth.errorDisplay.textContent = 'Enviando link de recuperação...';
+        
+        await sendPasswordResetEmail(auth, emailDigitado);
+        
+        dom.auth.errorDisplay.textContent = 'E-mail enviado! Verifique sua caixa de entrada e spam.';
       } catch (e) {
-        dom.auth.errorDisplay.textContent = 'Erro ao enviar email: ' + e.message;
+        dom.auth.errorDisplay.style.color = '#db1f20'; // Vermelho
+        if (e.code === 'auth/user-not-found') {
+             dom.auth.errorDisplay.textContent = 'Este e-mail não está cadastrado na Lilies.';
+        } else if (e.code === 'auth/invalid-email') {
+             dom.auth.errorDisplay.textContent = 'Formato de e-mail inválido.';
+        } else {
+             dom.auth.errorDisplay.textContent = 'Erro ao enviar email. Tente novamente.';
+        }
       }
     };
 
     onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        dom.auth.section.style.display = 'none';
-        userDocRef = doc(db, "usuarios", user.uid);
+        if (user) {
+            userDocRef = doc(db, "usuarios", user.uid); // A MÁGICA DE VOLTA: Diz quem é a pessoa logada
+            
+            if (user.email === "laisejschimithes@gmail.com") {
+                isAdmin = true; 
+                dom.sideMenu.aprovacoesBtn.style.display = 'block'; // Mostra menu Admin
+            } else {
+                isAdmin = false;
+                dom.sideMenu.aprovacoesBtn.style.display = 'none'; // Esconde menu Admin
+            }
+            document.getElementById('btn-add-filme').style.display = 'flex'; // O botão + APARECE PARA TODAS
 
         dom.sideMenu.profileName.addEventListener('blur', async () => {
             const newName = dom.sideMenu.profileName.textContent.trim();
@@ -1472,11 +2171,48 @@ card.prepend(favButton);
             }
         });
 
-        dom.sideMenu.profilePicEditBtn.addEventListener('click', async () => {
-            const url = prompt("Cole o URL da nova imagem de perfil:");
-            if (url && userDocRef) {
-                dom.sideMenu.profilePic.src = url;
-                await updateDoc(userDocRef, { foto: url });
+const modalProfile = document.getElementById('modal-profile-pic-bg');
+        const inputProfile = document.getElementById('profile-pic-input');
+        const previewProfile = document.getElementById('profile-pic-preview');
+        const defaultPic = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png";
+
+        // Abrir o novo pop-up
+        dom.sideMenu.profilePicEditBtn.addEventListener('click', () => {
+            const currentPic = userData.foto || defaultPic;
+            inputProfile.value = currentPic !== defaultPic ? currentPic : "";
+            previewProfile.src = currentPic;
+            modalProfile.style.display = 'flex';
+        });
+
+        // Atualizar a foto em tempo real enquanto a pessoa cola o link
+        inputProfile.addEventListener('input', () => {
+            const val = inputProfile.value.trim();
+            previewProfile.src = val ? val : defaultPic;
+        });
+
+        // Fechar no "X"
+        document.getElementById('profile-pic-close').addEventListener('click', () => {
+            modalProfile.style.display = 'none';
+        });
+
+        // Salvar a nova foto
+        document.getElementById('save-profile-pic-btn').addEventListener('click', async () => {
+            const newUrl = inputProfile.value.trim();
+            const finalUrl = newUrl ? newUrl : defaultPic;
+            
+            if (userDocRef) {
+                const btnSave = document.getElementById('save-profile-pic-btn');
+                btnSave.textContent = 'Salvando...';
+                
+                await updateDoc(userDocRef, { foto: finalUrl });
+                userData.foto = finalUrl;
+                dom.sideMenu.profilePic.src = finalUrl;
+                
+                btnSave.textContent = 'Salvar Foto';
+                modalProfile.style.display = 'none';
+                
+                // Atualiza a foto imediatamente na aba amigos, se estiver aberta
+                if (currentView === 'amigos') mostrarAmigos();
             }
         });
         
@@ -1515,15 +2251,18 @@ card.prepend(favButton);
         initChatListener();
         
         try {
-            const response = await fetch('filmes.json');
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            filmes = await response.json();
+            const querySnapshot = await getDocs(collection(db, "filmes"));
+            filmes = []; 
+            
+            querySnapshot.forEach((doc) => {
+                filmes.push({ id: doc.id, ...doc.data() });
+            });
+
+            filmes.sort((a, b) => a.titulo.localeCompare(b.titulo));
             init(); 
         } catch (error) {
-            console.error("Não foi possível carregar o arquivo de filmes (filmes.json):", error);
-            dom.displayArea.innerHTML = "<p>Erro ao carregar a lista de filmes. Verifique o console para mais detalhes.</p>";
+            console.error("Não foi possível carregar os filmes do banco de dados:", error);
+            dom.displayArea.innerHTML = "<p>Erro ao carregar a lista de filmes. Verifique sua conexão ou banco de dados.</p>";
         }
 
       } else {
@@ -1532,8 +2271,30 @@ card.prepend(favButton);
         userData = { favoritos: [], assistidos: [], quero: [], estrelas: {}, comentarios: [], bandeira: "", isPublic: false };
         if (dom.chat.floatingBtn) dom.chat.floatingBtn.style.display = 'none';
         if (unsubscribeChat) unsubscribeChat();
-      }
-    });
+
+        // PASSO 4: Sorteia uma imagem de fundo do catálogo para a janela de login
+        getDocs(collection(db, "filmes")).then(snapshot => {
+            const imagensParaFundo = [];
+            snapshot.forEach(doc => {
+                const filme = doc.data();
+                if (filme.galleryImages && filme.galleryImages.length > 0) {
+                    imagensParaFundo.push(filme.galleryImages[0]); 
+                } else if (filme.imagem) {
+                    imagensParaFundo.push(filme.imagem);
+                }
+            });
+            
+            if (imagensParaFundo.length > 0) {
+                const randomImg = imagensParaFundo[Math.floor(Math.random() * imagensParaFundo.length)];
+                const sideImg = document.querySelector('.split-visual');
+                if(sideImg) sideImg.style.setProperty('--bg-image', `url('${randomImg}')`);
+            }
+        }).catch(e => {
+            console.error("Erro ao puxar imagens para o fundo:", e);
+        });
+
+      } // FECHA O ELSE DO UTILIZADOR DESLOGADO
+    }); // FECHA O onAuthStateChanged
 
 // --- MAGIA PARA O BOTÃO VOLTAR DO CELULAR ---
     (function controleBotaoVoltar() {
@@ -1575,8 +2336,12 @@ card.prepend(favButton);
              if (!window.history.state || !window.history.state.trava) {
                  window.history.pushState({ trava: true }, "");
              }
-        });
+            });
+ 
     })();
+
+    // Comando que desenha os ícones na tela!
+    lucide.createIcons();
 
   </script>
 </body>

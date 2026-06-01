@@ -1,30 +1,33 @@
 /* --- ESTILOS GERAIS --- */
+/* --- ESTILOS GERAIS --- */
 :root {
   --cor-principal: #709e75;
-  --cor-fundo: #242d26;
-  --cor-card: #344236;
-  --cor-texto: #eee;
-  --cor-texto-secundario: #ccc;
+  --cor-fundo: #161c17; 
+  --cor-card: #242d26;
+  --cor-texto: #f8fafc;
+  --cor-texto-secundario: #94a3b8;
 }
 
 body {
   margin: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Inter', sans-serif; /* Fonte padrão do modelo novo */
   background-color: var(--cor-fundo);
   color: var(--cor-texto);
   cursor: default; 
   user-select: none; 
   -webkit-user-select: none; 
-  background-image: radial-gradient(circle at center, transparent 30%, rgba(0, 0, 0, 0.85) 120%);
+  background-image: radial-gradient(circle at center, transparent 30%, rgba(0, 0, 0, 0.5) 120%);
   background-attachment: fixed; 
 }
 
-input, textarea, [contenteditable="true"] {
-  cursor: text;
-  user-select: auto;
-  -webkit-user-select: auto;
+/* Tipografia de Títulos Premium */
+h1, h2, h3, h4, .section-title, .dynamic-title, .profile-name, .logo-mobile, .destaque-info h2 {
+  font-family: 'Montserrat', sans-serif;
 }
 
+input, textarea, select, button, [contenteditable="true"] {
+  font-family: 'Inter', sans-serif;
+}
 /* --- BARRAS DE ROLAGEM MINIMALISTAS --- */
 #modal-bg.details-sidebar::-webkit-scrollbar,
 #chat-sidebar.details-sidebar::-webkit-scrollbar,
@@ -167,70 +170,84 @@ h1 {
   cursor: pointer;
 }
 
-/* --- TELA DE LOGIN --- */
+/* --- TELA DE LOGIN IDENTICA AO MODELO FUGE --- */
 #auth-section {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.95);
-    z-index: 3000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-}
-#login-box {
-  background: var(--cor-card);
-  padding: 40px;
-  border-radius: 10px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.5);
-  width: 300px;
-  text-align: center;
-}
-#login-box h2 {
-  text-align: center;
-  margin: 0 0 25px 0;
-  font-size: 24px;
-}
-.login-input {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 15px;
-  border: 1px solid #555;
-  border-radius: 5px;
-  background: #333;
-  color: var(--cor-texto);
-  font-size: 16px;
-  box-sizing: border-box;
-}
-#login-btn, #register-btn {
-  width: 100%;
-  padding: 12px;
-  font-size: 16px;
-  border-radius: 5px;
-  border: none;
-  cursor: pointer;
-  background-color: var(--cor-principal);
-  color: #fff;
-  font-weight: bold;
-  transition: background-color 0.3s;
-  margin-top: 10px;
-}
-#login-btn:hover, #register-btn:hover {
-  background-color: #485951;
-}
-#auth-error {
-  color: var(--cor-principal);
-  margin-top: 10px;
-  font-size: 14px;
-  height: 16px;
-}
- #forgot-password {
-    color: var(--cor-texto-secundario);
-    font-size: 12px;
-    margin-top: 15px;
-    display: inline-block;
+    position: fixed; inset: 0; z-index: 3000;
+    display: flex; background-color: #f8fafc;
+    font-family: 'Inter', sans-serif;
 }
 
+/* Lado da Imagem (Esquerdo) */
+.split-visual {
+    flex: 1.2;
+    /* Degradê escuro puxando para o verde da Lily */
+    background: linear-gradient(135deg, #748778 0%, #214326 100%);
+    position: relative;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 50px; color: white; overflow: hidden;
+    --bg-image: url(''); /* Fundo padrão antes de carregar do Firebase */
+}
+
+.split-visual::before {
+    content: ''; position: absolute; inset: 0;
+    background-image: var(--bg-image);
+    background-size: cover; background-position: center; 
+    opacity: 0.55; mix-blend-mode: overlay; transition: background-image 0.5s ease;
+}
+
+.visual-content { position: relative; z-index: 2; max-width: 500px; margin: auto 0; }
+.visual-content h1 { font-family: 'Montserrat', sans-serif; font-size: 3.5rem; line-height: 1.1; margin-bottom: 20px; color: #fff; }
+.visual-content p { font-size: 1.1rem; opacity: 0.9; line-height: 1.6; }
+
+/* Lado do Formulário (Direito) */
+.split-form {
+    flex: 1; background: white;
+    display: flex; align-items: center; justify-content: center;
+    padding: 40px; position: relative;
+}
+
+.form-container { width: 100%; max-width: 400px; animation: fadeIn 0.4s ease; }
+
+.logo-mobile { 
+    display: flex; align-items: center; gap: 10px; margin-bottom: 30px; justify-content: center; 
+    font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.5rem; color: #242d26;
+}
+.logo-mobile img { height: 40px; }
+
+.form-header { margin-bottom: 30px; text-align: center; }
+.form-header h2 { font-family: 'Montserrat', sans-serif; font-size: 1.8rem; color: #242d26; margin-bottom: 5px; }
+.form-header p { color: #64748b; font-size: 0.9rem; }
+
+.input-group { margin-bottom: 20px; }
+.input-group label { display: block; font-size: 0.85rem; font-weight: 600; color: #0f172a; margin-bottom: 8px; text-align: left;}
+.input-wrapper { position: relative; }
+.input-wrapper input {
+    width: 100%; padding: 12px 15px 12px 45px;
+    border: 1px solid #e2e8f0; border-radius: 8px;
+    font-size: 1rem; transition: 0.3s; color: #0f172a; background: white; font-family: 'Inter', sans-serif;
+}
+.input-wrapper input:focus { border-color: #709e75; box-shadow: 0 0 0 3px rgba(112, 158, 117, 0.15); outline: none; }
+.input-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; width: 18px; }
+
+.btn-submit {
+    width: 100%; padding: 14px; background: #242d26; color: white;
+    border: none; border-radius: 8px; font-weight: 700; font-size: 1rem;
+    cursor: pointer; transition: 0.3s; margin-top: 10px; font-family: 'Inter', sans-serif;
+}
+.btn-submit:hover { background: #709e75; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(112, 158, 117, 0.25); }
+
+.form-footer { margin-top: 25px; text-align: center; font-size: 0.9rem; color: #64748b; }
+.form-footer a { color: #709e75; text-decoration: none; font-weight: 700; }
+.form-footer a:hover { text-decoration: underline; }
+
+.forgot-pass { display: block; text-align: right; font-size: 0.8rem; color: #0f172a; margin-top: 8px; text-decoration: none; font-weight: 600;}
+.forgot-pass:hover { text-decoration: underline; }
+
+.error-msg { color: #db1f20; font-size: 0.85rem; margin-bottom: 15px; min-height: 16px; font-weight: 600; text-align: center; }
+
+@media (max-width: 900px) {
+    .split-visual { display: none; }
+}
 /* --- MENU LATERAL DIREITO (CONTA/AMIGOS) --- */
 #hamburger-menu {
   background: none;
@@ -269,14 +286,27 @@ h1 {
   right: 0;
 }
 #close-menu {
-  background: none;
-  border: none;
-  color: var(--cor-texto-secundario);
-  font-size: 30px;
-  cursor: pointer;
   position: absolute;
-  top: 10px;
+  top: 15px;
   right: 15px;
+  background: rgba(0,0,0,0.1);
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--cor-texto-secundario);
+  font-size: 28px;
+  cursor: pointer;
+  transition: 0.3s;
+  padding-bottom: 4px; /* Esse padding centraliza a fonte do "X" perfeitamente no meio do círculo */
+}
+#close-menu:hover {
+  background: rgba(0,0,0,0.3);
+  color: var(--cor-principal);
+  transform: rotate(90deg);
 }
 .profile-section {
   text-align: center;
@@ -311,9 +341,9 @@ h1 {
   transition: background 0.3s;
 }
 .menu-nav-button:hover {
-  background: #444;
+  background: var(--cor-principal);
+  color: white;
 }
-
 .side-menu-bottom {
     margin-top: auto;
     padding-top: 20px;
@@ -594,101 +624,70 @@ h1 {
 }
 
 
-/* --- SEÇÃO AMIGOS (PÓDIO E LISTA) --- */
+/* --- SEÇÃO AMIGOS (PÓDIO PREMIUM) --- */
 .amigos-divider {
-    border: 0;
-    height: 1px;
-    background: rgba(255,255,255,0.1);
-    margin: 20px 0;
-    width: 100%;
+    border: 0; height: 1px; background: rgba(255,255,255,0.05); margin: 30px 0; width: 100%;
 }
 
 .podium-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    gap: 15px;
-    margin: 30px 0 40px 0;
+    display: flex; justify-content: center; align-items: center; gap: 20px; margin: 40px 0;
 }
+
+/* O Card do Pódio */
 .podium-step-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100px;
+    display: flex; flex-direction: column; align-items: center; width: 140px;
+    background: var(--cor-card); border-radius: 16px; padding: 25px 15px 20px 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05);
+    position: relative; transition: transform 0.3s ease;
 }
-.podium-step-container.empty {
-    visibility: hidden;
-}
-.podium-avatar-wrapper {
-    position: relative;
-    margin-bottom: 10px;
-}
+.podium-step-container.empty { visibility: hidden; }
+
+/* Destaque Maior para o 1º Lugar com Gradiente Subtil */
+.step-1 { transform: scale(1.15); z-index: 2; border-color: rgba(255, 215, 0, 0.3); background: linear-gradient(180deg, rgba(255,215,0,0.05) 0%, var(--cor-card) 100%); }
+.step-2 { border-color: rgba(192, 192, 192, 0.2); background: linear-gradient(180deg, rgba(192,192,192,0.05) 0%, var(--cor-card) 100%); }
+.step-3 { border-color: rgba(205, 127, 50, 0.2); background: linear-gradient(180deg, rgba(205,127,50,0.05) 0%, var(--cor-card) 100%); }
+
+.podium-avatar-wrapper { position: relative; margin-bottom: 15px; display: flex; justify-content: center; }
+
+/* Medalha Redonda Minimalista */
 .podium-medal {
-    position: absolute;
-    top: -15px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 24px;
-    z-index: 5;
+    position: absolute; top: -15px; background: var(--cor-fundo); border-radius: 50%;
+    width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); z-index: 5;
 }
-.podium-pic {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    object-fit: cover;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-    box-sizing: content-box;
-}
-.step-1 .podium-pic { width: 80px; height: 80px; border: 3px solid #ffd700; }
-.step-2 .podium-pic { border: 3px solid #c0c0c0; }
-.step-3 .podium-pic { border: 3px solid #cd7f32; }
+
+/* Fotos com Efeito Glow ao invés de Borda Sólida */
+.podium-pic { width: 65px; height: 65px; border-radius: 50%; object-fit: cover; border: 2px solid transparent; }
+.step-1 .podium-pic { width: 85px; height: 85px; border-color: #ffd700; box-shadow: 0 0 20px rgba(255,215,0,0.3); }
+.step-2 .podium-pic { border-color: #c0c0c0; box-shadow: 0 0 15px rgba(192,192,192,0.2); }
+.step-3 .podium-pic { border-color: #cd7f32; box-shadow: 0 0 15px rgba(205,127,50,0.2); }
 
 .podium-flag {
-    position: absolute;
-    bottom: 0;
-    right: -5px;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: #444;
-    border: 2px solid var(--cor-fundo);
+    position: absolute; bottom: 0; right: 0px; width: 22px; height: 22px;
+    border-radius: 50%; background: var(--cor-fundo); border: 2px solid var(--cor-card);
 }
+
 .podium-name {
-    font-size: 14px;
-    font-weight: bold;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: 100%;
-    margin-bottom: 5px;
-    color: var(--cor-texto);
+    font-size: 15px; font-weight: bold; text-align: center; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis; width: 100%; margin-bottom: 12px; color: var(--cor-texto);
 }
+
+/* Transforma os Blocos feios em "Pílulas" elegantes */
 .podium-bar {
-    width: 100%;
-    background: var(--cor-principal);
-    border-radius: 8px 8px 0 0;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    padding-top: 10px;
-    color: white;
-    font-weight: bold;
-    font-size: 12px;
-    box-shadow: inset 0 5px 10px rgba(0,0,0,0.2);
+    width: auto !important; height: auto !important;
+    background: rgba(255,255,255,0.05) !important;
+    border-radius: 20px !important; padding: 6px 12px !important;
+    display: flex; justify-content: center; align-items: center;
+    color: var(--cor-texto-secundario) !important; font-size: 11px !important; font-weight: 600 !important;
+    box-shadow: none !important; border: 1px solid rgba(255,255,255,0.05);
 }
-.step-1 .podium-bar { height: 120px; background: linear-gradient(to top, var(--cor-principal), #ffd700); color: #111;}
-.step-2 .podium-bar { height: 80px; background: linear-gradient(to top, var(--cor-principal), #c0c0c0); color: #111;}
-.step-3 .podium-bar { height: 50px; background: linear-gradient(to top, var(--cor-principal), #cd7f32); color: #111;}
-
-
 #amigos-section {
     display: flex;
     flex-direction: column;
     gap: 40px;
 }
 .amigo-card {
-    background-color: var(--cor-card);
+    background-color: rgba(0, 0, 0, 0.2); /* Cria um fundo mais escuro e sutil */
     padding: 20px;
     border-radius: 12px;
 }
@@ -887,99 +886,99 @@ h1 {
 }
 
 /* =========================================================================
-   ABAS LATERAIS (Filme e Chat Global)
+   ABAS LATERAIS (NOVO DESIGN HBO / NETFLIX)
    ========================================================================= */
-
-#modal-bg.details-sidebar {
-    width: 0;
-    height: 100vh;
-    background: var(--cor-card);
-    overflow-y: hidden;
-    overflow-x: hidden;
-    transition: width 0.3s ease;
-    border-right: 1px solid rgba(255,255,255,0.1);
-    z-index: 1000;
-    flex-shrink: 0;
-    display: block; 
-}
+#modal-bg.details-sidebar, 
 #chat-sidebar.details-sidebar {
     width: 0;
     height: 100vh;
-    background: var(--cor-card);
-    overflow-y: hidden;
-    overflow-x: hidden;
-    transition: width 0.3s ease;
-    border-right: 1px solid rgba(255,255,255,0.1);
+    background: var(--cor-card); 
+    overflow: hidden; 
+    transition: width 0.3s ease; 
+    /* Borda na direita, porque a aba voltou para a ESQUERDA */
+    border-right: 1px solid rgba(255,255,255,0.05);
     z-index: 1000;
     flex-shrink: 0;
-    display: block; 
+    display: block;
+    /* Removido o 'position: fixed' para o Chat e o Filme voltarem ao lugar certo! */
 }
 
-/* LARGURA QUANDO ABERTOS NO PC */
-#modal-bg.details-sidebar.open {
-    width: 380px;
-    overflow-y: auto;
-}
-#chat-sidebar.details-sidebar.open {
-    width: 500px; /* CHAT FICOU MAIS LARGO NO PC */
-    overflow-y: auto;
-}
+/* LARGURA DA BARRA GRUDADA NO PC */
+#modal-bg.details-sidebar.open { width: 420px; overflow-y: auto; overflow-x: hidden; }
+#chat-sidebar.details-sidebar.open { width: 450px; overflow-y: auto; overflow-x: hidden; }
 
-#modal-content.sidebar-content {
-    width: 380px;
-    min-width: 380px;
-    background: transparent;
-    border-radius: 0;
-    padding: 0;
-    color: var(--cor-texto);
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    opacity: 0;
-    transition: opacity 0.2s;
-}
+#modal-content.sidebar-content,
 #chat-sidebar .sidebar-content {
-    width: 500px; /* CHAT MAIS LARGO NO PC */
-    min-width: 500px;
-    background: transparent;
-    border-radius: 0;
-    padding: 0;
-    color: var(--cor-texto);
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    opacity: 0;
-    transition: opacity 0.2s;
+    width: 100%; min-width: 100%; height: 100%; margin: 0; 
+    background: transparent; border-radius: 0; box-shadow: none; border: none;
+    padding: 0; color: var(--cor-texto); position: relative; display: flex;
+    flex-direction: column; opacity: 0; transition: opacity 0.3s 0.1s; overflow-x: hidden;
 }
 
 #modal-bg.details-sidebar.open #modal-content.sidebar-content,
-#chat-sidebar.details-sidebar.open .sidebar-content {
-    opacity: 1;
-    transition: opacity 0.3s 0.1s;
+#chat-sidebar.details-sidebar.open .sidebar-content { opacity: 1; }
+
+/* --- O BOTÃO FECHAR PADRONIZADO (X Redondo) --- */
+#modal-close, #chat-close {
+    position: absolute; top: 15px; right: 15px;
+    background: rgba(0,0,0,0.1); border-radius: 50%;
+    width: 36px; height: 36px; display: flex;
+    align-items: center; justify-content: center;
+    color: var(--cor-texto-secundario); font-size: 28px;
+    cursor: pointer; transition: 0.3s; z-index: 100;
+    border: none; padding-bottom: 4px; /* Centraliza a fonte perfeitamente */
+}
+#modal-close:hover, #chat-close:hover {
+    background: rgba(0,0,0,0.3); color: var(--cor-principal); transform: rotate(90deg);
 }
 
-#modal-close,
-#chat-close {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: rgba(0,0,0,0.6);
-    border-radius: 50%;
-    width: 35px;
-    height: 35px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 20px;
-    cursor: pointer;
-    transition: background 0.3s;
-    z-index: 10;
-    border: none;
+/* --- O BANNER HBO/NETFLIX --- */
+.modal-hero {
+    width: 100%; height: 240px; background-size: cover; background-position: center;
+    position: relative; flex-shrink: 0; 
+    transition: opacity 0.4s ease; /* Desvanecer limpo por opacidade */
 }
-#modal-close:hover,
-#chat-close:hover {
-    background: rgba(0,0,0,0.9);
+.modal-hero-gradient {
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0) 20%, var(--cor-card) 100%);
+}
+
+/* --- CORPO PRINCIPAL --- */
+.modal-body {
+    padding: 0 25px 30px 25px; position: relative; z-index: 2;
+}
+
+/* Pôster e Título lado a lado */
+.modal-header-flex {
+    display: flex; gap: 20px; margin-top: -80px; margin-bottom: 20px; align-items: flex-end; 
+}
+#modal-poster {
+    width: 115px; height: 170px; object-fit: cover; border-radius: 8px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1);
+    flex-shrink: 0;
+}
+.modal-title-area {
+    flex-grow: 1; padding-bottom: 5px; 
+}
+#modal-title {
+    font-size: 26px; margin: 0 0 5px 0; line-height: 1.1;
+    /* Sombra distorcida removida! */
+}
+#modal-stars { margin-bottom: 0; font-size: 22px; }
+
+/* --- TEMA CLARO --- */
+body.light-theme #modal-bg.details-sidebar, 
+body.light-theme #chat-sidebar.details-sidebar {
+    background: #ffffff; border-right: 1px solid #e2e8f0;
+}
+body.light-theme .modal-hero-gradient {
+    background: linear-gradient(to bottom, rgba(255,255,255,0) 20%, #ffffff 100%);
+}
+body.light-theme #modal-close, body.light-theme #chat-close { 
+    background: rgba(0,0,0,0.05); 
+}
+body.light-theme #modal-close:hover, body.light-theme #chat-close:hover { 
+    background: rgba(0,0,0,0.1); 
 }
 
 /* --- POSTER MENOR COM BORDA --- */
@@ -1608,7 +1607,6 @@ h1 {
     color: var(--cor-texto);
 }
 
-
 /* --- ESTILO DO BOTÃO DE TEMA E TEMA CLARO --- */
 #theme-toggle-container {
     display: flex;
@@ -1620,73 +1618,59 @@ h1 {
     padding: 0 5px;
 }
 
+/* =========================================
+   TEMA CLARO - IDÊNTICO AO LOGIN (FUGE) 
+   ========================================= */
 body.light-theme {
-  --cor-fundo: #f4f4f9;
-  --cor-card: #a4b8a6;
-  --cor-texto: #111111;
-  --cor-texto-secundario: #3d3d3d;
-  background-image: radial-gradient(circle at center, transparent 40%, rgba(0, 0, 0, 0.08) 120%);
+  --cor-fundo: #f8fafc;
+  --cor-card: #ffffff;
+  --cor-texto: #0f172a;
+  --cor-texto-secundario: #64748b;
+  background-image: none; /* Deixa o fundo limpo e sólido */
 }
 
-body.light-theme #side-menu { background: #ffffff; }
-body.light-theme .menu-nav-button { background: #eaeaea; color: #111; }
-body.light-theme .menu-nav-button:hover { background: #d4d4d4; }
-body.light-theme #search-box, 
-body.light-theme .login-input { background: #fff; border: 1px solid #aaa; color: #111; }
-body.light-theme #tag-dropdown-content { background-color: #fff; border: 1px solid #ddd; }
-body.light-theme .dropdown-tag { color: #111; }
-body.light-theme .dropdown-tag:hover { background-color: #f0f0f0; }
-body.light-theme .tag, 
-body.light-theme .amigo-tab-btn { background: #e0e0e0; color: #333; }
-body.light-theme .tag:hover, 
-body.light-theme .amigo-tab-btn:hover { background: #ccc; }
-body.light-theme .tag.active, 
-body.light-theme .amigo-tab-btn.active { background: var(--cor-principal); color: white; }
-body.light-theme .modal-button { background: #e0e0e0; color: #222; }
-body.light-theme .modal-button:hover { background: #ccc; }
-body.light-theme .modal-button.active { background: var(--cor-principal); color: white; }
-body.light-theme .watched-counter-menu { background-color: #eaeaea; }
-body.light-theme #login-box { background: #ffffff; }
-body.light-theme #logout-btn { background: #dcdcdc; }
-body.light-theme #logout-btn:hover { background: #c7c7c7; }
-body.light-theme .sidebar-poster-container img { border: 0px solid #fff; }
+/* Sombras, bordas e botões no Tema Claro */
+body.light-theme .main-header { border-bottom: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+body.light-theme .card-base { box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
+body.light-theme #side-menu, body.light-theme .details-sidebar, body.light-theme #tag-dropdown-content { background: #ffffff; border-color: #e2e8f0; box-shadow: -4px 0 15px rgba(0,0,0,0.05); }
+body.light-theme .login-input, body.light-theme #search-box, body.light-theme #comment-input { background: #ffffff; border: 1px solid #e2e8f0; color: #0f172a; }
+body.light-theme .login-input:focus, body.light-theme #search-box:focus { border-color: var(--cor-principal); box-shadow: 0 0 0 3px rgba(112, 158, 117, 0.15); outline: none; }
+body.light-theme .menu-nav-button { background: #f1f5f9; color: #0f172a; font-weight: 600; }
+body.light-theme .menu-nav-button { background: #f1f5f9; color: #0f172a; font-weight: 600; }
+body.light-theme .menu-nav-button:hover { background: var(--cor-principal); color: white; border-color: var(--cor-principal); }
+body.light-theme .tag, body.light-theme .amigo-tab-btn, body.light-theme .modal-button { background: #f1f5f9; color: #0f172a; border: 1px solid #e2e8f0; }
+body.light-theme .tag:hover, body.light-theme .amigo-tab-btn:hover, body.light-theme .modal-button:hover { background: #e2e8f0; }
+body.light-theme .tag.active, body.light-theme .amigo-tab-btn.active, body.light-theme .modal-button.active { background: var(--cor-principal); color: white; border-color: var(--cor-principal); }
+body.light-theme .watched-counter-menu { background-color: #f1f5f9; }
+body.light-theme .dropdown-tag { color: #0f172a; }
+body.light-theme .dropdown-tag:hover { background-color: #f1f5f9; }
+body.light-theme #logout-btn { background: #e2e8f0; color: #0f172a; }
+body.light-theme #logout-btn:hover { background: #cbe1d3; }
 body.light-theme .section-subtitle { border-bottom-color: rgba(0,0,0,0.1); }
-body.light-theme #comment-input { background-color: #fff; border-color: #ccc; color: #111; }
-body.light-theme .comment-bubble, body.light-theme .amigo-recent-comment { background: rgba(255, 255, 255, 0.288); }
-
-/* Cores de Tema Claro para o Perfil, Ajuda, Chat e Borda */
-body.light-theme .profile-pic.has-border { background-color: #fff; }
-body.light-theme .amigo-profile-pic.has-border { background-color: #fff; }
-body.light-theme #current-flag-btn { border-color: #fff; }
-body.light-theme .amigo-flag-badge, body.light-theme .chat-flag { border-color: #fff; }
+body.light-theme .comment-bubble, body.light-theme .amigo-recent-comment { background: #f1f5f9; border: 1px solid #e2e8f0; }
+body.light-theme .profile-pic.has-border, body.light-theme .amigo-profile-pic.has-border, body.light-theme .chat-pic.has-border { background-color: #fff; }
+body.light-theme #current-flag-btn, body.light-theme .amigo-flag-badge, body.light-theme .chat-flag { border-color: #fff; }
 body.light-theme .ajuda-card h3 { border-bottom-color: rgba(0,0,0,0.1); }
-body.light-theme .chat-input-area { background: #eaeaea; border-top-color: #ccc; }
-body.light-theme .chat-input-area textarea { background: #fff; border-color: #ccc; color: #111; }
-body.light-theme .chat-bubble { background: #d4d4d4; color: #111; }
+body.light-theme .chat-input-area { background: #ffffff; border-top-color: #e2e8f0; }
+body.light-theme .chat-bubble { background: #e2e8f0; color: #0f172a; }
 body.light-theme .chat-msg.own .chat-bubble { background: var(--cor-principal); color: #fff; }
-body.light-theme .chat-pic.has-border { background-color: #fff; }
-body.light-theme #chat-badge { border-color: #f4f4f9; }
+body.light-theme #chat-badge { border-color: #f8fafc; }
+body.light-theme .amigo-card { background-color: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
 
-/* --- TROCA DE ÍCONES NO TEMA CLARO --- */
-body.light-theme #main-title {
-    content: url("lily-light.png");
-}
+/* Adaptação das logos no tema claro (Se você tiver a lily-light.png) */
+body.light-theme #main-title { content: url("lily-light.png"); }
+body.light-theme #search-toggle img { content: url("lupa-light.png"); }
 
-body.light-theme #search-toggle img {
-    content: url("lupa-light.png");
+/* =========================================
+   EFEITOS PREMIUM NOS CARDS
+   ========================================= */
+.card-base {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 12px;
 }
-
-body.light-theme #modal-bg.details-sidebar::-webkit-scrollbar-thumb,
-body.light-theme #chat-sidebar.details-sidebar::-webkit-scrollbar-thumb,
-body.light-theme .amigo-comments-container::-webkit-scrollbar-thumb,
-body.light-theme .chat-messages-container::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.2);
-}
-body.light-theme #modal-bg.details-sidebar::-webkit-scrollbar-thumb:hover,
-body.light-theme #chat-sidebar.details-sidebar::-webkit-scrollbar-thumb:hover,
-body.light-theme .amigo-comments-container::-webkit-scrollbar-thumb:hover,
-body.light-theme .chat-messages-container::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(0, 0, 0, 0.4);
+.card-base:hover { 
+  transform: translateY(-5px); 
+  box-shadow: 0 12px 20px rgba(0,0,0,0.15); 
 }
 
 /* --- TOGGLE SWITCH --- */
@@ -2093,17 +2077,16 @@ body.noscroll {
         gap: 8px;
   }
 
-  /* --- SEÇÃO AMIGOS --- */
-  .podium-wrapper { gap: 8px; margin: 15px 0; }
-  .step-1 .podium-pic { width: 50px; height: 50px; } 
-  .podium-pic { width: 38px; height: 38px; } 
-  .podium-medal { font-size: 18px; top: -12px; }
-  .podium-flag { width: 14px; height: 14px; }
-  .podium-name { font-size: 11px; }
-  .podium-bar span { font-size: 9px; }
-  .step-1 .podium-bar { height: 90px; }
-  .step-2 .podium-bar { height: 60px; }
-  .step-3 .podium-bar { height: 40px; }
+/* --- SEÇÃO AMIGOS --- */
+  .podium-wrapper { gap: 10px; margin: 25px 0; }
+  .podium-step-container { width: 100px; padding: 15px 10px; border-radius: 12px; }
+  .step-1 { transform: scale(1.1); }
+  .step-1 .podium-pic { width: 60px; height: 60px; } 
+  .podium-pic { width: 45px; height: 45px; } 
+  .podium-medal { width: 24px; height: 24px; font-size: 12px; top: -10px; }
+  .podium-flag { width: 16px; height: 16px; border-width: 1px; }
+  .podium-name { font-size: 12px; margin-bottom: 8px; }
+  .podium-bar { padding: 4px 8px !important; font-size: 10px !important; }
 
   .amigo-card { padding: 10px; }
   .amigo-profile-info { gap: 10px; align-items: flex-start; margin-bottom: 10px;}
@@ -2186,4 +2169,385 @@ body.noscroll {
     height: 50%;
     object-fit: cover; 
     border-radius: 0%; 
+}
+/* =========================================
+   EFEITO HOVER VERDE CLARO NOS CARDS
+   ========================================= */
+body.light-theme .card-content {
+  transition: background-color 0.3s ease;
+  border-radius: 0 0 12px 12px; /* Acompanha a borda arredondada do card */
+}
+
+body.light-theme .card-base:hover .card-content {
+  background-color: #e6f2e8; /* Um verde bem clarinho e elegante */
+}
+/* =========================================
+   NOVO MODAL DE ADMINISTRAÇÃO PREMIUM (MINIMALISTA E SEM SCROLL)
+   ========================================= */
+.admin-modal-overlay {
+    position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px); z-index: 4000;
+    display: flex; justify-content: center; align-items: center; padding: 20px;
+}
+
+/* O "Retângulo Cinza Elegante" */
+.admin-modal-content.minimalist {
+    background: #232824; /* Cinza esverdeado super elegante (Dark) */
+    width: 950px; max-width: 100%;
+    border-radius: 20px; /* Radius mais suave e moderno */
+    padding: 35px 40px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+    position: relative;
+    animation: fadeIn 0.3s ease;
+    /* A MÁGICA: Sem scroll, tudo coube na tela perfeitamente */
+    overflow: hidden; 
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.admin-close-btn {
+    position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.1);
+    border: none; width: 36px; height: 36px; border-radius: 50%;
+    display: flex; justify-content: center; align-items: center;
+    color: var(--cor-texto-secundario); transition: 0.3s;
+    font-size: 28px; cursor: pointer; padding-bottom: 4px; /* Centraliza a fonte do X */
+}
+.admin-close-btn:hover { background: rgba(0,0,0,0.3); color: var(--cor-principal); transform: rotate(90deg); }
+/* Layout em 3 Colunas para não ter scroll */
+.minimalist-grid { display: flex; gap: 30px; align-items: stretch; }
+.admin-col-poster { width: 180px; flex-shrink: 0; display: flex; flex-direction: column; }
+.admin-col-details { flex: 1.2; display: flex; flex-direction: column; gap: 12px; }
+.admin-col-extra { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+
+.admin-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+/* Placeholders Menores e Elegantes */
+.poster-placeholder.mini {
+    width: 100%; aspect-ratio: 2 / 3; background: rgba(0,0,0,0.15);
+    border: 1px dashed rgba(255,255,255,0.15); border-radius: 12px;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    color: var(--cor-texto-secundario); margin-bottom: 15px; position: relative; overflow: hidden;
+}
+.gallery-placeholder.mini {
+    width: 100%; aspect-ratio: 16 / 9; background: rgba(0,0,0,0.15);
+    border: 1px dashed rgba(255,255,255,0.15); border-radius: 8px;
+    display: flex; justify-content: center; align-items: center;
+    margin-bottom: 8px; position: relative; overflow: hidden;
+}
+.poster-placeholder.mini img, .gallery-placeholder.mini img {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: cover; z-index: 5; background-color: var(--cor-card);
+}
+
+/* Inputs Minimalistas */
+.minimalist-input { margin-bottom: 0; }
+.minimalist-input label { 
+    font-size: 11px; margin-bottom: 5px; opacity: 0.7; font-weight: 600; 
+    text-transform: uppercase; letter-spacing: 0.5px; display: block;
+}
+.minimalist-input input, .minimalist-input select, .minimalist-input textarea {
+    width: 100%; padding: 10px 14px; background: rgba(0,0,0,0.2);
+    border: 1px solid transparent; border-bottom: 1px solid rgba(255,255,255,0.05);
+    border-radius: 8px; font-size: 13px; color: var(--cor-texto); transition: 0.2s;
+    box-sizing: border-box; font-family: 'Inter', sans-serif;
+}
+.minimalist-input input:focus, .minimalist-input select:focus, .minimalist-input textarea:focus {
+    background: rgba(0,0,0,0.3); border-bottom-color: var(--cor-principal); outline: none;
+}
+
+.admin-gallery-mini-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.gallery-item-mini input { padding: 8px; font-size: 11px; }
+
+.minimalist-btn {
+    background: var(--cor-principal); 
+    color: white; 
+    border: none;
+    border-radius: 25px; /* Deixei mais arredondado, estilo pílula */
+    padding: 12px 28px; 
+    font-size: 14px; 
+    font-weight: bold;
+    cursor: pointer; 
+    transition: 0.3s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2); /* Sombra elegante */
+}
+
+.minimalist-btn:hover { 
+    background: #485951; 
+    transform: translateY(-2px); 
+    box-shadow: 0 6px 20px rgba(112, 158, 117, 0.4); /* Sombra brilha ao passar o mouse */
+}
+/* Adaptação para o Tema Claro */
+body.light-theme .admin-modal-content.minimalist {
+    background: #f1f9f4; /* Retângulo Cinza Claro Elegante */
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+}
+body.light-theme .minimalist-input input, 
+body.light-theme .minimalist-input select, 
+body.light-theme .minimalist-input textarea {
+    background: #ffffff; border-bottom: 1px solid rgba(0,0,0,0.05); color: #0f172a;
+}
+body.light-theme .poster-placeholder.mini, 
+body.light-theme .gallery-placeholder.mini {
+    background: #ffffff; border-color: rgba(0,0,0,0.1); color: #648b6e;
+}
+/* Adapta os dois botões redondos de fechar para o tema claro */
+body.light-theme .admin-close-btn,
+body.light-theme #close-menu { 
+    background: rgba(0,0,0,0.05); 
+}
+body.light-theme .admin-close-btn:hover,
+body.light-theme #close-menu:hover { 
+    background: rgba(0,0,0,0.1); 
+}
+
+/* Responsividade Admin */
+@media (max-width: 900px) {
+    .admin-modal-content.minimalist { padding: 25px 20px; overflow-y: auto; max-height: 95vh;}
+    .minimalist-grid { flex-direction: column; gap: 20px; }
+    .admin-col-poster { width: 100%; max-width: 200px; margin: 0 auto; }
+    .minimalist-btn { margin-top: 20px; }
+    .admin-row-2 { grid-template-columns: 1fr; gap: 12px; }
+}
+/* =========================================
+   BOTÃO FLUTUANTE DE ADICIONAR FILME
+   ========================================= */
+.floating-add-btn {
+    position: fixed;
+    bottom: 105px; /* Fica perfeitamente acima do botão de chat */
+    right: 30px;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    background-color: #426d4f; /* O roxo clássico do Admin */
+    color: white;
+    border: none;
+    font-size: 32px;
+    font-weight: 300;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    z-index: 1500;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.3s, background-color 0.3s;
+}
+
+.floating-add-btn:hover {
+    transform: scale(1.1); /* Faz o + girar e crescer ao passar o mouse */
+    background-color: #426d4f;
+}
+
+/* Ajuste perfeito para o celular */
+@media (max-width: 768px) {
+    .floating-add-btn {
+        bottom: 85px; 
+        right: 20px;
+        width: 45px;
+        height: 45px;
+        font-size: 26px;
+    }
+}
+/* Adapta os botões de fechar da lateral para o tema claro */
+body.light-theme #modal-close,
+body.light-theme #chat-close { 
+    background: rgba(0,0,0,0.05); 
+}
+body.light-theme #modal-close:hover,
+body.light-theme #chat-close:hover { 
+    background: rgba(0,0,0,0.1); 
+}
+
+/* --- BOTÃO DE PRÓXIMA IMAGEM DA GALERIA (NOVO DESIGN INVISÍVEL) --- */
+.hero-nav-btn {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent; /* Zero fundo, totalmente transparente */
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: rgba(255, 255, 255, 0.5); /* Seta translúcida que mescla com a foto */
+    font-size: 25px; /* Seta maior e imponente */
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.3s ease;
+    padding: 10px;
+    /* Essa sombra pesada garante que a seta seja vista mesmo se a cena do filme for branca */
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.9); 
+}
+
+.hero-nav-btn:hover {
+    color: #ffffff; /* Fica branco puro ao passar o mouse */
+    /* Efeito de apontar: a seta dá uma leve deslizada para a direita */
+    transform: translateY(-50%) translateX(5px) scale(1.05); 
+}
+
+/* No tema claro, a cor da seta não muda, pois a imagem do filme no fundo continua a mesma! */
+body.light-theme .hero-nav-btn {
+    color: rgba(255, 255, 255, 0.6);
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.9);
+}
+body.light-theme .hero-nav-btn:hover {
+    color: #ffffff;
+}
+
+/* Correções de TEMA CLARO para o pódio novo */
+body.light-theme .step-1 { background: linear-gradient(180deg, rgba(255,215,0,0.15) 0%, #ffffff 100%); }
+body.light-theme .step-2 { background: linear-gradient(180deg, rgba(192,192,192,0.15) 0%, #ffffff 100%); }
+body.light-theme .step-3 { background: linear-gradient(180deg, rgba(205,127,50,0.15) 0%, #ffffff 100%); }
+body.light-theme .podium-bar { background: rgba(0,0,0,0.05) !important; color: #0f172a !important; border-color: rgba(0,0,0,0.05); }
+body.light-theme .podium-medal, body.light-theme .podium-flag { background: #ffffff; border-color: #ffffff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+/* =========================================
+   CONTADORES E DUPLO PÓDIO (LIVROS)
+   ========================================= */
+.clickable-counter {
+    cursor: pointer;
+    transition: color 0.3s;
+}
+.clickable-counter:hover {
+    color: var(--cor-principal);
+}
+
+.double-podium-container {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 40px;
+    width: 100%;
+    margin: 20px 0;
+}
+.podium-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.podium-title {
+    color: var(--cor-texto-secundario);
+    font-size: 16px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+}
+
+/* Responsividade do Duplo Pódio no Celular */
+@media (max-width: 768px) {
+    .double-podium-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+    }
+    .podium-title {
+        font-size: 14px;
+        margin-bottom: 15px;
+    }
+}
+
+/* =========================================
+   DROPDOWN DE CATEGORIA PREMIUM (MODAL ADMIN)
+   ========================================= */
+.category-select {
+    background: rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(8px); /* Efeito vidro */
+    color: var(--cor-texto);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 25px; /* Pílula perfeita */
+    padding: 12px 20px; /* Mesma altura exata do botão Salvar */
+    font-size: 14px;
+    font-weight: 600; /* Fonte grossa mas não agressiva */
+    outline: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Inter', sans-serif;
+    appearance: none;
+    -webkit-appearance: none;
+    /* Setinha customizada desenhada direto no código (branca) */
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 16px;
+    padding-right: 42px; 
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.category-select:hover, 
+.category-select:focus {
+    background-color: rgba(0, 0, 0, 0.4);
+    border-color: var(--cor-principal);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* O estilo da listinha que abre quando você clica */
+.category-select option {
+    background-color: #232824; /* Fundo cinza chique igual ao modal */
+    color: var(--cor-texto);
+    font-weight: 600;
+}
+
+/* --- Adaptação para o Tema Claro --- */
+body.light-theme .category-select {
+    background-color: rgba(255, 255, 255, 0.8);
+    color: #0f172a;
+    border-color: rgba(0, 0, 0, 0.1);
+    /* Setinha preta para o fundo claro */
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230f172a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+}
+body.light-theme .category-select:hover,
+body.light-theme .category-select:focus {
+    border-color: var(--cor-principal);
+    background-color: #ffffff;
+}
+body.light-theme .category-select option {
+    background-color: #ffffff;
+    color: #0f172a;
+}
+/* =========================================
+   MODAL DE EDIÇÃO DE FOTO DE PERFIL
+   ========================================= */
+.profile-pic-preview-container {
+    margin: 0 auto 20px auto;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px dashed rgba(255,255,255,0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0,0,0,0.2);
+}
+.profile-pic-preview-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Adaptação para o Tema Claro */
+body.light-theme .profile-pic-preview-container {
+    border-color: rgba(0,0,0,0.1);
+    background: rgba(0,0,0,0.05);
+}
+/* =========================================
+   TELA DE APROVAÇÕES (ADMIN)
+   ========================================= */
+.sugestao-card {
+    display: flex; gap: 20px; align-items: stretch;
+}
+.sugestao-card img {
+    width: 100px; height: 150px; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); flex-shrink: 0;
+}
+.sugestao-info { flex-grow: 1; display: flex; flex-direction: column; justify-content: center;}
+.sugestao-actions { display: flex; gap: 10px; margin-top: 15px; }
+.btn-aprovar { background: var(--cor-principal); color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s;}
+.btn-aprovar:hover { background: #485951; }
+.btn-rejeitar { background: #db1f20; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s;}
+.btn-rejeitar:hover { background: #a11414; }
+
+@media (max-width: 768px) {
+    .sugestao-card { flex-direction: column; }
+    .sugestao-card img { width: 100%; height: auto; max-height: 250px;}
+    .sugestao-actions { flex-direction: column; }
 }
