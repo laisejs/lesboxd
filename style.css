@@ -3005,3 +3005,31 @@ body.light-theme .side-menu-bottom {
         display: inline-block !important;
     }
 }
+/* =========================================
+   REFINAMENTOS FINAIS MOBILE (TAMANHOS)
+   ========================================= */
+@media (max-width: 768px) {
+    /* 1. Reduz os ícones da Header (Hamburguer e Lupa) que estavam gigantes */
+    #hamburger-menu svg, #search-toggle svg { 
+        width: 22px !important; 
+        height: 22px !important; 
+    }
+    
+    /* 2. Deixa o texto "Bem-vinda" com tamanho elegante no celular */
+    .visual-content h1 { 
+        font-size: 2.2rem !important; 
+    }
+    .visual-content p { 
+        font-size: 0.95rem !important; 
+        line-height: 1.4 !important;
+    }
+    
+    /* 3. Reduz a logo e o nome LILIES no formulário de login */
+    .logo-mobile { 
+        font-size: 1.2rem !important; 
+        margin-bottom: 20px !important;
+    }
+    .logo-mobile img { 
+        height: 30px !important; 
+    }
+}

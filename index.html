@@ -1032,7 +1032,7 @@ function updateChatBadge() {
         }
     }
 
-    function abrirChat() {
+function abrirChat() {
         fecharModal(); 
         dom.chat.sidebar.classList.add('open');
         lastReadChatTime = Date.now();
@@ -1044,7 +1044,11 @@ function updateChatBadge() {
             dom.chat.messagesContainer.scrollTop = dom.chat.messagesContainer.scrollHeight;
         }, 100);
         
-        dom.chat.input.focus();
+        // A MÁGICA: Só foca na caixa de texto automaticamente se estiver no PC!
+        // No telemóvel evitamos o focus automático, assim o ecrã não salta para baixo.
+        if (window.innerWidth > 768) {
+            dom.chat.input.focus();
+        }
     }
 
     function fecharChat() {
