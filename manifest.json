@@ -2,7 +2,7 @@
   "name": "Lilies",
   "short_name": "Lilies",
   "description": "A sua biblioteca pessoal de conteúdo sáfico.",
-  "start_url": "/",
+"start_url": "/index.html",
   "display": "standalone",
   "background_color": "#161c17",
   "theme_color": "#709e75",

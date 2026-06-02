@@ -133,6 +133,9 @@
       <h2 class="profile-name" id="profile-name-element" contenteditable="true" spellcheck="false">NOME</h2>
     </div>
 <nav class="menu-nav">
+    <button class="menu-nav-button" id="btn-instalar-app" style="display: none; background: var(--cor-principal); color: white;">
+          <i data-lucide="download" class="menu-icon"></i> Instalar App
+      </button>
       <button class="menu-nav-button" id="show-favorites-btn"><i data-lucide="heart" class="menu-icon"></i> Favoritos</button>
       <button class="menu-nav-button" id="show-watched-btn"><i data-lucide="play" class="menu-icon"></i> Assistidos</button>
       <button class="menu-nav-button" id="show-lidos-btn"><i data-lucide="book-marked" class="menu-icon"></i> Lidos</button>
@@ -2521,7 +2524,31 @@ const docSnap = await getDoc(userDocRef);
                  window.history.pushState({ trava: true }, "");
              }
         });
- 
+ // ==========================================
+        // LÓGICA DO BOTÃO NATIVO DE INSTALAR O PWA
+        // ==========================================
+        let promptDeInstalacao;
+        const btnInstalar = document.getElementById('btn-instalar-app');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            promptDeInstalacao = e;
+            if (btnInstalar) btnInstalar.style.display = 'flex';
+            setTimeout(() => lucide.createIcons(), 10);
+        });
+
+        if (btnInstalar) {
+            btnInstalar.addEventListener('click', async () => {
+                if (!promptDeInstalacao) return;
+                promptDeInstalacao.prompt();
+                const { outcome } = await promptDeInstalacao.userChoice;
+                if (outcome === 'accepted') {
+                    btnInstalar.style.display = 'none';
+                }
+                promptDeInstalacao = null;
+            });
+        }
+        
     })();
 
     // Comando que desenha os ícones na tela!
