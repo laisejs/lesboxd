@@ -57,15 +57,16 @@
                 </div>
             </div>
 
-            <div class="input-group">
-                <label>Senha</label>
-                <div class="input-wrapper">
-                    <i data-lucide="lock" class="input-icon"></i>
-                    <input type="password" id="auth-password" placeholder="••••••••" required>
-                </div>
-                <a href="#" id="forgot-password" class="forgot-pass">Esqueceu a senha?</a>
-            </div>
-
+<div class="input-group">
+    <label>Senha</label>
+    <div class="input-wrapper">
+        <i data-lucide="lock" class="input-icon"></i>
+        <input type="password" id="auth-password" placeholder="••••••••" required>
+        <!-- Adicione a linha abaixo: -->
+        <i data-lucide="eye" class="toggle-password" data-target="auth-password"></i>
+    </div>
+    <a href="#" id="forgot-password" class="forgot-pass">Esqueceu a senha?</a>
+</div>
             <div id="auth-error" class="error-msg"></div>
 
             <button id="login-btn" class="btn-submit">ENTRAR</button>
@@ -94,14 +95,15 @@
                 </div>
             </div>
 
-            <div class="input-group">
-                <label>Senha</label>
-                <div class="input-wrapper">
-                    <i data-lucide="lock" class="input-icon"></i>
-                    <input type="password" id="reg-password" placeholder="Mínimo 6 caracteres" required>
-                </div>
-            </div>
-
+<div class="input-group">
+    <label>Senha</label>
+    <div class="input-wrapper">
+        <i data-lucide="lock" class="input-icon"></i>
+        <input type="password" id="reg-password" placeholder="Mínimo 6 caracteres" required>
+        <!-- Adicione a linha abaixo: -->
+        <i data-lucide="eye" class="toggle-password" data-target="reg-password"></i>
+    </div>
+</div>
             <div id="reg-error" class="error-msg"></div>
 
             <button id="register-btn" class="btn-submit">CADASTRAR</button>
@@ -625,27 +627,204 @@ auth: {
         };
     }
     
-    
-function mostrarTelaInicial() {
+// Função que rola a lista pelos botões (NOVA PARA O PC)
+    window.scrollLinha = function(btn, amount) {
+        const linha = btn.parentElement.querySelector('.linha-horizontal');
+        if(linha) linha.scrollBy({ left: amount, behavior: 'smooth' });
+    };
+
+    // Função que verifica o scroll e tira o degradê quando chega no final
+    window.handleScrollFade = function(element) {
+        const wrapper = element.parentElement;
+        setTimeout(() => {
+            if (element.scrollWidth <= element.clientWidth || element.scrollLeft + element.clientWidth >= element.scrollWidth - 10) {
+                wrapper.classList.add('is-at-end');
+            } else {
+                wrapper.classList.remove('is-at-end');
+            }
+        }, 150);
+    };
+
+    // Função que garimpa o Ranking e os Comentários aleatórios
+    window.carregarExtrasHome = async function() {
+        const rankingContainer = document.getElementById('home-ranking-container');
+        const commentsContainer = document.getElementById('home-comments-container');
+        if(!rankingContainer || !commentsContainer) return;
+
+        try {
+            const querySnapshot = await getDocs(collection(db, "usuarios"));
+            const usuariosPublicos = [];
+            let todosComentarios = [];
+
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                if (data.isPublic) {
+                    usuariosPublicos.push(data);
+                    if (data.comentarios) {
+                        data.comentarios.forEach(c => {
+                            // Agora capturamos o nome do autor!
+                            todosComentarios.push({ texto: c.texto, filme: c.filme, autor: data.apelido || "Anônimo" });
+                        });
+                    }
+                }
+            });
+
+            // 1. Renderiza o Ranking (Pódio)
+            if (usuariosPublicos.length > 0) {
+                const usersStats = usuariosPublicos.map(u => {
+                    const mapTitles = (u.assistidos || []).map(t => filmes.find(f => f.titulo === t)).filter(Boolean);
+                    const countAssistidos = mapTitles.filter(f => !f.tags.includes('Livros')).length;
+                    const countLidos = mapTitles.filter(f => f.tags.includes('Livros')).length;
+                    return { ...u, countAssistidos, countLidos };
+                });
+
+                const topAssistidos = [...usersStats].sort((a,b) => b.countAssistidos - a.countAssistidos).slice(0, 3);
+                const topLidos = [...usersStats].sort((a,b) => b.countLidos - a.countLidos).slice(0, 3);
+                
+                const getPodiumUser = (user, rank, type) => {
+                    if(!user || user[type] === 0) return `<div class="podium-step-container step-${rank} empty"></div>`;
+                    const count = user[type];
+                    const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : '🥉';
+                    const pic = user.foto || 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png';
+                    const flag = user.bandeira ? `<img src="${user.bandeira}" class="podium-flag">` : '';
+                    const borderClass = user.bandeira ? 'has-border' : '';
+                    const label = type === 'countAssistidos' ? 'assistidos' : 'lidos';
+                    return `
+                        <div class="podium-step-container step-${rank}">
+                            <div class="podium-avatar-wrapper">
+                                <span class="podium-medal">${medal}</span>
+                                <img src="${pic}" class="podium-pic ${borderClass}">
+                                ${flag}
+                            </div>
+                            <span class="podium-name">${user.apelido}</span>
+                            <div class="podium-bar">
+                                <span class="podium-score">${count} ${label}</span>
+                            </div>
+                        </div>
+                    `;
+                };
+
+                rankingContainer.innerHTML = `
+                    <div class="double-podium-container home-podium" style="margin-bottom: 50px;">
+                        <div class="podium-section">
+                            <div class="podium-wrapper" style="margin: 0;">
+                                ${getPodiumUser(topAssistidos[1], 2, 'countAssistidos')}
+                                ${getPodiumUser(topAssistidos[0], 1, 'countAssistidos')}
+                                ${getPodiumUser(topAssistidos[2], 3, 'countAssistidos')}
+                            </div>
+                        </div>
+                        <div class="podium-section">
+                            <div class="podium-wrapper" style="margin: 0;">
+                                ${getPodiumUser(topLidos[1], 2, 'countLidos')}
+                                ${getPodiumUser(topLidos[0], 1, 'countLidos')}
+                                ${getPodiumUser(topLidos[2], 3, 'countLidos')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // 2. Renderiza os Mini Cards de Comentários
+            if (todosComentarios.length > 0) {
+                const comentariosSorteados = shuffleArray(todosComentarios).slice(0, 8); 
+                
+                let commentsHTML = `<div style="position: relative; margin-top: 20px;">
+                    <button class="scroll-btn left" onclick="scrollLinha(this, -400)">&#10094;</button>
+                    <div class="scroll-wrapper"><div class="linha-horizontal linha-comentarios" onscroll="handleScrollFade(this)">`;
+                
+                comentariosSorteados.forEach(c => {
+                    const filmeObj = filmes.find(f => f.titulo === c.filme);
+                    if (filmeObj) {
+                        const bgImage = (filmeObj.galleryImages && filmeObj.galleryImages.length > 0) ? filmeObj.galleryImages[0] : filmeObj.imagem;
+                        const index = filmes.findIndex(f => f.titulo === c.filme);
+                        commentsHTML += `
+                            <div class="mini-comment-card" onclick="abrirModal(${index})">
+                                <div class="mini-comment-bg" style="background-image: url('${bgImage}')"></div>
+                                <div class="mini-comment-overlay">
+                                    <div style="width: 100%;">
+                                        <div class="mini-comment-quote">"${c.texto}"</div>
+                                        <div class="mini-comment-author">— ${c.autor}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+                
+                commentsHTML += `</div></div>
+                    <button class="scroll-btn right" onclick="scrollLinha(this, 400)">&#10095;</button>
+                </div>`;
+                commentsContainer.innerHTML = commentsHTML;
+                
+                setTimeout(() => {
+                    const commentLine = commentsContainer.querySelector('.linha-horizontal');
+                    if(commentLine) handleScrollFade(commentLine);
+                }, 100);
+            }
+
+        } catch(e) {
+            console.error("Erro ao carregar extras da home", e);
+        }
+    };
+
+    function mostrarTelaInicial() {
       currentView = 'home';
-      currentMenuFilter = 'Todos'; // <-- ISSO CORRIGE O BUG! Zera o filtro lateral ao ir pra Home
+      currentMenuFilter = 'Todos'; 
       dom.displayArea.innerHTML = "";
       dom.displayArea.className = '';
       resetFilters();
       renderDestaque();
 
+      const extrasContainer = document.createElement('div');
+      extrasContainer.innerHTML = `
+          <div id="home-ranking-container"></div>
+          <div id="home-comments-container"></div>
+      `;
+      dom.displayArea.appendChild(extrasContainer);
+      carregarExtrasHome();
+
       const createSection = (title, data) => {
         if (data.length) {
           const secao = document.createElement("section");
+          secao.style.marginBottom = "30px";
+          
           const h2 = document.createElement("h2");
           h2.className = 'section-title';
           h2.textContent = title;
           secao.appendChild(h2);
+          
+          const outerWrapper = document.createElement("div");
+          outerWrapper.style.position = "relative";
+          
+          const btnLeft = document.createElement("button");
+          btnLeft.className = "scroll-btn left";
+          btnLeft.innerHTML = "&#10094;";
+          btnLeft.onclick = function() { scrollLinha(this, -400) };
+          
+          const wrapper = document.createElement("div");
+          wrapper.className = "scroll-wrapper"; 
+          
           const linha = document.createElement("div");
           linha.className = "linha-horizontal";
+          linha.onscroll = function() { handleScrollFade(this) }; 
+          
+          const btnRight = document.createElement("button");
+          btnRight.className = "scroll-btn right";
+          btnRight.innerHTML = "&#10095;";
+          btnRight.onclick = function() { scrollLinha(this, 400) };
+          
           data.forEach(filme => linha.appendChild(createCard(filme, 'mini')));
-          secao.appendChild(linha);
+          
+          wrapper.appendChild(linha);
+          
+          outerWrapper.appendChild(btnLeft);
+          outerWrapper.appendChild(wrapper);
+          outerWrapper.appendChild(btnRight);
+          
+          secao.appendChild(outerWrapper);
           dom.displayArea.appendChild(secao);
+          
+          setTimeout(() => handleScrollFade(linha), 100);
         }
       };
 
@@ -664,7 +843,6 @@ function mostrarTelaInicial() {
           createSection(tag, filmesDaTag);
       });
     }
-
     function mostrarFilmesGrid(lista) {
       currentView = 'grid';
       dom.destaque.style.display = 'none';
@@ -1614,7 +1792,7 @@ if(dom.sideMenu.watchBtn) {
 
 let heroInterval; // Controla a troca de imagens da galeria
 
-    function abrirModal(index) {
+window.abrirModal = function(index) {
       fecharChat(); 
       syncFilmesWithUserData();
       const f = filmes[index];
@@ -1836,6 +2014,7 @@ dom.modal.wantBtn.classList.toggle('active', f.queroAssistir);
       updateWatchedCounters(); 
       popularTags();
       mostrarTelaInicial();
+      
       
       if(auth.currentUser) dom.chat.floatingBtn.style.display = 'flex';
        // EVENTOS DO PAINEL ADMIN
@@ -2111,8 +2290,8 @@ try {
           // --- MÁGICA: FECHAR MODAIS LATERAIS AO CLICAR FORA ---
           // Fechar Detalhes do Filme
           if (dom.modal.bg.classList.contains('open')) {
-              // Só fecha se o clique não foi dentro da aba, e não foi na capa de um filme
-              if (!dom.modal.bg.contains(e.target) && !e.target.closest('.card-base') && !e.target.closest('#destaque-ver-mais')) {
+              // Só fecha se o clique não foi dentro da aba, não foi na capa, não foi no destaque E NÃO FOI NA PÍLULA
+              if (!dom.modal.bg.contains(e.target) && !e.target.closest('.card-base') && !e.target.closest('#destaque-ver-mais') && !e.target.closest('.mini-comment-card')) {
                   fecharModal();
               }
           }
@@ -2322,7 +2501,13 @@ document.body.classList.add('light-theme');
         if (user) {
             userDocRef = doc(db, "usuarios", user.uid); // A MÁGICA DE VOLTA: Diz quem é a pessoa logada
             
-            if (user.email === "laisejschimithes@gmail.com") {
+            // Crie a sua lista de e-mails administradores aqui:
+            const adminEmails = [
+                "laisejschimithes@gmail.com", 
+                "novo_admin@gmail.com" // <-- Insira o novo e-mail aqui!
+            ];
+            
+            if (adminEmails.includes(user.email)) {
                 isAdmin = true; 
                 dom.sideMenu.aprovacoesBtn.style.display = 'block'; // Mostra menu Admin
             } else {
@@ -2599,7 +2784,28 @@ const docSnap = await getDoc(userDocRef);
     })();
 
     // Comando que desenha os ícones na tela!
-    lucide.createIcons();
+// --- LÓGICA DO OLHINHO DA SENHA ---
+    document.querySelectorAll('.toggle-password').forEach(icon => {
+        icon.addEventListener('click', function() {
+            // Descobre qual input esse ícone controla (login ou cadastro)
+            const targetId = this.getAttribute('data-target');
+            const input = document.getElementById(targetId);
+            
+            // Alterna entre texto visível e bolinhas
+            if (input.type === 'password') {
+                input.type = 'text';
+                // Troca para o ícone de olho riscado
+                this.setAttribute('data-lucide', 'eye-off');
+            } else {
+                input.type = 'password';
+                // Troca para o ícone de olho normal
+                this.setAttribute('data-lucide', 'eye');
+            }
+            
+            // Redesenha os ícones da tela para a mudança fazer efeito
+            lucide.createIcons();
+        });
+    });
 
   </script>
 </body>
