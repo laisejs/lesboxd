@@ -745,31 +745,36 @@ async function mostrarAprovacoes() {
 
             let html = '<div class="ajuda-container"><h2 class="section-title dynamic-title">Sugestões Pendentes</h2>';
             
-            sugestoes.forEach(s => {
-                const isLivro = s.tags.includes('Livros');
-                const cat = isLivro ? 'Livro' : s.tags.includes('Series') ? 'Série' : 'Filme';
-                const autor = isLivro ? 'Autor(a):' : 'Elenco:';
-                const capa = s.imagem || 'https://via.placeholder.com/100x150?text=Sem+Capa';
-                
-                html += `
-                    <div class="ajuda-card sugestao-card" id="sugestao-${s.id}">
-                        <img src="${capa}">
-                        <div class="sugestao-info">
-                            <h3 style="margin:0 0 5px 0; border:none; padding:0; font-size:22px;">
-                                ${s.titulo} <span style="font-size:11px; background:var(--cor-principal); padding:2px 8px; border-radius:10px; color:white; vertical-align:middle; font-weight:bold;">${cat}</span>
-                            </h3>
-                            <p style="font-size:14px; color:var(--cor-texto-secundario); margin:0 0 10px 0;">Sugerido por: <strong style="color:var(--cor-principal);">${s.sugeridoPor}</strong></p>
-                            <p style="font-size:13px; margin:0 0 5px 0;"><strong>${autor}</strong> ${s.elenco || 'Não informado'}</p>
-                            <p style="font-size:13px; margin:0 0 5px 0;"><strong>Onde Ver/Editora:</strong> ${s.plataforma || 'Não informado'}</p>
-                            <p style="font-size:13px; margin:0 0 10px 0;"><strong>Tags:</strong> ${s.tags.join(', ')}</p>
-                            <div class="sugestao-actions">
-                                <button class="btn-aprovar" onclick="aprovarSugestao('${s.id}')">Aprovar e Publicar</button>
-                                <button class="btn-rejeitar" onclick="rejeitarSugestao('${s.id}')">Rejeitar</button>
+        sugestoes.forEach(s => {
+                    const isLivro = s.tags.includes('Livros');
+                    const cat = isLivro ? 'Livro' : s.tags.includes('Series') ? 'Série' : 'Filme';
+                    const autor = isLivro ? 'Autor(a):' : 'Elenco:';
+                    const capa = s.imagem || 'https://via.placeholder.com/100x150?text=Sem+Capa';
+                    
+                    // Badge dinâmico para diferenciar Edições de Novas Adições
+                    const badgeTipo = s.isEdit 
+                        ? `<span style="font-size:11px; background:#b8860b; padding:2px 8px; border-radius:10px; color:white; vertical-align:middle; font-weight:bold; margin-left:5px;">EDIÇÃO</span>`
+                        : `<span style="font-size:11px; background:var(--cor-principal); padding:2px 8px; border-radius:10px; color:white; vertical-align:middle; font-weight:bold; margin-left:5px;">NOVO</span>`;
+                    
+                    html += `
+                        <div class="ajuda-card sugestao-card" id="sugestao-${s.id}">
+                            <img src="${capa}">
+                            <div class="sugestao-info">
+                                <h3 style="margin:0 0 5px 0; border:none; padding:0; font-size:22px;">
+                                    ${s.titulo} ${badgeTipo}
+                                </h3>
+                                <p style="font-size:14px; color:var(--cor-texto-secundario); margin:0 0 10px 0;">Sugerido por: <strong style="color:var(--cor-principal);">${s.sugeridoPor}</strong></p>
+                                <p style="font-size:13px; margin:0 0 5px 0;"><strong>${autor}</strong> ${s.elenco || 'Não informado'}</p>
+                                <p style="font-size:13px; margin:0 0 5px 0;"><strong>Onde Ver/Editora:</strong> ${s.plataforma || 'Não informado'}</p>
+                                <p style="font-size:13px; margin:0 0 10px 0;"><strong>Tags:</strong> ${s.tags.join(', ')}</p>
+                                <div class="sugestao-actions">
+                                    <button class="btn-aprovar" onclick="aprovarSugestao('${s.id}')">Aprovar Alteração</button>
+                                    <button class="btn-rejeitar" onclick="rejeitarSugestao('${s.id}')">Rejeitar</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                `;
-            });
+                    `;
+                });
             html += '</div>';
             dom.displayArea.innerHTML = html;
         } catch (e) {
@@ -779,30 +784,48 @@ async function mostrarAprovacoes() {
     }
 
     // Comandos de ação que os botões vão chamar
-    window.aprovarSugestao = async function(id) {
-        if(!confirm("Deseja aprovar e enviar este título para o catálogo de todas?")) return;
+window.aprovarSugestao = async function(id) {
+        if(!confirm("Deseja aprovar esta sugestão e aplicar as mudanças no catálogo?")) return;
         try {
             const docRef = doc(db, "sugestoes", id);
             const docSnap = await getDoc(docRef);
+            
             if(docSnap.exists()){
                 const data = docSnap.data();
-                delete data.sugeridoPor; // Limpa o "Sugerido por" antes de jogar pro catálogo oficial
+                const isEdit = data.isEdit || false;
+                const filmeId = data.filmeId || null;
                 
-                // Transfere para os filmes
-                const novoRef = await addDoc(collection(db, "filmes"), data);
-                data.id = novoRef.id;
-                filmes.push(data);
+                // Limpa as propriedades de controle da sugestão antes de salvar no catálogo oficial
+                delete data.sugeridoPor; 
+                delete data.isEdit;
+                delete data.filmeId;
+                
+                if (isEdit && filmeId) {
+                    // Se for uma edição, atualiza o documento existente correspondente
+                    await updateDoc(doc(db, "filmes", filmeId), data);
+                    data.id = filmeId;
+                    const idx = filmes.findIndex(f => f.id === filmeId);
+                    if (idx !== -1) filmes[idx] = data;
+                    alert("Edição aprovada e aplicada com sucesso!");
+                } else {
+                    // Se for um filme novo, adiciona um documento inédito
+                    const novoRef = await addDoc(collection(db, "filmes"), data);
+                    data.id = novoRef.id;
+                    filmes.push(data);
+                    alert("Novo título aprovado e adicionado ao catálogo!");
+                }
+                
                 filmes.sort((a, b) => a.titulo.localeCompare(b.titulo));
                 popularTags();
                 
-                // Exclui da fila pendente e some da tela
+                // Exclui a pendência da fila e remove o card da tela
                 await deleteDoc(docRef); 
                 document.getElementById('sugestao-'+id).remove();
                 
-                // Se a fila ficar vazia, mostra a mensagem
                 if(!document.querySelector('.sugestao-card')) mostrarAprovacoes(); 
             }
         } catch(e) {
+            console.error(e);
             alert("Erro ao aprovar.");
         }
     };
@@ -1653,14 +1676,16 @@ let heroInterval; // Controla a troca de imagens da galeria
           }
       }
 
-        if (btnEdit && btnDelete) {
+if (btnEdit && btnDelete) {
+          // O botão Editar agora fica visível e funcional para todos!
+          btnEdit.style.display = 'inline-block';
+          btnEdit.onclick = () => abrirModalEdicao(index);
+          
           if (isAdmin) {
-              btnEdit.style.display = 'inline-block';
+              // Apenas Admin pode Excluir
               btnDelete.style.display = 'inline-block';
-              btnEdit.onclick = () => abrirModalEdicao(index);
               btnDelete.onclick = () => deletarFilme(index);
           } else {
-              btnEdit.style.display = 'none';
               btnDelete.style.display = 'none';
           }
       }
@@ -1898,30 +1923,44 @@ if (btnAddFilme) {
                   queroAssistir: false
               };
 
-              try {
+try {
                   btnSalvarAdmin.textContent = "Salvando...";
                   
-                  if (isAdmin) {
-                      if (editingFilmeId) {
+                  if (editingFilmeId) {
+                      if (isAdmin) {
+                          // Admin edita diretamente o catálogo oficial
                           await updateDoc(doc(db, "filmes", editingFilmeId), novoFilme);
                           novoFilme.id = editingFilmeId;
                           const idx = filmes.findIndex(f => f.id === editingFilmeId);
                           if (idx !== -1) filmes[idx] = novoFilme;
-                          alert("Atualizado com sucesso!");
+                          alert("Atualizado com sucesso no catálogo!");
                       } else {
+                          // Usuário comum envia a edição para a fila de aprovações
+                          novoFilme.sugeridoPor = userData.apelido || "Anônimo";
+                          novoFilme.isEdit = true;
+                          novoFilme.filmeId = editingFilmeId; // Guarda qual filme está sendo alterado
+                          
+                          await addDoc(collection(db, "sugestoes"), novoFilme);
+                          alert("Sua sugestão de edição foi enviada para aprovação! Obrigada ❤");
+                      }
+                  } else {
+                      // CADASTRO DE NOVO FILME
+                      if (isAdmin) {
                           const docRef = await addDoc(collection(db, "filmes"), novoFilme);
                           novoFilme.id = docRef.id;
                           filmes.push(novoFilme);
                           alert("Adicionado ao catálogo com sucesso!");
+                      } else {
+                          novoFilme.sugeridoPor = userData.apelido || "Anônimo";
+                          await addDoc(collection(db, "sugestoes"), novoFilme);
+                          alert("Sua sugestão foi enviada para aprovação! Obrigada ❤");
                       }
-                      filmes.sort((a, b) => a.titulo.localeCompare(b.titulo));
-                      popularTags();
-                      mostrarTelaInicial(); 
-                  } else {
-                      novoFilme.sugeridoPor = userData.apelido || "Anônimo";
-                      await addDoc(collection(db, "sugestoes"), novoFilme);
-                      alert("Sua sugestão foi enviada para aprovação! Obrigada ❤");
                   }
+                  
+                  // Organiza e limpa a tela
+                  filmes.sort((a, b) => a.titulo.localeCompare(b.titulo));
+                  popularTags();
+                  mostrarTelaInicial(); 
                   
                   document.querySelectorAll('#modal-admin-bg input, #modal-admin-bg textarea').forEach(input => input.value = '');
                   document.querySelectorAll('#modal-admin-bg img').forEach(img => img.style.display = 'none');
@@ -1933,9 +1972,12 @@ if (btnAddFilme) {
               } finally {
                   btnSalvarAdmin.textContent = isAdmin ? "Salvar no Catálogo" : "Enviar Sugestão";
               }
-          }; // <-- CHAVE 1 (FECHA A FUNÇÃO DO CLIQUE)
-      } // <-- CHAVE 2 (FECHA A VERIFICAÇÃO DO BOTÃO)
+          }; // <-- ADICIONE ESTA LINHA (Fecha o onclick)
+      } // <-- ADICIONE ESTA LINHA (Fecha o if do botão)
 
+      // EVENTOS DO CHAT
+      dom.chat.floatingBtn.addEventListener('click', abrirChat);
+      dom.chat.sendBtn.addEventListener('click', enviarMensagemChat);   
       // EVENTOS DO CHAT
       dom.chat.floatingBtn.addEventListener('click', abrirChat);
       dom.chat.sendBtn.addEventListener('click', enviarMensagemChat);
@@ -2354,6 +2396,10 @@ const docSnap = await getDoc(userDocRef);
           userData = docSnap.data();
           if (!userData.comentarios) userData.comentarios = []; 
           if (!userData.notificacoes) userData.notificacoes = { chat: false, admin: false }; // Cria a gaveta se for usuário antigo
+          
+          // MÁGICA: Atualiza as chaves das notificações para mostrarem o que está salvo!
+          document.getElementById('notif-chat-toggle').checked = userData.notificacoes.chat;
+          document.getElementById('notif-admin-toggle').checked = userData.notificacoes.admin;
           
           if (userData.foto) dom.sideMenu.profilePic.src = userData.foto;
           if (userData.apelido) dom.sideMenu.profileName.textContent = userData.apelido;
