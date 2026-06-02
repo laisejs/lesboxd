@@ -1,31 +1,59 @@
-const CACHE_NAME = 'meu-pwa-cache-v1';
-
-// Lista de arquivos que o Service Worker vai salvar no cache
-// Coloque esta lista corrigida no seu arquivo sw.js (ou service-worker.js)
-const urlsToCache = [
+const CACHE_NAME = 'lilies-cache-v1';
+const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
-  '/style.css',                         // Corrigido
-  '/manifest.json',                     // Adicionado (boa prática)
-  '/assets/icons/icon-192x192.png',
-  '/assets/icons/icon-512x512.png'      // Adicionado a partir do seu manifest.json
+  '/style.css',
+  '/lily.png',
+  '/lily-light.png'
 ];
-// Ouve o evento 'install' (instalação do PWA)
-self.addEventListener('install', event => {
+
+// Instalação do Service Worker (Guarda o esqueleto da app no telemóvel)
+self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      // Abre o cache e salva todos os arquivos da lista
-      return cache.addAll(urlsToCache);
+    caches.open(CACHE_NAME).then((cache) => {
+      console.log('Cache aberta com sucesso!');
+      return cache.addAll(ASSETS_TO_CACHE);
     })
   );
+  self.skipWaiting(); // Força a atualização imediata se houver código novo
 });
 
-// Ouve o evento 'fetch' (requisições de rede)
-self.addEventListener('fetch', event => {
+// Limpeza de Caches antigos (quando você atualizar a versão do site)
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+  self.clients.claim();
+});
+
+// A MÁGICA: Interceta os pedidos de internet
+self.addEventListener('fetch', (event) => {
+  // Ignora chamadas ao banco de dados (Firebase) para garantir que tem sempre dados frescos
+  if (event.request.url.includes('firestore.googleapis.com') || event.request.url.includes('identitytoolkit')) {
+    return;
+  }
+
+  // Estratégia "Stale-While-Revalidate": Mostra a versão guardada no telemóvel para ser instantâneo, 
+  // mas puxa a versão nova da internet em segundo plano
   event.respondWith(
-    caches.match(event.request).then(response => {
-      // Se o arquivo estiver no cache, ele o entrega de forma instantânea
-      return response || fetch(event.request);
+    caches.match(event.request).then((cachedResponse) => {
+      const fetchPromise = fetch(event.request).then((networkResponse) => {
+        caches.open(CACHE_NAME).then((cache) => {
+          cache.put(event.request, networkResponse.clone());
+        });
+        return networkResponse;
+      }).catch(() => {
+        // Se a pessoa estiver sem internet, apenas falha silenciosamente e usa o cache
+      });
+      return cachedResponse || fetchPromise;
     })
   );
 });

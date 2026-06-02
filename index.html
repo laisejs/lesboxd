@@ -133,36 +133,53 @@
       <h2 class="profile-name" id="profile-name-element" contenteditable="true" spellcheck="false">NOME</h2>
     </div>
 <nav class="menu-nav">
-      <button class="menu-nav-button" id="show-favorites-btn">Favoritos</button>
-      
-      <button class="menu-nav-button" id="show-watched-btn">Assistidos</button>
-      <button class="menu-nav-button" id="show-lidos-btn">Lidos</button>
-      
-      <button class="menu-nav-button" id="show-want-btn">Lista</button>
-      <button class="menu-nav-button" id="show-amigos-btn">Social</button>
-      <button class="menu-nav-button" id="show-help-btn">Ajuda</button>
+      <button class="menu-nav-button" id="show-favorites-btn"><i data-lucide="heart" class="menu-icon"></i> Favoritos</button>
+      <button class="menu-nav-button" id="show-watched-btn"><i data-lucide="play" class="menu-icon"></i> Assistidos</button>
+      <button class="menu-nav-button" id="show-lidos-btn"><i data-lucide="book-marked" class="menu-icon"></i> Lidos</button>
+      <button class="menu-nav-button" id="show-want-btn"><i data-lucide="bookmark" class="menu-icon"></i> Lista</button>
+      <button class="menu-nav-button" id="show-amigos-btn"><i data-lucide="users" class="menu-icon"></i> Social</button>
       <button class="menu-nav-button" id="show-aprovacoes-btn" style="display: none; background-color: #b8860b; color: white;">Pendentes</button>
-    <div class="side-menu-bottom">
-        <div id="theme-toggle-container">
-            <label for="theme-toggle">Tema Escuro</label>
-            <label class="switch">
-                <input type="checkbox" id="theme-toggle">
-                <span class="slider round"></span>
-            </label>
+</nav>        
+            
+<div class="side-menu-bottom" style="display: flex; gap: 10px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+            <button id="logout-btn" style="flex-grow: 1;">Sair</button>
+            <button id="settings-btn" title="Configurações" style="width: 45px; border-radius: 8px; background: #444; color: var(--cor-texto); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s;"><i data-lucide="settings"></i></button>
         </div>
-        <div id="visibility-toggle-container">
-            <label for="visibility-toggle">Perfil Público</label>
-            <label class="switch">
-                <input type="checkbox" id="visibility-toggle">
-                <span class="slider round"></span>
-            </label>
-        </div>
-        <button id="logout-btn">Sair</button>
-    </div>
   </aside>
+
+  <div id="modal-settings-bg" class="admin-modal-overlay" style="display: none;">
+      <div class="admin-modal-content minimalist" style="max-width: 400px; padding: 35px 30px;">
+          <button id="settings-close" class="admin-close-btn">×</button>
+          <h2 style="font-size: 22px; color: var(--cor-principal); margin: 0 0 25px 0;">Configurações</h2>
+          
+          <div class="menu-settings-group">
+              <p class="settings-label"><i data-lucide="bell" style="width:14px; margin-right:5px; vertical-align:text-top;"></i> Notificações</p>
+              <div class="toggle-container">
+                  <label for="notif-chat-toggle">Mensagens do Chat</label>
+                  <label class="switch"><input type="checkbox" id="notif-chat-toggle"><span class="slider round"></span></label>
+              </div>
+<div class="toggle-container" id="admin-notif-container">
+                  <label for="notif-admin-toggle">Novas Adições</label>
+                  <label class="switch"><input type="checkbox" id="notif-admin-toggle"><span class="slider round"></span></label>
+              </div>
+          </div>
+
+          <div class="menu-settings-group" style="border-bottom: none; margin-bottom: 0;">
+              <p class="settings-label"><i data-lucide="sliders-horizontal" style="width:14px; margin-right:5px; vertical-align:text-top;"></i> Preferências</p>
+              <div class="toggle-container">
+                  <label for="theme-toggle">Tema Escuro</label>
+                  <label class="switch"><input type="checkbox" id="theme-toggle"><span class="slider round"></span></label>
+              </div>
+              <div class="toggle-container">
+                  <label for="visibility-toggle">Perfil Público</label>
+                  <label class="switch"><input type="checkbox" id="visibility-toggle" checked><span class="slider round"></span></label>
+              </div>
+          </div>
+      </div>
+  </div>
 <button id="btn-add-filme" class="floating-add-btn" title="Adicionar Filme" style="display: none;">+</button>
 <button id="floating-chat-btn" class="floating-chat-btn" title="Chat Global" style="display: none;">
-      <img src="chat.png" alt="Chat" class="chat-btn-image">
+<i data-lucide="message-circle"></i>
       
       <span id="chat-badge" style="display:none;">0</span>
   </button>
@@ -402,9 +419,9 @@
                 <input type="text" id="search-box" placeholder="Pesquise por título, elenco..." />
             </div>
             <button id="search-toggle" title="Buscar">
-            <img src="lupa.png" alt="Ícone de Pesquisa">
+<i data-lucide="search"></i>
             </button>
-            <button id="hamburger-menu" title="Menu">☰</button>
+<button id="hamburger-menu" title="Menu"><i data-lucide="align-justify"></i></button>
         </div>
       </header>
 
@@ -487,7 +504,6 @@ auth: {
         lidosBtn: document.getElementById("show-lidos-btn"), // <-- ADICIONE ESTA LINHA
         wantBtn: document.getElementById("show-want-btn"),
         amigosBtn: document.getElementById('show-amigos-btn'),
-        helpBtn: document.getElementById('show-help-btn'), 
         aprovacoesBtn: document.getElementById('show-aprovacoes-btn'), // <-- NOVA LINHA 
         logoutBtn: document.getElementById("logout-btn"),
         profileName: document.getElementById('profile-name-element'),
@@ -577,6 +593,7 @@ auth: {
       } else if (currentView === 'home') {
         mostrarTelaInicial();
       }
+      setTimeout(() => lucide.createIcons(), 50);
     }
 
     function renderDestaque() {
@@ -654,7 +671,7 @@ function mostrarTelaInicial() {
       grid.className = 'grid';
 
       if(lista.length === 0) {
-        grid.innerHTML = `<p>Nenhum item encontrado para os filtros selecionados.</p>`;
+      grid.innerHTML = '<div class="no-items-center">Nenhum título encontrado.</div>'
       } else {
         lista.forEach(filme => grid.appendChild(createCard(filme, 'grid')));
       }
@@ -911,14 +928,13 @@ async function mostrarAprovacoes() {
                             <p class="amigo-watched-count">${filmesAssistidos.length} assistidos | ${livrosLidos.length} lidos</p>
                         </div>
                     </div>
-                     <div class="amigo-list-selector">
-                        <button class="amigo-tab-btn active" data-list="favoritos">Favoritos</button>
-                        <button class="amigo-tab-btn" data-list="assistidos">Assistidos</button>
-                        <button class="amigo-tab-btn" data-list="lidos">Lidos</button>
-                        <button class="amigo-tab-btn" data-list="quero">Lista</button>
-                        <button class="amigo-tab-btn" data-list="comentarios">Comentários</button>
+<div class="amigo-list-selector">
+                        <button class="amigo-tab-btn active" data-list="favoritos"><i data-lucide="heart" style="width: 14px;"></i> Favoritos</button>
+                        <button class="amigo-tab-btn" data-list="assistidos"><i data-lucide="tv-minimal-play" style="width: 14px;"></i> Assistidos</button>
+                        <button class="amigo-tab-btn" data-list="lidos"><i data-lucide="book-marked" style="width: 14px;"></i> Lidos</button>
+                        <button class="amigo-tab-btn" data-list="quero"><i data-lucide="bookmark" style="width: 14px;"></i> Lista</button>
+                        <button class="amigo-tab-btn" data-list="comentarios"><i data-lucide="message-circle" style="width: 14px;"></i> Comentários</button>
                     </div>`;
-
                 const createListContainer = (listName, filmList) => {
                     const container = document.createElement('div');
                     container.className = 'amigo-film-list-container';
@@ -987,27 +1003,17 @@ async function mostrarAprovacoes() {
                     card.querySelectorAll('.amigo-film-list-container').forEach(c => c.style.display = 'none');
                     card.querySelector(`.amigo-film-list-container[data-list="${listToShow}"]`).style.display = 'flex';
                 });
-            });
+});
+            
+            // Renderiza os ícones novos dentro da aba de amigos
+            setTimeout(() => lucide.createIcons(), 10);
 
         } catch (error) {
             console.error("Erro ao buscar usuários:", error);
         }
     }
 
-    // --- FUNÇÕES DO CHAT GLOBAL ---
-    function initChatListener() {
-        if (unsubscribeChat) unsubscribeChat();
-        const q = query(collection(db, "mensagens"), orderBy("timestamp", "asc"));
-        
-        unsubscribeChat = onSnapshot(q, (snapshot) => {
-            chatMessages = [];
-            snapshot.forEach((doc) => {
-                chatMessages.push({ id: doc.id, ...doc.data() });
-            });
-            renderChatMessages();
-            updateChatBadge();
-        });
-    }
+let isInitialChatLoad = true;
 
 function updateChatBadge() {
         if (dom.chat.sidebar.classList.contains('open')) {
@@ -1145,41 +1151,67 @@ function formatScreentimeText(screentime) {
             </div>
         `;
 const favButton = document.createElement('button');
-// Verifica se o filme é favorito para escolher a imagem inicial
-const heartImg = filme.favorito ? 'heart-green.png' : 'heart-white.png';
-favButton.className = `favorite-heart ${filme.favorito ? 'favorited' : ''}`;
-favButton.innerHTML = '❤︎';
-favButton.title = "Favoritar";
+        favButton.className = `favorite-heart ${filme.favorito ? 'favorited' : ''}`;
+        // Usa o ícone do Lucide, e se for favorito já adiciona a classe 'filled'
+        favButton.innerHTML = `<i data-lucide="heart" class="heart-icon ${filme.favorito ? 'filled' : ''}"></i>`;
+        favButton.title = "Favoritar";
 
-favButton.onclick = (e) => {
-    e.stopPropagation();
-    toggleFavorite(filme.titulo);
-    
-    // Troca a imagem visualmente na hora do clique
-    const img = favButton.querySelector('.heart-icon');
-    if (img.src.includes('heart-white.png')) {
-        img.src = 'heart-green.png';
-    } else {
-        img.src = 'heart-white.png';
-    }
-};
-card.prepend(favButton);
+        favButton.onclick = (e) => {
+            e.stopPropagation();
+            toggleFavorite(filme.titulo);
+            
+            // Troca o visual do coração instantaneamente (preenchido/vazio)
+            const isNowFav = favButton.classList.toggle('favorited');
+            const icon = favButton.querySelector('svg');
+            if(icon) {
+                if(isNowFav) icon.classList.add('filled');
+                else icon.classList.remove('filled');
+            }
+        };
+        card.prepend(favButton);
         card.onclick = () => {
              const index = filmes.findIndex(f => f.titulo === filme.titulo);
              abrirModal(index);
         };
         return card;
     }
+// --- FUNÇÕES DE CLIQUE NAS TAGS QUE FALTAVAM ---
+    function handleBaseFilterClick(tagId) {
+        currentBaseFilter = tagId;
+        activeTags.clear();
+        currentView = 'grid';
+        ocultarContador();
+        applyAllFilters();
+    }
 
+    function toggleTagFilter(tagText) {
+        if (activeTags.has(tagText)) {
+            activeTags.delete(tagText);
+        } else {
+            activeTags.add(tagText);
+        }
+        currentView = 'grid';
+        ocultarContador();
+        applyAllFilters();
+    }
 function popularTags() {
         dom.tags.fixedContainer.innerHTML = '';
-        ['Todos', 'Series', 'Filmes', 'Livros'].forEach(tagText => { // <-- Livros Adicionado!
+        const baseTags = [
+            { id: 'Todos', icon: 'layout-grid', label: 'Todos' },
+            { id: 'Series', icon: 'square-play', label: 'Séries' },
+            { id: 'Filmes', icon: 'clapperboard', label: 'Filmes' },
+            { id: 'Livros', icon: 'book-marked', label: 'Livros' }
+        ];
+
+        baseTags.forEach(tagInfo => { 
             const el = document.createElement("span");
             el.className = "tag base-tag";
-            el.textContent = tagText;
-            el.onclick = () => handleBaseFilterClick(tagText);
+            el.dataset.filter = tagInfo.id;
+            el.innerHTML = `<i data-lucide="${tagInfo.icon}" class="header-base-icon" style="width: 16px; height: 16px;"></i><span class="base-tag-text">${tagInfo.label}</span>`;
+            el.onclick = () => handleBaseFilterClick(tagInfo.id);
             dom.tags.fixedContainer.appendChild(el);
         });
+
         const allOtherTags = new Set(filmes.flatMap(f => f.tags));
         ['Series', 'Filmes', 'Livros', 'Adult'].forEach(t => allOtherTags.delete(t));
         dom.tags.dropdownContent.innerHTML = '';
@@ -1194,27 +1226,12 @@ function popularTags() {
             dom.tags.dropdownContent.appendChild(el);
         });
         updateTagUI();
-    }
-
-    function handleBaseFilterClick(tagText) {
-        currentBaseFilter = tagText;
-        currentView = 'grid';
-        applyAllFilters();
-    }
-
-    function toggleTagFilter(tagText) {
-        if (activeTags.has(tagText)) {
-            activeTags.delete(tagText);
-        } else {
-            activeTags.add(tagText);
-        }
-        currentView = 'grid';
-        applyAllFilters();
+        setTimeout(() => lucide.createIcons(), 10);
     }
 
     function updateTagUI() {
         dom.tags.fixedContainer.querySelectorAll('.base-tag').forEach(el => {
-            el.classList.toggle('active', el.textContent === currentBaseFilter);
+            el.classList.toggle('active', el.dataset.filter === currentBaseFilter);
         });
         dom.tags.selectedContainer.innerHTML = '';
         activeTags.forEach(tagText => {
@@ -1281,6 +1298,9 @@ function applyAllFilters() {
           title.textContent = currentMenuFilter;
           dom.displayArea.prepend(title);
       }
+      
+      // A MÁGICA: Manda desenhar os corações sempre que você pesquisar ou mudar de Tag!
+      setTimeout(() => lucide.createIcons(), 10);
     }
 
     function resetFilters() {
@@ -1502,18 +1522,17 @@ function updateWatchedCounters() {
         const lidosLivros = filmes.filter(f => f.assistido && f.tags.includes('Livros')).length;
         const totalLivros = filmes.filter(f => f.tags.includes('Livros')).length;
         
-        // Atualiza os botões do Menu Lateral para mostrar os números encostados na direita
-        if(dom.sideMenu.watchBtn) {
-            dom.sideMenu.watchBtn.innerHTML = `Assistidos <span style="float:right; opacity:0.7; font-size:13px; font-weight:normal;">${assistidosFilmesSeries} / ${totalFilmesSeries}</span>`;
+if(dom.sideMenu.watchBtn) {
+            dom.sideMenu.watchBtn.innerHTML = `<i data-lucide="play" class="menu-icon"></i> Assistidos <span style="float:right; opacity:0.7; font-size:13px; font-weight:normal;">${assistidosFilmesSeries} / ${totalFilmesSeries}</span>`;
         }
         if(dom.sideMenu.lidosBtn) {
-            dom.sideMenu.lidosBtn.innerHTML = `Lidos <span style="float:right; opacity:0.7; font-size:13px; font-weight:normal;">${lidosLivros} / ${totalLivros}</span>`;
+            dom.sideMenu.lidosBtn.innerHTML = `<i data-lucide="book-marked" class="menu-icon"></i> Lidos <span style="float:right; opacity:0.7; font-size:13px; font-weight:normal;">${lidosLivros} / ${totalLivros}</span>`;
         }
+        setTimeout(() => lucide.createIcons(), 10);
 
         // Atualiza a barrinha de contagem da página principal (caso ativada)
         const mainHtml = `<span class="clickable-counter" onclick="abrirListaMenu('Assistidos')">Assistidos: ${assistidosFilmesSeries} / ${totalFilmesSeries}</span> &nbsp;&nbsp;|&nbsp;&nbsp; <span class="clickable-counter" onclick="abrirListaMenu('Lidos')">Lidos: ${lidosLivros} / ${totalLivros}</span>`;
         const mainCounter = document.getElementById('watched-counter');
-        if (mainCounter) mainCounter.innerHTML = mainHtml;
     }
 
     function createClickableFilterHTML(type, data, joiner = ', ') {
@@ -1630,7 +1649,7 @@ let heroInterval; // Controla a troca de imagens da galeria
           }
       }
 
-      if (btnEdit && btnDelete) {
+        if (btnEdit && btnDelete) {
           if (isAdmin) {
               btnEdit.style.display = 'inline-block';
               btnDelete.style.display = 'inline-block';
@@ -1680,12 +1699,20 @@ let heroInterval; // Controla a troca de imagens da galeria
 function updateModalButtons(index){
       const f = filmes[index];
       const isLivro = f.tags && f.tags.includes('Livros');
+      const isSerie = f.tags && f.tags.includes('Series');
+      // A mágica: Escolhe o ícone baseado na categoria!
+      const watchIcon = isLivro ? 'book-marked' : (isSerie ? 'square-play' : 'clapperboard');
+      
       dom.modal.favBtn.classList.toggle('active', f.favorito);
-      dom.modal.favBtn.innerHTML = '❤︎';
+      dom.modal.favBtn.innerHTML = `<i data-lucide="heart" class="${f.favorito ? 'filled' : ''}"></i> ` + (f.favorito ? '' : '');
+      
       dom.modal.watchBtn.classList.toggle('active', f.assistido);
-      dom.modal.watchBtn.textContent = f.assistido ? (isLivro ? 'Lido' : 'Assistido') : (isLivro ? 'Marcar como lido' : 'Marcar como assistido');
-      dom.modal.wantBtn.classList.toggle('active', f.queroAssistir);
-      dom.modal.wantBtn.textContent = f.queroAssistir ? 'Lista' : '+';
+      dom.modal.watchBtn.innerHTML = `<i data-lucide="${watchIcon}"></i> ` + (f.assistido ? (isLivro ? 'Lido' : 'Assistido') : (isLivro ? 'Marcar como lido' : 'Marcar como assistido'));
+      
+dom.modal.wantBtn.classList.toggle('active', f.queroAssistir);
+      dom.modal.wantBtn.innerHTML = `<i data-lucide="${f.queroAssistir ? 'bookmark-check' : 'bookmark'}"></i> ` + (f.queroAssistir ? '' : '');
+      // Manda o Lucide desenhar os novos ícones injetados
+      setTimeout(() => lucide.createIcons(), 10);
     }
 
     function renderStarsInModal(index) {
@@ -1722,6 +1749,7 @@ function updateModalButtons(index){
         } finally {
             dom.modal.deleteBtn.textContent = 'Excluir';
         }
+
     }
 
     function abrirModalEdicao(index) {
@@ -1957,6 +1985,56 @@ if (btnAddFilme) {
           }
       });
 
+      // ==========================================
+      // MAGIA DOS GESTOS (SWIPES DO TELEMÓVEL)
+      // ==========================================
+      let touchStartX = 0;
+      let touchStartY = 0;
+
+      document.addEventListener('touchstart', e => {
+          touchStartX = e.changedTouches[0].screenX;
+          touchStartY = e.changedTouches[0].screenY;
+      }, { passive: true });
+
+      document.addEventListener('touchend', e => {
+          const touchEndX = e.changedTouches[0].screenX;
+          const touchEndY = e.changedTouches[0].screenY;
+          
+          const deltaX = touchEndX - touchStartX;
+          const deltaY = touchEndY - touchStartY;
+          
+          // Se o movimento for mais vertical do que horizontal (scroll de página), 
+          // ou for um puxão muito curtinho, ignoramos.
+          if (Math.abs(deltaY) > Math.abs(deltaX) || Math.abs(deltaX) < 50) return;
+
+          // Proteção: Não aciona se a pessoa estiver a rolar a lista de filmes na horizontal
+          if (e.target.closest('.linha-horizontal, .amigo-list-selector, .admin-gallery-mini-grid, input, textarea')) return;
+
+          const isMenuOpen = dom.sideMenu.menu.classList.contains('open');
+          const isChatOpen = dom.chat.sidebar.classList.contains('open');
+          const isModalOpen = dom.modal.bg.classList.contains('open');
+
+          if (deltaX > 0) {
+              // 👉 DESLIZAR PARA A DIREITA
+              if (isMenuOpen) {
+                  closeSideMenu(); // Fecha o menu (empurra de volta para a direita)
+              } else if (!isChatOpen && !isModalOpen && touchStartX < 80) {
+                  // Abre o Chat (Se puxar a partir da borda esquerda)
+                  abrirChat();
+              }
+          } else {
+              // 👈 DESLIZAR PARA A ESQUERDA
+              if (isChatOpen) {
+                  fecharChat(); // Fecha o chat (empurra de volta para a esquerda)
+              } else if (isModalOpen) {
+                  fecharModal(); // Fecha os detalhes do filme (empurra para a esquerda)
+              } else if (!isMenuOpen && touchStartX > window.innerWidth - 80) {
+                  // Abre o Menu (Se puxar a partir da borda direita)
+                  openSideMenu();
+              }
+          }
+      }, { passive: true });
+
       dom.sideMenu.openBtn.addEventListener('click', openSideMenu);
       dom.sideMenu.closeBtn.addEventListener('click', closeSideMenu);
       dom.sideMenu.overlay.addEventListener('click', closeSideMenu);
@@ -1983,6 +2061,22 @@ if (btnAddFilme) {
           if (dom.sideMenu.profileFlagBtn && !dom.sideMenu.profileFlagBtn.contains(e.target) && dom.sideMenu.profileFlagDropdown.classList.contains('show')) {
               dom.sideMenu.profileFlagDropdown.classList.remove('show');
           }
+          
+          // --- MÁGICA: FECHAR MODAIS LATERAIS AO CLICAR FORA ---
+          // Fechar Detalhes do Filme
+          if (dom.modal.bg.classList.contains('open')) {
+              // Só fecha se o clique não foi dentro da aba, e não foi na capa de um filme
+              if (!dom.modal.bg.contains(e.target) && !e.target.closest('.card-base') && !e.target.closest('#destaque-ver-mais')) {
+                  fecharModal();
+              }
+          }
+          // Fechar Chat Global
+          if (dom.chat.sidebar.classList.contains('open')) {
+              // Só fecha se o clique não foi dentro do chat, e não foi no botão de abrir o chat
+              if (!dom.chat.sidebar.contains(e.target) && !e.target.closest('.floating-chat-btn')) {
+                  fecharChat();
+              }
+          }
       });
       
 const createSideMenuFilterHandler = (statusText) => () => {
@@ -2005,10 +2099,6 @@ const createSideMenuFilterHandler = (statusText) => () => {
       dom.sideMenu.wantBtn.onclick = createSideMenuFilterHandler('Lista');
       dom.sideMenu.amigosBtn.onclick = () => {
           mostrarAmigos();
-          closeSideMenu();
-      };
-      dom.sideMenu.helpBtn.onclick = () => {
-          mostrarAjuda();
           closeSideMenu();
       };
       dom.sideMenu.aprovacoesBtn.onclick = () => {
@@ -2047,12 +2137,47 @@ const createSideMenuFilterHandler = (statusText) => () => {
               localStorage.setItem('saficos_theme', 'dark');
           } else {
               // Se desligou o botão, adiciona a classe clara
-              document.body.classList.add('light-theme');
+document.body.classList.add('light-theme');
               localStorage.setItem('saficos_theme', 'light');
           }
       });
 
-    }
+      // --- MENU DE CONFIGURAÇÕES ---
+      const modalSettings = document.getElementById('modal-settings-bg');
+      document.getElementById('settings-btn').addEventListener('click', () => {
+          modalSettings.style.display = 'flex';
+          closeSideMenu();
+      });
+      document.getElementById('settings-close').addEventListener('click', () => {
+          modalSettings.style.display = 'none';
+      });
+
+      // --- RECUPERAR LÓGICA DE NOTIFICAÇÕES E SALVAR ---
+      const updateSettings = async () => {
+          if (userDocRef) {
+              await updateDoc(userDocRef, { notificacoes: userData.notificacoes, isPublic: userData.isPublic });
+          }
+      };
+
+      document.getElementById('notif-chat-toggle').addEventListener('change', async (e) => {
+          if (e.target.checked && Notification.permission !== "granted") {
+              const perm = await Notification.requestPermission();
+              if (perm !== "granted") { e.target.checked = false; return alert("Permita no navegador!"); }
+          }
+          userData.notificacoes.chat = e.target.checked;
+          updateSettings();
+      });
+
+      document.getElementById('notif-admin-toggle').addEventListener('change', async (e) => {
+          if (e.target.checked && Notification.permission !== "granted") {
+              const perm = await Notification.requestPermission();
+              if (perm !== "granted") { e.target.checked = false; return alert("Permita no navegador!"); }
+          }
+          userData.notificacoes.admin = e.target.checked;
+          updateSettings();
+      });
+
+    } // FIM DA FUNÇÃO INIT
 
 // --- ALTERNAR ENTRE LOGIN E CADASTRO ---
     document.getElementById('go-to-register').onclick = (e) => {
@@ -2100,7 +2225,7 @@ const createSideMenuFilterHandler = (statusText) => () => {
           bandeira: "", 
           apelido: "Novo Usuário",
           foto: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
-          isPublic: false
+          isPublic: true
         });
       } catch (e) {
          switch(e.code) {
@@ -2220,13 +2345,17 @@ const modalProfile = document.getElementById('modal-profile-pic-bg');
             }
         });
 
-        const docSnap = await getDoc(userDocRef);
+const docSnap = await getDoc(userDocRef);
         if (docSnap.exists()) {
           userData = docSnap.data();
           if (!userData.comentarios) userData.comentarios = []; 
+          if (!userData.notificacoes) userData.notificacoes = { chat: false, admin: false }; // Cria a gaveta se for usuário antigo
+          
           if (userData.foto) dom.sideMenu.profilePic.src = userData.foto;
           if (userData.apelido) dom.sideMenu.profileName.textContent = userData.apelido;
           dom.sideMenu.visibilityToggle.checked = !!userData.isPublic; 
+
+          
 
           if (userData.bandeira) {
               dom.sideMenu.profileFlagBtn.src = userData.bandeira;
@@ -2235,39 +2364,48 @@ const modalProfile = document.getElementById('modal-profile-pic-bg');
               dom.sideMenu.profileFlagBtn.src = 'lesbica.png'; 
               dom.sideMenu.profilePic.classList.remove('has-border');
           }
-
         } else {
-          userData = { favoritos: [], assistidos: [], quero: [], estrelas: {}, comentarios: [], bandeira: "", apelido: "Novo Usuário", foto: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png", isPublic: false };
+          userData = { favoritos: [], assistidos: [], quero: [], estrelas: {}, comentarios: [], bandeira: "", apelido: "Novo Usuário", foto: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png", isPublic: false, notificacoes: { chat: false, admin: false } };
           await setDoc(userDocRef, userData);
           dom.sideMenu.visibilityToggle.checked = false;
           dom.sideMenu.profileFlagBtn.src = 'lesbica.png';
           dom.sideMenu.profilePic.classList.remove('has-border');
         }
+
+
+
+    function initChatListener() {
+        if (unsubscribeChat) unsubscribeChat();
+        const q = query(collection(db, "mensagens"), orderBy("timestamp", "asc"));
         
-        initChatListener();
-        
-        try {
-            const querySnapshot = await getDocs(collection(db, "filmes"));
-            filmes = []; 
-            
-            querySnapshot.forEach((doc) => {
-                filmes.push({ id: doc.id, ...doc.data() });
+        unsubscribeChat = onSnapshot(q, (snapshot) => {
+            snapshot.docChanges().forEach((change) => {
+                if (change.type === "added") {
+                    const m = change.doc.data();
+                    const isOwnMessage = m.uid === auth.currentUser?.uid;
+                    
+                    // Se não for o carregamento inicial, não for mensagem sua, e a permissão estiver ligada...
+                    if (!isInitialChatLoad && !isOwnMessage && userData.notificacoes?.chat && Notification.permission === "granted") {
+                        // Faz a mágica aparecer no telemóvel/PC!
+                        new Notification("Lilies Chat: " + m.nome, {
+                            body: m.texto,
+                            icon: "lily.png",
+                            silent: false
+                        });
+                    }
+                }
             });
 
-            filmes.sort((a, b) => a.titulo.localeCompare(b.titulo));
-            init(); 
-        } catch (error) {
-            console.error("Não foi possível carregar os filmes do banco de dados:", error);
-            dom.displayArea.innerHTML = "<p>Erro ao carregar a lista de filmes. Verifique sua conexão ou banco de dados.</p>";
-        }
-
-      } else {
-        dom.main.style.display = 'none';
-        dom.auth.section.style.display = 'flex';
-        userData = { favoritos: [], assistidos: [], quero: [], estrelas: {}, comentarios: [], bandeira: "", isPublic: false };
-        if (dom.chat.floatingBtn) dom.chat.floatingBtn.style.display = 'none';
-        if (unsubscribeChat) unsubscribeChat();
-
+            chatMessages = [];
+            snapshot.forEach((doc) => chatMessages.push({ id: doc.id, ...doc.data() }));
+            
+            renderChatMessages();
+            updateChatBadge();
+            
+            // Depois da primeira leitura, liberta os alarmes
+            isInitialChatLoad = false;
+        });
+    }
         // PASSO 4: Sorteia uma imagem de fundo do catálogo para a janela de login
         getDocs(collection(db, "filmes")).then(snapshot => {
             const imagensParaFundo = [];
@@ -2289,7 +2427,57 @@ const modalProfile = document.getElementById('modal-profile-pic-bg');
             console.error("Erro ao puxar imagens para o fundo:", e);
         });
 
-      } // FECHA O ELSE DO UTILIZADOR DESLOGADO
+        // A MÁGICA: Diz para o ecrã de login desaparecer e a biblioteca abrir!
+// O MOTOR DO CATÁLOGO: Puxa os filmes em tempo real e dispara notificações
+        let isInitialCatalogLoad = true;
+
+        onSnapshot(collection(db, "filmes"), (snapshot) => {
+            
+            // 1. Verifica as novidades para notificar (como fazemos no Chat)
+            snapshot.docChanges().forEach((change) => {
+                if (change.type === "added" && !isInitialCatalogLoad) {
+                    const novoFilme = change.doc.data();
+                    
+                    // Se a pessoa ativou a notificação de Novas Adições
+                    if (userData.notificacoes?.admin && Notification.permission === "granted") {
+                        let categoria = "Novo Título";
+                        if (novoFilme.tags && novoFilme.tags.includes("Livros")) categoria = "Novo Livro";
+                        else if (novoFilme.tags && novoFilme.tags.includes("Series")) categoria = "Nova Série";
+                        else categoria = "Novo Filme";
+
+                        new Notification("Lilies: " + categoria + " Adicionado!", {
+                            body: novoFilme.titulo,
+                            icon: "lily.png",
+                            silent: false
+                        });
+                    }
+                }
+            });
+
+            // 2. Atualiza o catálogo
+            filmes = [];
+            snapshot.forEach((doc) => {
+                filmes.push({ id: doc.id, ...doc.data() });
+            });
+            filmes.sort((a, b) => a.titulo.localeCompare(b.titulo));
+            
+            popularTags();
+            updateWatchedCounters();
+            if (currentView === 'home') mostrarTelaInicial();
+            else if (currentView === 'grid') applyAllFilters();
+
+            // Proteção para não disparar 100 notificações ao abrir o site
+            isInitialCatalogLoad = false;
+        });
+        // A MÁGICA: Diz para o ecrã de login desaparecer e a biblioteca abrir!
+        init();
+        initChatListener();
+
+      } else {
+        // Garante que o ecrã de login volta a aparecer se a pessoa não estiver logada
+        dom.auth.section.style.display = "flex";
+        dom.main.style.display = "none";
+      }
     }); // FECHA O onAuthStateChanged
 
 // --- MAGIA PARA O BOTÃO VOLTAR DO CELULAR ---
@@ -2326,13 +2514,13 @@ const modalProfile = document.getElementById('modal-profile-pic-bg');
             }
         });
         
-        // Se o usuário fechar a janela clicando no "X" ao invés de usar o botão voltar,
+ // Se o usuário fechar a janela clicando no "X" ao invés de usar o botão voltar,
         // garantimos que a armadilha continue ativa pra quando ele estiver na Home
         document.addEventListener('click', () => {
              if (!window.history.state || !window.history.state.trava) {
                  window.history.pushState({ trava: true }, "");
              }
-            });
+        });
  
     })();
 

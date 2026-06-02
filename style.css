@@ -291,7 +291,51 @@ h1 {
 .error-msg { color: #db1f20; font-size: 0.85rem; margin-bottom: 15px; min-height: 16px; font-weight: 600; text-align: center; }
 
 @media (max-width: 900px) {
-    .split-visual { display: none; }
+    /* 1. Mágica do Deslize (Swipe Nativo) */
+    #auth-section {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory; /* Cria o efeito "íman" ao deslizar */
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+    }
+    .split-visual {
+        display: flex !important; /* Volta a mostrar o fundo degrade */
+        min-width: 100vw; /* Ocupa exatamente 1 ecrã inteiro */
+        scroll-snap-align: start;
+        padding: 40px 20px;
+        text-align: center;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Animação que avisa o usuário para deslizar */
+    .visual-content::after {
+        content: 'Deslize para o lado para entrar ➔';
+        display: block;
+        margin-top: 40px;
+        font-size: 15px;
+        font-weight: bold;
+        opacity: 0.8;
+        animation: pulseSwipe 2s infinite;
+    }
+    @keyframes pulseSwipe { 
+        0% { transform: translateX(0); } 
+        50% { transform: translateX(10px); } 
+        100% { transform: translateX(0); } 
+    }
+
+    /* 2. Corrige as caixas cortando no formulário */
+    .split-form {
+        min-width: 100vw; /* Ocupa o 2º ecrã inteiro */
+        scroll-snap-align: start;
+        padding: 20px !important; /* Reduz as bordas laterais que estavam empurrando os inputs */
+        box-sizing: border-box;
+    }
+    .form-container {
+        width: 100%;
+        max-width: 100%;
+    }
 }
 /* --- MENU LATERAL DIREITO (CONTA/AMIGOS) --- */
 #hamburger-menu {
@@ -331,6 +375,9 @@ h1 {
   right: 0;
 }
 #close-menu {
+  display: none !important; /* A MÁGICA: Esconde o botão para sempre */
+}
+/* #close-menu {
   position: absolute;
   top: 15px;
   right: 15px;
@@ -347,12 +394,12 @@ h1 {
   cursor: pointer;
   transition: 0.3s;
   padding-bottom: 4px; /* Esse padding centraliza a fonte do "X" perfeitamente no meio do círculo */
-}
+/*}
 #close-menu:hover {
   background: rgba(0,0,0,0.3);
   color: var(--cor-principal);
   transform: rotate(90deg);
-}
+}*/
 .profile-section {
   text-align: center;
   margin-top: 30px;
@@ -423,17 +470,18 @@ h1 {
 #search-toggle {
   background: none;
   border: none;
-  font-size: 24px;
   color: #eee;
   cursor: pointer;
   padding: 0;
   margin: 0;
-  line-height: 1;
+  display: flex; /* A MÁGICA DO ALINHAMENTO */
+  align-items: center;
+  justify-content: center;
   order: 1;
 }
-#search-toggle img {
-    width: 30px; 
-    height: 30px; 
+#search-toggle svg {
+    width: 24px; 
+    height: 24px;
     display: block;
 }
 #search-wrapper {
@@ -931,38 +979,48 @@ h1 {
 }
 
 /* =========================================================================
-   ABAS LATERAIS (NOVO DESIGN HBO / NETFLIX)
+   ABAS LATERAIS (DESIGN FLUTUANTE APP NATIVO)
    ========================================================================= */
 #modal-bg.details-sidebar, 
 #chat-sidebar.details-sidebar {
-    width: 0;
+    position: fixed;
+    top: 0;
+    left: 0; /* A MÁGICA: Agora gruda na esquerda do ecrã! */
     height: 100vh;
     background: var(--cor-card); 
-    overflow: hidden; 
-    transition: width 0.3s ease; 
-    /* Borda na direita, porque a aba voltou para a ESQUERDA */
-    border-right: 1px solid rgba(255,255,255,0.05);
-    z-index: 1000;
-    flex-shrink: 0;
+    overflow-y: auto; 
+    overflow-x: hidden;
+    z-index: 1050;
     display: block;
-    /* Removido o 'position: fixed' para o Chat e o Filme voltarem ao lugar certo! */
+    
+    /* Borda na direita, porque agora desliza da esquerda */
+    border-right: 1px solid rgba(255,255,255,0.05);
+    border-left: none;
+    
+    /* A Mágica de Deslizar da Esquerda para o Centro */
+    transform: translateX(-100%); /* O valor negativo esconde do lado esquerdo */
+    transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow:none; /* Sombra pesada projetada para a direita */
 }
 
-/* LARGURA DA BARRA GRUDADA NO PC */
-#modal-bg.details-sidebar.open { width: 420px; overflow-y: auto; overflow-x: hidden; }
-#chat-sidebar.details-sidebar.open { width: 450px; overflow-y: auto; overflow-x: hidden; }
+/* Larguras fixas no PC */
+#modal-bg.details-sidebar { width: 420px; }
+#chat-sidebar.details-sidebar { width: 450px; }
+
+/* O Estado Aberto */
+#modal-bg.details-sidebar.open,
+#chat-sidebar.details-sidebar.open { 
+    transform: translateX(0); 
+    box-shadow: 10px 0 30px rgba(0,0,0,0.6); /* A sombra só aparece aqui! */
+}
 
 #modal-content.sidebar-content,
 #chat-sidebar .sidebar-content {
     width: 100%; min-width: 100%; height: 100%; margin: 0; 
     background: transparent; border-radius: 0; box-shadow: none; border: none;
     padding: 0; color: var(--cor-texto); position: relative; display: flex;
-    flex-direction: column; opacity: 0; transition: opacity 0.3s 0.1s; overflow-x: hidden;
+    flex-direction: column; overflow-x: hidden;
 }
-
-#modal-bg.details-sidebar.open #modal-content.sidebar-content,
-#chat-sidebar.details-sidebar.open .sidebar-content { opacity: 1; }
-
 /* --- O BOTÃO FECHAR PADRONIZADO (X Redondo) --- */
 #modal-close, #chat-close {
     position: absolute; top: 15px; right: 15px;
@@ -1014,7 +1072,7 @@ h1 {
 /* --- TEMA CLARO --- */
 body.light-theme #modal-bg.details-sidebar, 
 body.light-theme #chat-sidebar.details-sidebar {
-    background: #ffffff; border-right: 1px solid #e2e8f0;
+    background: #ffffff; border-right: 1px solid #e2e8f0; border-left: none;
 }
 body.light-theme .modal-hero-gradient {
     background: linear-gradient(to bottom, rgba(255,255,255,0) 20%, #ffffff 100%);
@@ -1798,7 +1856,29 @@ body.noscroll {
     }
 }
 @media (max-width: 768px) {
-
+/* --- MÁGICA: DEIXAR SÓ ÍCONES NO MOBILE --- */
+  /* Remove os textos dos botões do modal de filmes */
+  .modal-button {
+      font-size: 0 !important; 
+      padding: 12px !important; 
+      gap: 0 !important;
+  }
+  .modal-button svg {
+      width: 20px !important;
+      height: 20px !important;
+  }
+  
+  /* Remove os textos das abas da área social */
+  .amigo-tab-btn {
+      font-size: 0 !important;
+      padding: 10px 14px !important;
+      gap: 0 !important;
+  }
+  .amigo-tab-btn svg {
+      width: 18px !important;
+      height: 18px !important;
+      margin: 0 !important;
+  }
   #app-container {
     padding: 20px 15px 15px 15px; 
   }
@@ -1938,13 +2018,15 @@ body.noscroll {
   }
 #search-toggle {
       order: 1; 
-      padding: 5px; /* Estava 10px, diminua para 5px */
+      padding: 5px; 
       position: relative;
       z-index: 10;
+      display: flex;
+      align-items: center;
   }
-  #search-toggle img {
-    width: 20px; 
-    height: 20px;
+  #search-toggle svg {
+      width: 22px; 
+      height: 22px;
   }
 
   /* CORREÇÃO DO MENU HAMBÚRGUER */
@@ -2034,45 +2116,12 @@ body.noscroll {
       width: 24px; height: 24px; font-size: 14px; top: 5px; right: 5px;
   }
 
-  /* --- ADAPTAÇÃO DA NOVA SIDEBAR (DETALHES E CHAT) PARA MOBILE --- */
-  
 /* --- ADAPTAÇÃO DA NOVA SIDEBAR (DETALHES E CHAT) PARA MOBILE --- */
-  
-  /* 1. O Estado Fechado: Preparado do lado direito do ecrã */
   #modal-bg.details-sidebar,
   #chat-sidebar.details-sidebar {
-      position: fixed !important; 
-      top: 0;
-      left: 0;
       width: 100% !important; 
-      height: 100% !important; 
       z-index: 2000;
-      box-sizing: border-box;
       border: none !important; 
-      
-      /* A MÁGICA DA PLACA DE VÍDEO: Empurra a janela para fora do ecrã */
-      transform: translateX(100%);
-      /* Cria o deslize perfeito de 60 quadros por segundo */
-      transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
-  }
-
-  /* 2. O Estado Aberto: Desliza para dentro */
-  #modal-bg.details-sidebar.open,
-  #chat-sidebar.details-sidebar.open {
-      transform: translateX(0);
-      overflow: hidden; 
-  }
-  
-  /* 3. Ajuste do Conteúdo Interno */
-  #modal-content.sidebar-content,
-  #chat-sidebar .sidebar-content {
-      width: 100% !important;
-      min-width: 0 !important; 
-      max-width: 100% !important;
-      height: 100% !important;
-      box-sizing: border-box;
-      overflow-x: hidden;
-      overflow-y: auto; 
   }
 
 /* Esconde os botões de fechar quando a barra lateral está fechada */
@@ -2134,16 +2183,16 @@ body.noscroll {
   }
 
 /* --- SEÇÃO AMIGOS --- */
-  .podium-wrapper { gap: 10px; margin: 25px 0; }
-  .podium-step-container { width: 100px; padding: 15px 10px; border-radius: 12px; }
-  .step-1 { transform: scale(1.1); }
-  .step-1 .podium-pic { width: 60px; height: 60px; } 
-  .podium-pic { width: 45px; height: 45px; } 
-  .podium-medal { width: 24px; height: 24px; font-size: 12px; top: -10px; }
-  .podium-flag { width: 16px; height: 16px; border-width: 1px; }
-  .podium-name { font-size: 12px; margin-bottom: 8px; }
-  .podium-bar { padding: 4px 8px !important; font-size: 10px !important; }
-
+/* Correção do Ranking cortando na direita */
+  .podium-wrapper { gap: 5px; margin: 25px 0; }
+  .podium-step-container { width: 85px; padding: 15px 5px; border-radius: 10px; } /* Estreita o degrau */
+  .step-1 { transform: scale(1.05); } /* Diminui o aumento do 1º lugar */
+  .step-1 .podium-pic { width: 55px; height: 55px; } 
+  .podium-pic { width: 40px; height: 40px; } 
+  .podium-medal { width: 20px; height: 20px; font-size: 10px; top: -8px; }
+  .podium-flag { width: 14px; height: 14px; border-width: 1px; }
+  .podium-name { font-size: 11px; margin-bottom: 6px; }
+  .podium-bar { padding: 4px 6px !important; font-size: 9px !important; }
   .amigo-card { padding: 10px; }
   .amigo-profile-info { gap: 10px; align-items: flex-start; margin-bottom: 10px;}
   .amigo-name { font-size: 15px; }
@@ -2391,10 +2440,19 @@ body.light-theme #close-menu:hover {
 
 /* --- Responsividade Admin Completa (Mobile) --- */
 @media (max-width: 900px) {
+    /* Tira as margens de segurança da tela escura no celular */
+    .admin-modal-overlay {
+        padding: 0 !important;
+    }
+    
+    /* Expande o modal para bater de ponta a ponta na tela */
     .admin-modal-content.minimalist { 
-        padding: 20px 15px; 
+        padding: 25px 20px 20px 20px; 
         overflow-y: auto; 
-        max-height: 95vh;
+        height: 100vh;
+        max-height: 100vh;
+        border-radius: 0;
+        border: none;
     }
     .minimalist-grid { flex-direction: column; gap: 20px; }
     .admin-col-poster { width: 100%; max-width: 160px; margin: 0 auto; }
@@ -2682,4 +2740,268 @@ body.light-theme .profile-pic-preview-container {
     .sugestao-card { flex-direction: column; }
     .sugestao-card img { width: 100%; height: auto; max-height: 250px;}
     .sugestao-actions { flex-direction: column; }
+}
+/* =========================================
+   PAINEL DE CONFIGURAÇÕES DO MENU
+   ========================================= */
+.menu-settings-group {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-left: 5px;
+    padding-right: 5px;
+}
+.settings-label {
+    font-size: 11px;
+    color: var(--cor-texto-secundario);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+.toggle-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--cor-texto);
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+.toggle-container:last-child {
+    margin-bottom: 0;
+}
+
+/* Adaptação para o Tema Claro */
+body.light-theme .menu-settings-group {
+    border-bottom-color: rgba(0,0,0,0.1);
+}
+body.light-theme .toggle-container {
+    color: #b8b8b8;
+}
+/* =========================================
+   ÍCONES LUCIDE E ALINHAMENTOS
+   ========================================= */
+.menu-nav-button {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.menu-icon {
+    width: 20px;
+    height: 20px;
+    opacity: 0.8;
+}
+.modal-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+}
+.modal-button svg {
+    width: 18px;
+    height: 18px;
+}
+/* A mágica que permite o coração ficar totalmente preenchido com a cor do tema */
+.lucide.filled {
+    fill: currentColor;
+}
+/* Correção da cor da Lupa no Tema Claro */
+body.light-theme #search-toggle { 
+    color: #0f172a; 
+}
+
+/* Deixa o Coração Preenchido super elegante (tira a borda grossa) */
+.lucide.filled {
+    fill: currentColor;
+    stroke: none !important;
+    transform: scale(1.1);
+}
+
+/* Alinhamento das categorias do topo */
+.base-tag {
+    display: flex !important;
+    align-items: center;
+    gap: 6px;
+}
+
+/* MÁGICA: No telemóvel, esconde o texto do topo e mostra apenas os ícones */
+@media (max-width: 768px) {
+    .base-tag-text {
+        display: none;
+    }
+    .base-tag {
+        padding: 8px !important; /* Deixa o botão quadrado/redondo só para o ícone */
+    }
+}
+/* --- Alinhamento dos novos ícones (Hambúrguer e Amigos) --- */
+#hamburger-menu {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.amigo-tab-btn {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 6px;
+}
+/* =========================================
+   SUPER CORREÇÕES DE DESIGN E MOBILE
+   ========================================= */
+
+/* 1. Corrige o coração invisível e hitboxes de ícones (Clicar no ícone agora clica no botão) */
+.heart-icon { width: 18px !important; height: 18px !important; pointer-events: none; }
+.amigo-tab-btn svg, .modal-button svg, .menu-nav-button svg { pointer-events: none; }
+
+/* 2. Unifica os botões Flutuantes (+ e Chat) */
+.floating-add-btn, .floating-chat-btn {
+    width: 60px !important; height: 60px !important; right: 30px !important;
+    display: flex; justify-content: center; align-items: center;
+}
+.floating-chat-btn { bottom: 30px !important; }
+.floating-add-btn { bottom: 105px !important; }
+
+/* 3. Centraliza a mensagem de Nenhum Item */
+.no-items-center { width: 100%; text-align: center; margin-top: 50px; color: var(--cor-texto-secundario); font-size: 15px; font-weight: bold; }
+
+@media (max-width: 900px) {
+    /* 4. Corrige a tela de Login/Cadastro espremida e cortando */
+    .split-visual, .split-form { width: 100vw !important; min-width: 100vw !important; box-sizing: border-box !important; }
+    .split-form { padding: 30px 20px !important; overflow-y: auto; display: block; }
+    .form-container { width: 100%; max-width: 320px; margin: 0 auto; }
+}
+
+@media (max-width: 768px) {
+    /* 5. Devolve os textos dos botões Assistido/Lido no Modal */
+    .modal-button { font-size: 12px !important; padding: 8px 12px !important; gap: 6px !important; }
+    
+    /* 6. Aumenta a Header e os Ícones no Mobile */
+    .main-header { min-height: 75px !important; padding: 10px 15px !important; }
+    #hamburger-menu svg, #search-toggle svg { width: 28px !important; height: 28px !important; }
+    .base-tag svg { width: 20px !important; height: 20px !important; }
+    
+    /* 7. Alinha os botões flutuantes no celular */
+    .floating-chat-btn { width: 55px !important; height: 55px !important; bottom: 20px !important; right: 20px !important; }
+    .floating-add-btn { width: 55px !important; height: 55px !important; bottom: 85px !important; right: 20px !important; }
+    
+    /* 8. Corrige Modal Admin cortando o título */
+    .admin-modal-content.minimalist { padding-top: 55px !important; padding-bottom: 50px !important; }
+}
+
+/* Deixa a engrenagem branca no modo escuro e preta no claro */
+#settings-btn:hover { background: var(--cor-principal) !important; color: white !important; }
+body.light-theme #settings-btn { background: #e2e8f0; color: #0f172a; }
+/* =========================================
+   REFINAMENTOS DE INTERFACE E MOBILE (CORREÇÕES)
+   ========================================= */
+
+/* 1. Centraliza PERFEITAMENTE a mensagem de Nenhum Item na grelha */
+.no-items-center { 
+    grid-column: 1 / -1 !important; /* Mágica para ocupar o centro da grelha inteira */
+    width: 100%; 
+    text-align: center; 
+    margin-top: 50px; 
+}
+
+/* 2. Impede que os campos de texto do login vazem para fora do ecrã na direita */
+.input-wrapper input {
+    box-sizing: border-box !important;
+    width: 100% !important;
+}
+
+@media (max-width: 900px) {
+    /* 3. Centraliza a tela de Login verticalmente e corrige os cortes */
+    .split-form { 
+        display: flex !important; 
+        flex-direction: column !important; 
+        justify-content: center !important; 
+        align-items: center !important; 
+        padding: 20px !important;
+    }
+    .form-container { 
+        width: 100% !important; 
+        max-width: 320px !important; 
+        margin: auto !important;
+    }
+
+    /* 4. Modal de Configurações a ocupar o ecrã inteiro sem cortar o título */
+    #modal-settings-bg {
+        padding: 0 !important;
+    }
+    #modal-settings-bg .admin-modal-content {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        height: 100vh !important;
+        max-height: 100vh !important;
+        border-radius: 0 !important;
+        padding: 60px 25px 20px 25px !important; /* Empurra o título mais para baixo */
+        margin: 0 !important;
+        box-sizing: border-box !important;
+        border: none !important;
+    }
+}
+
+@media (max-width: 768px) {
+    /* 5. Aumentar o espaçamento dos ícones na Header */
+    .header-right { 
+        gap: 15px !important; 
+    }
+
+    /* 6. Espaçar os botões da aba Social */
+    .amigo-list-selector { 
+        gap: 12px !important; 
+    }
+}
+/* =========================================
+   AFINAÇÕES FINAIS DE DESIGN (BRANCOS E MARGENS)
+   ========================================= */
+
+/* 1. Desce o título "Cadastrar no Catálogo/Editar" no celular para não cortar em cima */
+@media (max-width: 768px) {
+    .admin-modal-content.minimalist { 
+        padding-top: 90px !important; 
+    }
+}
+
+/* 2. Deixa o fundo da Aba de Notificações/Configurações 100% Branco (Tema Claro) */
+body.light-theme .admin-modal-content.minimalist {
+    background: #ffffff !important;
+}
+
+/* 3. Clareia o botão da Engrenagem e o seu container para não ficar um bloco escuro */
+#settings-btn {
+    background: rgba(255, 255, 255, 0.1) !important; /* Translúcido no modo Escuro */
+}
+#settings-btn:hover {
+    background: var(--cor-principal) !important;
+}
+
+/* Deixa o botão da engrenagem e a linha do container perfeitos no Tema Claro */
+body.light-theme #settings-btn {
+    background: #f1f5f9 !important; /* Cinza super claro, quase branco */
+    color: #0f172a !important;
+}
+body.light-theme .side-menu-bottom {
+    border-top: 1px solid rgba(0, 0, 0, 0.1) !important; /* Linha divisória clara */
+}
+/* =========================================
+   AJUSTES DO DESTAQUE NO MOBILE
+   ========================================= */
+@media (max-width: 768px) {
+    /* Diminui o título para não gritar no ecrã */
+    .destaque-info h2 {
+        font-size: 18px !important; 
+        line-height: 1.3 !important;
+        margin-bottom: 12px !important;
+    }
+    
+    /* Dá um respiro na parte de baixo para desgrudar o botão */
+    .destaque-info {
+        padding-bottom: 35px !important; 
+    }
+    
+    /* Garante que o botão respeita as margens */
+    .destaque-info a {
+        display: inline-block !important;
+    }
 }

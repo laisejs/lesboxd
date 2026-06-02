@@ -1,21 +1,24 @@
 {
-  "name": "LESBOXD",
-  "short_name": "l",
-  "start_url": "/index.html",
+  "name": "Lilies",
+  "short_name": "Lilies",
+  "description": "A sua biblioteca pessoal de conteúdo sáfico.",
+  "start_url": "/",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#2196f3",
-  "description": "",
+  "background_color": "#161c17",
+  "theme_color": "#709e75",
+  "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/assets/icons/icon-192x192.png",
+      "src": "lily-light.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "/assets/icons/icon-512x512.png",
+      "src": "lily.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
