@@ -3033,3 +3033,33 @@ body.light-theme .side-menu-bottom {
         height: 30px !important; 
     }
 }
+/* =========================================
+   RESGATAR O BOTÃO DE FECHAR (ADMIN/CONFIG)
+   ========================================= */
+.admin-close-btn {
+    position: fixed !important; /* Prende o botão na tela (não rola com o texto) */
+    top: 25px !important; 
+    right: 25px !important; 
+    z-index: 9999 !important; /* Garante que fica por cima de tudo */
+    background: rgba(0,0,0,0.15) !important; /* Deixa-o ligeiramente mais visível */
+}
+
+/* Garante que o X fica escuro e visível no Tema Claro */
+body.light-theme .admin-close-btn {
+    background: rgba(0,0,0,0.1) !important;
+    color: #0f172a !important;
+}
+/* =========================================
+   O RESGATE DEFINITIVO DO BOTÃO DE FECHAR
+   ========================================= */
+@media (max-width: 900px) {
+    .admin-close-btn {
+        position: fixed !important; 
+        top: 45px !important; /* Foge da câmara e da bateria do telemóvel! */
+        right: 20px !important; 
+        z-index: 999999 !important; /* Garante que fica por cima do texto */
+        background: var(--cor-principal) !important; /* Fica verde para destacar sempre */
+        color: white !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.4) !important;
+    }
+}

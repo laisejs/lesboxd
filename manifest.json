@@ -2,7 +2,7 @@
   "name": "Lilies",
   "short_name": "Lilies",
   "description": "A sua biblioteca pessoal de conteúdo sáfico.",
-"start_url": "/index.html",
+  "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#161c17",
   "theme_color": "#709e75",
@@ -10,13 +10,13 @@
   "icons": [
     {
       "src": "lily-light.png",
-      "sizes": "192x192",
+      "sizes": "957x957",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "lily.png",
-      "sizes": "512x512",
+      "src": "lily-light.png",
+      "sizes": "any",
       "type": "image/png",
       "purpose": "any maskable"
     }
