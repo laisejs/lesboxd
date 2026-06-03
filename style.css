@@ -730,7 +730,7 @@ h1 {
 .podium-step-container {
     display: flex; flex-direction: column; align-items: center; width: 140px;
     background: var(--cor-card); border-radius: 16px; padding: 25px 15px 20px 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);; border: 1px solid rgba(255,255,255,0.05);
     position: relative; transition: transform 0.3s ease;
 }
 .podium-step-container.empty { visibility: hidden; }
@@ -3116,7 +3116,7 @@ body.light-theme .admin-close-btn {
     border-radius: 12px;
     overflow: hidden;
     cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     transition: transform 0.3s;
     border: 1px solid rgba(255,255,255,0.05);
 }
@@ -3236,4 +3236,27 @@ body.light-theme .admin-close-btn {
     #destaque-container {
         margin-top: 0px !important;
     }
+}
+/* --- NÚMEROS DO TOP 10 SÓLIDOS NO TOPO --- */
+.netflix-rank {
+    position: absolute;
+    bottom: 5px;  /* Fica na parte de cima, com um leve respiro */
+    left: 8px; /* 100% dentro do pôster */
+    font-size: 60px; /* Tamanho imponente, mas que cabe perfeitamente */
+    font-weight: 900;
+    color: #ffffff; /* Sólido e limpo */
+    -webkit-text-stroke: 0; /* Adeus vazado! */
+    line-height: 1;
+    z-index: 10;
+    font-family: 'Montserrat', sans-serif;
+    pointer-events: none;
+    letter-spacing: -2px;
+    /* Sombra pesada por trás para garantir que o número branco dê para ler até em capas brancas */
+    text-shadow: 2px 4px 12px rgba(0, 0, 0, 0.4), 0px 1px 4px rgba(0, 0, 0, 0.3); 
+}
+
+/* Adaptação para o Tema Claro */
+body.light-theme .netflix-rank {
+    color: #ffffff; /* Fica verde sólido no claro */
+    text-shadow: 2px 4px 12px rgba(0, 0, 0, 0.4), 0px 1px 4px rgba(0, 0, 0, 0.3);
 }

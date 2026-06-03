@@ -767,81 +767,149 @@ auth: {
         }
     };
 
-    function mostrarTelaInicial() {
-      currentView = 'home';
-      currentMenuFilter = 'Todos'; 
-      dom.displayArea.innerHTML = "";
-      dom.displayArea.className = '';
-      resetFilters();
-      renderDestaque();
+async function mostrarTelaInicial() {
+        currentView = 'home';
+        currentMenuFilter = 'Todos';
+        dom.displayArea.innerHTML = "";
+        dom.displayArea.className = '';
+        resetFilters();
+        renderDestaque();
 
-      const extrasContainer = document.createElement('div');
-      extrasContainer.innerHTML = `
-          <div id="home-ranking-container"></div>
-          <div id="home-comments-container"></div>
-      `;
-      dom.displayArea.appendChild(extrasContainer);
-      carregarExtrasHome();
+        // Array onde guardaremos as prateleiras para embaralhar depois
+        let secoesDaHome = [];
 
-      const createSection = (title, data) => {
-        if (data.length) {
-          const secao = document.createElement("section");
-          secao.style.marginBottom = "30px";
-          
-          const h2 = document.createElement("h2");
-          h2.className = 'section-title';
-          h2.textContent = title;
-          secao.appendChild(h2);
-          
-          const outerWrapper = document.createElement("div");
-          outerWrapper.style.position = "relative";
-          
-          const btnLeft = document.createElement("button");
-          btnLeft.className = "scroll-btn left";
-          btnLeft.innerHTML = "&#10094;";
-          btnLeft.onclick = function() { scrollLinha(this, -400) };
-          
-          const wrapper = document.createElement("div");
-          wrapper.className = "scroll-wrapper"; 
-          
-          const linha = document.createElement("div");
-          linha.className = "linha-horizontal";
-          linha.onscroll = function() { handleScrollFade(this) }; 
-          
-          const btnRight = document.createElement("button");
-          btnRight.className = "scroll-btn right";
-          btnRight.innerHTML = "&#10095;";
-          btnRight.onclick = function() { scrollLinha(this, 400) };
-          
-          data.forEach(filme => linha.appendChild(createCard(filme, 'mini')));
-          
-          wrapper.appendChild(linha);
-          
-          outerWrapper.appendChild(btnLeft);
-          outerWrapper.appendChild(wrapper);
-          outerWrapper.appendChild(btnRight);
-          
-          secao.appendChild(outerWrapper);
-          dom.displayArea.appendChild(secao);
-          
-          setTimeout(() => handleScrollFade(linha), 100);
+        // 1. GERAÇÃO DOS BLOCOS DE CONTEÚDO
+        // Bloco A: Pódio e Comentários (FIXOS NO TOPO, NÃO VÃO PRO SORTEIO)
+        const extrasHTML = `
+            <div id="home-ranking-container"></div>
+            <div id="home-comments-container"></div>
+        `;
+
+        // Função de apoio que gera o HTML de uma "estante" de filmes com os números do Top 10!
+        const renderSectionHTML = (title, data, isTop = false) => {
+            if (!data.length) return "";
+            
+            let html = `<section style="margin-bottom: 30px;">
+                <h2 class="section-title">${title}</h2>
+                <div style="position: relative;">
+                    <button class="scroll-btn left" onclick="scrollLinha(this, -400)">&#10094;</button>
+                    <div class="scroll-wrapper">
+                        <div class="linha-horizontal" onscroll="handleScrollFade(this)">`;
+            
+            data.forEach((filme, idx) => {
+                const tempDiv = document.createElement('div');
+                const cardNode = createCard(filme, 'mini');
+                const index = filmes.findIndex(f => f.titulo === filme.titulo);
+                cardNode.setAttribute('onclick', `abrirModal(${index})`);
+                
+                const favBtn = cardNode.querySelector('.favorite-heart');
+                if(favBtn) {
+                     favBtn.setAttribute('onclick', `event.stopPropagation(); toggleFavorite('${filme.titulo.replace(/'/g, "\\'")}')`);
+                }
+
+                // INJETA O NÚMERO DO RANKING SÓ SE FOR O TOP 10
+                if (isTop) {
+                    const badge = document.createElement('div');
+                    badge.className = 'netflix-rank';
+                    badge.textContent = idx + 1; // 1, 2, 3...
+                    const imgWrapper = cardNode.querySelector('.card-image-wrapper');
+                    if(imgWrapper) imgWrapper.appendChild(badge);
+                }
+                
+                tempDiv.appendChild(cardNode);
+                html += tempDiv.innerHTML;
+            });
+            
+            html += `       </div>
+                    </div>
+                    <button class="scroll-btn right" onclick="scrollLinha(this, 400)">&#10095;</button>
+                </div>
+            </section>`;
+            return html;
+        };
+
+        try {
+            // Conta os dados direto do banco para um ranking real
+            const usuariosSnapshot = await getDocs(collection(db, "usuarios"));
+            let contagemGlobal = {};
+            
+            usuariosSnapshot.forEach(doc => {
+                const data = doc.data();
+                if (data.assistidos) {
+                    data.assistidos.forEach(titulo => {
+                        contagemGlobal[titulo] = (contagemGlobal[titulo] || 0) + 1;
+                    });
+                }
+            });
+
+            const getRealTop10 = (categoriaTag) => {
+                let filtrados;
+                if (categoriaTag === 'Filmes') {
+                    filtrados = filmes.filter(f => !f.tags.includes('Livros') && !f.tags.includes('Series'));
+                } else if (categoriaTag === 'Series') {
+                    filtrados = filmes.filter(f => f.tags.includes('Series'));
+                } else if (categoriaTag === 'Livros') {
+                    filtrados = filmes.filter(f => f.tags.includes('Livros'));
+                }
+                
+                filtrados.sort((a, b) => {
+                    const countA = contagemGlobal[a.titulo] || 0;
+                    const countB = contagemGlobal[b.titulo] || 0;
+                    return countB - countA;
+                });
+
+                return filtrados.filter(f => (contagemGlobal[f.titulo] || 0) > 0).slice(0, 10);
+            };
+
+            const topFilmes = getRealTop10('Filmes');
+            if(topFilmes.length) secoesDaHome.push({ html: renderSectionHTML("Top 10 Filmes", topFilmes, true) });
+
+            const topSeries = getRealTop10('Series');
+            if(topSeries.length) secoesDaHome.push({ html: renderSectionHTML("Top 10 Séries", topSeries, true) });
+
+            const topLivros = getRealTop10('Livros');
+            if(topLivros.length) secoesDaHome.push({ html: renderSectionHTML("Top 10 Livros", topLivros, true) });
+            
+        } catch (e) {
+            console.error("Erro ao gerar Top 10 reais:", e);
         }
-      };
 
-      const naoAssistidos = shuffleArray(filmes.filter(f => !f.assistido)).slice(0, 10);
-      createSection("Descubra", naoAssistidos);
-      createSection("Queridinhos", filmes.filter(f => f.favorito));
-      
-      const tagsExcluidas = ['Series', 'Filmes', 'Adult'];
-      const todasAsTags = Array.from(new Set(filmes.flatMap(f => f.tags)))
-                                .filter(tag => !tagsExcluidas.includes(tag));
-      
-      const tagsAleatorias = shuffleArray(todasAsTags).slice(0, 4);
+        // Bloco C: Descubra (Filmes que VOCÊ não viu)
+        const naoAssistidos = shuffleArray(filmes.filter(f => !f.assistido)).slice(0, 10);
+        if(naoAssistidos.length) secoesDaHome.push({ html: renderSectionHTML("Descubra", naoAssistidos) });
 
-      tagsAleatorias.forEach(tag => {
-          const filmesDaTag = shuffleArray(filmes.filter(f => f.tags.includes(tag))).slice(0, 10);
-          createSection(tag, filmesDaTag);
-      });
+        // Bloco D: Queridinhos (Seus favoritos)
+        const favoritos = filmes.filter(f => f.favorito);
+        if(favoritos.length) secoesDaHome.push({ html: renderSectionHTML("Seus Queridinhos", favoritos) });
+
+        // Bloco E: Tags Aleatórias
+        const tagsExcluidas = ['Series', 'Filmes', 'Adult'];
+        const todasAsTags = Array.from(new Set(filmes.flatMap(f => f.tags))).filter(tag => !tagsExcluidas.includes(tag));
+        const tagsAleatorias = shuffleArray(todasAsTags).slice(0, 3);
+        tagsAleatorias.forEach(tag => {
+            const filmesDaTag = shuffleArray(filmes.filter(f => f.tags.includes(tag))).slice(0, 10);
+            if(filmesDaTag.length) secoesDaHome.push({ html: renderSectionHTML(tag, filmesDaTag) });
+        });
+
+        // 2. EMBARALHA AS PRATELEIRAS E INJETA NA TELA
+        secoesDaHome = shuffleArray(secoesDaHome);
+        
+        let htmlFinal = extrasHTML;
+        secoesDaHome.forEach(secao => {
+            htmlFinal += secao.html;
+        });
+        
+        dom.displayArea.innerHTML = htmlFinal;
+
+        // 3. PÓS-PROCESSAMENTO
+        carregarExtrasHome(); 
+
+        setTimeout(() => {
+            document.querySelectorAll('.linha-horizontal').forEach(linha => {
+                handleScrollFade(linha);
+            });
+            lucide.createIcons();
+        }, 150);
     }
     function mostrarFilmesGrid(lista) {
       currentView = 'grid';
@@ -1514,15 +1582,52 @@ function applyAllFilters() {
         updateTagUI();
     }
 
-    async function toggleFavorite(titulo) {
+async function toggleFavorite(titulo) {
       const idx = userData.favoritos.indexOf(titulo);
-      if (idx >= 0) userData.favoritos.splice(idx, 1);
-      else userData.favoritos.push(titulo);
-      await updateDoc(userDocRef, { favoritos: userData.favoritos });
+      let marcouComoAssistido = false;
+
+      if (idx >= 0) {
+          userData.favoritos.splice(idx, 1);
+      } else {
+          userData.favoritos.push(titulo);
+          // A MÁGICA: Se favoritar, automaticamente marca como assistido (se já não estiver)
+          if (!userData.assistidos.includes(titulo)) {
+              userData.assistidos.push(titulo);
+              marcouComoAssistido = true;
+          }
+      }
+      
+      await updateDoc(userDocRef, { 
+          favoritos: userData.favoritos,
+          assistidos: userData.assistidos 
+      });
+      
       syncFilmesWithUserData();
+      
+      if (marcouComoAssistido) {
+          updateWatchedCounters();
+      }
+
       const index = filmes.findIndex(f => f.titulo === titulo);
       if (dom.modal.bg.classList.contains("open")) updateModalButtons(index);
-      render();
+      
+      // MÁGICA 2: Atualiza a cor dos corações na tela sem recarregar o site
+      document.querySelectorAll('.card-base').forEach(card => {
+          const cardTitle = card.querySelector('h3');
+          if (cardTitle && cardTitle.textContent === titulo) {
+              const favBtn = card.querySelector('.favorite-heart');
+              if (favBtn) {
+                  const isFav = userData.favoritos.includes(titulo);
+                  favBtn.classList.toggle('favorited', isFav);
+                  const icon = favBtn.querySelector('svg');
+                  if(icon) {
+                      if(isFav) icon.classList.add('filled');
+                      else icon.classList.remove('filled');
+                  }
+              }
+          }
+      });
+      // A linha render() foi removida para parar de embaralhar a tela!
     }
     
     async function toggleAssistido(titulo) {
@@ -1534,7 +1639,7 @@ function applyAllFilters() {
       updateWatchedCounters(); 
       const index = filmes.findIndex(f => f.titulo === titulo);
       if (dom.modal.bg.classList.contains("open")) updateModalButtons(index);
-      render();
+      // A linha render() foi removida para parar de embaralhar a tela!
     }
 
     async function toggleQueroAssistir(titulo) {
@@ -1545,7 +1650,7 @@ function applyAllFilters() {
       syncFilmesWithUserData();
       const index = filmes.findIndex(f => f.titulo === titulo);
       if (dom.modal.bg.classList.contains("open")) updateModalButtons(index);
-      render();
+      // A linha render() foi removida para parar de embaralhar a tela!
     }
 
     async function setUserRating(titulo, rating) {
@@ -1555,7 +1660,7 @@ function applyAllFilters() {
       let marcouComoAssistido = false;
       let assistidosAtualizados = userData.assistidos;
 
-      // NOVO: Adiciona automaticamente aos assistidos se der uma nota e ainda não estiver
+      // Adiciona automaticamente aos assistidos se der uma nota e ainda não estiver
       if (rating > 0 && !userData.assistidos.includes(titulo)) {
           assistidosAtualizados.push(titulo);
           marcouComoAssistido = true;
@@ -1574,9 +1679,9 @@ function applyAllFilters() {
           renderCommentsForMovie(titulo); 
       }
       if(marcouComoAssistido) updateWatchedCounters();
-      render();
+      
+      // A linha render() foi removida para parar de embaralhar a tela!
     }
-
     async function adicionarComentario(titulo) {
         const texto = dom.modal.commentInput.value.trim();
         if(!texto) return;
@@ -2504,7 +2609,7 @@ document.body.classList.add('light-theme');
             // Crie a sua lista de e-mails administradores aqui:
             const adminEmails = [
                 "laisejschimithes@gmail.com", 
-                "novo_admin@gmail.com" // <-- Insira o novo e-mail aqui!
+                "coisasinuteis454@gmail.com" // <-- Insira o novo e-mail aqui!
             ];
             
             if (adminEmails.includes(user.email)) {
