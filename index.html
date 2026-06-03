@@ -2898,28 +2898,27 @@ const docSnap = await getDoc(userDocRef);
 
     // Comando que desenha os ícones na tela!
 // --- LÓGICA DO OLHINHO DA SENHA ---
-    document.querySelectorAll('.toggle-password').forEach(icon => {
-        icon.addEventListener('click', function() {
-            // Descobre qual input esse ícone controla (login ou cadastro)
-            const targetId = this.getAttribute('data-target');
-            const input = document.getElementById(targetId);
+// --- LÓGICA DO OLHINHO DA SENHA (CORRIGIDA) ---
+    document.addEventListener('click', function(e) {
+        // Verifica se o clique acertou o ícone de senha (mesmo que ele tenha acabado de ser redesenhado)
+        const icon = e.target.closest('.toggle-password');
+        
+        if (icon) {
+            // Pega o input de senha que mora na mesma caixa do ícone
+            const input = icon.parentElement.querySelector('input');
             
-            // Alterna entre texto visível e bolinhas
-            if (input.type === 'password') {
+            if (input && input.type === 'password') {
                 input.type = 'text';
-                // Troca para o ícone de olho riscado
-                this.setAttribute('data-lucide', 'eye-off');
-            } else {
+                icon.setAttribute('data-lucide', 'eye-off'); // Muda para o olho cortado
+            } else if (input) {
                 input.type = 'password';
-                // Troca para o ícone de olho normal
-                this.setAttribute('data-lucide', 'eye');
+                icon.setAttribute('data-lucide', 'eye'); // Muda para o olho aberto
             }
             
-            // Redesenha os ícones da tela para a mudança fazer efeito
+            // Pede para o Lucide atualizar apenas os ícones da tela
             lucide.createIcons();
-        });
+        }
     });
-
   </script>
 </body>
 </html>
