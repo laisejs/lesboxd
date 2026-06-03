@@ -874,27 +874,35 @@ async function mostrarTelaInicial() {
             console.error("Erro ao gerar Top 10 reais:", e);
         }
 
-        // Bloco C: Descubra (Filmes que VOCÊ não viu)
+// Bloco C: Descubra (Filmes que VOCÊ não viu) - AGORA FIXO NO TOPO!
+        let descubraHTML = "";
         const naoAssistidos = shuffleArray(filmes.filter(f => !f.assistido)).slice(0, 10);
-        if(naoAssistidos.length) secoesDaHome.push({ html: renderSectionHTML("Descubra", naoAssistidos) });
+        if(naoAssistidos.length) {
+            // Repare que não jogamos ele na 'secoesDaHome'. Ele fica guardado separado!
+            descubraHTML = renderSectionHTML("Descubra", naoAssistidos);
+        }
 
         // Bloco D: Queridinhos (Seus favoritos)
         const favoritos = filmes.filter(f => f.favorito);
         if(favoritos.length) secoesDaHome.push({ html: renderSectionHTML("Seus Queridinhos", favoritos) });
 
-        // Bloco E: Tags Aleatórias
+        // Bloco E: Tags Aleatórias (AUMENTADO PARA 5)
         const tagsExcluidas = ['Series', 'Filmes', 'Adult'];
         const todasAsTags = Array.from(new Set(filmes.flatMap(f => f.tags))).filter(tag => !tagsExcluidas.includes(tag));
-        const tagsAleatorias = shuffleArray(todasAsTags).slice(0, 3);
+        // A MÁGICA AQUI: O .slice(0, 5) agora sorteia 5 tags diferentes em vez de 3!
+        const tagsAleatorias = shuffleArray(todasAsTags).slice(0, 7); 
         tagsAleatorias.forEach(tag => {
             const filmesDaTag = shuffleArray(filmes.filter(f => f.tags.includes(tag))).slice(0, 10);
             if(filmesDaTag.length) secoesDaHome.push({ html: renderSectionHTML(tag, filmesDaTag) });
         });
 
-        // 2. EMBARALHA AS PRATELEIRAS E INJETA NA TELA
+        // 2. EMBARALHA AS PRATELEIRAS MÓVEIS E INJETA NA TELA
         secoesDaHome = shuffleArray(secoesDaHome);
         
-        let htmlFinal = extrasHTML;
+        // A MÁGICA DO LAYOUT: O HTML começa com Extras (Ranking/Comentários) + Descubra!
+        let htmlFinal = extrasHTML + descubraHTML;
+        
+        // Depois, adicionamos todo o resto que foi embaralhado
         secoesDaHome.forEach(secao => {
             htmlFinal += secao.html;
         });
