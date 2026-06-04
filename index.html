@@ -470,16 +470,22 @@ import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, addD
     const db = getFirestore();
     const messaging = getMessaging(app);
 
-    async function ativarNotificacoesFCM() {
+async function ativarNotificacoesFCM() {
         try {
             const permission = await Notification.requestPermission();
             if (permission === 'granted') {
-                // Aqui está a sua chave que você me enviou:
                 const vapidKey = "BOIewRnXdZTIADJylvzoKFIYFCpGIoYAtgaibwugyTQvycRSL1kcpLhQIgJiZ0otT_oPxugxIOmSduTt4x9etr8"; 
-                const token = await getToken(messaging, { vapidKey: vapidKey });
+                
+                // MÁGICA: Avisar o Firebase para usar o nosso ficheiro sw.js em vez do padrão
+                const swRegistration = await navigator.serviceWorker.ready;
+                const token = await getToken(messaging, { 
+                    vapidKey: vapidKey,
+                    serviceWorkerRegistration: swRegistration
+                });
+                
                 if (token && userDocRef) {
                     await updateDoc(userDocRef, { fcmToken: token });
-                    console.log("Token gerado! Agora o site pode acordar seu celular: ", token);
+                    console.log("Token gerado! Agora o site pode acordar o seu telemóvel: ", token);
                 }
             }
         } catch (error) {
