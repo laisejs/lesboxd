@@ -58,3 +58,29 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
+
+// --- MÁGICA DAS NOTIFICAÇÕES EM SEGUNDO PLANO ---
+importScripts('https://www.gstatic.com/firebasejs/11.10.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/11.10.0/firebase-messaging-compat.js');
+
+firebase.initializeApp({
+    apiKey: "AIzaSyAb2eewnWnHU3xN3Pxio-Hy55SDz_W3zfI",
+    authDomain: "saficos-b5494.firebaseapp.com",
+    projectId: "saficos-b5494",
+    storageBucket: "saficos-b5494.appspot.com",
+    messagingSenderId: "706719668164",
+    appId: "1:706719668164:web:265bbd08b6ad395dbf7691"
+});
+
+const messaging = firebase.messaging();
+
+messaging.onBackgroundMessage(function(payload) {
+    const notificationTitle = "Lilies Chat";
+    const notificationOptions = {
+        body: payload.notification.body,
+        icon: '/lily-light.png',
+        badge: '/lily-light.png',
+        vibrate: [200, 100, 200]
+    };
+    return self.registration.showNotification(notificationTitle, notificationOptions);
+});

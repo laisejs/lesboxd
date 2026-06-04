@@ -449,7 +449,8 @@
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-analytics.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, addDoc, deleteDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
-    
+   import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-messaging.js";
+
     let isAdmin = false;
     let editingFilmeId = null; // Vai guardar o ID do filme quando formos editar
 
@@ -467,6 +468,24 @@ import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, addD
     const analytics = getAnalytics(app);
     const auth = getAuth();
     const db = getFirestore();
+    const messaging = getMessaging(app);
+
+    async function ativarNotificacoesFCM() {
+        try {
+            const permission = await Notification.requestPermission();
+            if (permission === 'granted') {
+                // Aqui está a sua chave que você me enviou:
+                const vapidKey = "BOIewRnXdZTIADJylvzoKFIYFCpGIoYAtgaibwugyTQvycRSL1kcpLhQIgJiZ0otT_oPxugxIOmSduTt4x9etr8"; 
+                const token = await getToken(messaging, { vapidKey: vapidKey });
+                if (token && userDocRef) {
+                    await updateDoc(userDocRef, { fcmToken: token });
+                    console.log("Token gerado! Agora o site pode acordar seu celular: ", token);
+                }
+            }
+        } catch (error) {
+            console.log("Erro FCM:", error);
+        }
+    }
 
     let filmes = []; 
 
@@ -1354,41 +1373,42 @@ function updateChatBadge() {
         }
     }
 
+    // Nova função ultra-rápida: renderiza apenas a mensagem nova
+    function renderSingleChatMessage(m) {
+        const isOwn = m.uid === auth.currentUser?.uid;
+        const date = new Date(m.timestamp);
+        const dia = date.getDate().toString().padStart(2, '0');
+        const mes = (date.getMonth() + 1).toString().padStart(2, '0');
+        const horas = date.getHours().toString().padStart(2, '0');
+        const minutos = date.getMinutes().toString().padStart(2, '0');
+        
+        const timeStr = `${dia}/${mes} às ${horas}:${minutos}`;
+        const flagHtml = m.bandeira ? `<img src="${m.bandeira}" class="chat-flag">` : '';
+        const borderClass = m.bandeira ? 'has-border' : '';
+        const bubbleClass = isOwn ? 'chat-msg own' : 'chat-msg';
+
+        const html = `
+            <div class="${bubbleClass}">
+                <div class="chat-user-profile">
+                    <div class="chat-pic-wrapper">
+                        <img src="${m.foto}" class="chat-pic ${borderClass}">
+                        ${flagHtml}
+                    </div>
+                    <div class="chat-name">${m.nome}</div>
+                </div>
+                
+                <div class="chat-bubble-container">
+                    <div class="chat-bubble">${m.texto}</div>
+                    <div class="chat-time">${timeStr}</div>
+                </div>
+            </div>
+        `;
+        dom.chat.messagesContainer.insertAdjacentHTML('beforeend', html);
+    }
+
     function renderChatMessages() {
         dom.chat.messagesContainer.innerHTML = '';
-        chatMessages.forEach(m => {
-            const isOwn = m.uid === auth.currentUser?.uid;
-            const date = new Date(m.timestamp);
-            const dia = date.getDate().toString().padStart(2, '0');
-            const mes = (date.getMonth() + 1).toString().padStart(2, '0');
-            const horas = date.getHours().toString().padStart(2, '0');
-            const minutos = date.getMinutes().toString().padStart(2, '0');
-            
-            // Montando o texto final (ex: "16/04 às 15:30")
-            const timeStr = `${dia}/${mes} às ${horas}:${minutos}`;
-            const flagHtml = m.bandeira ? `<img src="${m.bandeira}" class="chat-flag">` : '';
-            const borderClass = m.bandeira ? 'has-border' : '';
-            const bubbleClass = isOwn ? 'chat-msg own' : 'chat-msg';
-
-const html = `
-                <div class="${bubbleClass}">
-                    <div class="chat-user-profile">
-                        <div class="chat-pic-wrapper">
-                            <img src="${m.foto}" class="chat-pic ${borderClass}">
-                            ${flagHtml}
-                        </div>
-                        <div class="chat-name">${m.nome}</div>
-                    </div>
-                    
-                    <div class="chat-bubble-container">
-                        <div class="chat-bubble">${m.texto}</div>
-                        <div class="chat-time">${timeStr}</div>
-                    </div>
-                </div>
-            `;
-            dom.chat.messagesContainer.insertAdjacentHTML('beforeend', html);
-        });
-        
+        chatMessages.forEach(m => renderSingleChatMessage(m));
         if (dom.chat.sidebar.classList.contains('open')) {
             dom.chat.messagesContainer.scrollTop = dom.chat.messagesContainer.scrollHeight;
         }
@@ -2609,6 +2629,7 @@ document.body.classList.add('light-theme');
         }
       }
     };
+    ativarNotificacoesFCM(); // <-- ISSO LIGA AS NOTIFICAÇÕES DE SEGUNDO PLANO
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
@@ -2745,7 +2766,49 @@ const docSnap = await getDoc(userDocRef);
             });
 
             chatMessages = [];
-            snapshot.forEach((doc) => chatMessages.push({ id: doc.id, ...doc.data() }));
+         function initChatListener() {
+        if (unsubscribeChat) unsubscribeChat();
+        const q = query(collection(db, "mensagens"), orderBy("timestamp", "asc"));
+        
+        unsubscribeChat = onSnapshot(q, (snapshot) => {
+            snapshot.docChanges().forEach((change) => {
+                if (change.type === "added") {
+                    const m = { id: change.doc.id, ...change.doc.data() };
+                    
+                    // Se for o carregamento inicial, apenas empilha para renderizar depois
+                    if (isInitialChatLoad) {
+                        chatMessages.push(m);
+                    } else {
+                        // Se for uma mensagem NOVA, desenha de forma instantânea sem piscar a tela
+                        chatMessages.push(m);
+                        renderSingleChatMessage(m);
+                        
+                        if (dom.chat.sidebar.classList.contains('open')) {
+                            dom.chat.messagesContainer.scrollTop = dom.chat.messagesContainer.scrollHeight;
+                        }
+
+                        // Aciona a notificação de nova mensagem
+                        const isOwnMessage = m.uid === auth.currentUser?.uid;
+                        if (!isOwnMessage && userData.notificacoes?.chat && Notification.permission === "granted") {
+                            new Notification("Lilies Chat: " + m.nome, {
+                                body: m.texto,
+                                icon: "lily.png",
+                                silent: false
+                            });
+                        }
+                    }
+                }
+            });
+
+            // Se for o primeiro carregamento, injeta tudo na tela de uma vez e finaliza o ciclo inicial
+            if (isInitialChatLoad) {
+                renderChatMessages();
+                isInitialChatLoad = false;
+            }
+            
+            updateChatBadge();
+        });
+    }   snapshot.forEach((doc) => chatMessages.push({ id: doc.id, ...doc.data() }));
             
             renderChatMessages();
             updateChatBadge();
