@@ -449,7 +449,7 @@
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-analytics.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, addDoc, deleteDoc, onSnapshot, query, orderBy, arrayUnion } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
-   import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-messaging.js";
+   import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-messaging.js";
 
     let isAdmin = false;
     let editingFilmeId = null; // Vai guardar o ID do filme quando formos editar
@@ -494,6 +494,19 @@ async function ativarNotificacoesFCM() {
             console.log("Erro FCM:", error);
         }
     }
+    // MÁGICA: Ouve as notificações se o celular achar que o site ainda está aberto
+    onMessage(messaging, (payload) => {
+        console.log("Mensagem recebida com o site ativo!", payload);
+        
+        // Em celulares, a notificação precisa ser disparada pelo Service Worker
+        navigator.serviceWorker.ready.then((registration) => {
+            registration.showNotification(payload.notification.title || "Lilies", {
+                body: payload.notification.body,
+                icon: '/lily-light.png',
+                vibrate: [200, 100, 200]
+            });
+        });
+    });
     let filmes = []; 
 
     const dom = {
@@ -2757,49 +2770,27 @@ const docSnap = await getDoc(userDocRef);
         unsubscribeChat = onSnapshot(q, (snapshot) => {
             snapshot.docChanges().forEach((change) => {
                 if (change.type === "added") {
-                    const m = change.doc.data();
-                    const isOwnMessage = m.uid === auth.currentUser?.uid;
-                    
-                    // Se não for o carregamento inicial, não for mensagem sua, e a permissão estiver ligada...
-                    if (!isInitialChatLoad && !isOwnMessage && userData.notificacoes?.chat && Notification.permission === "granted") {
-                        // Faz a mágica aparecer no telemóvel/PC!
-                        new Notification("Lilies Chat: " + m.nome, {
-                            body: m.texto,
-                            icon: "lily.png",
-                            silent: false
-                        });
-                    }
-                }
-            });
-
-            chatMessages = [];
-         function initChatListener() {
-        if (unsubscribeChat) unsubscribeChat();
-        const q = query(collection(db, "mensagens"), orderBy("timestamp", "asc"));
-        
-        unsubscribeChat = onSnapshot(q, (snapshot) => {
-            snapshot.docChanges().forEach((change) => {
-                if (change.type === "added") {
                     const m = { id: change.doc.id, ...change.doc.data() };
                     
                     // Se for o carregamento inicial, apenas empilha para renderizar depois
                     if (isInitialChatLoad) {
                         chatMessages.push(m);
                     } else {
-                        // Se for uma mensagem NOVA, desenha de forma instantânea sem piscar a tela
+                        // Se for uma mensagem NOVA, desenha instantaneamente sem piscar a tela
                         chatMessages.push(m);
                         renderSingleChatMessage(m);
                         
+                        // Rola para o fim automaticamente
                         if (dom.chat.sidebar.classList.contains('open')) {
                             dom.chat.messagesContainer.scrollTop = dom.chat.messagesContainer.scrollHeight;
                         }
 
-                        // Aciona a notificação de nova mensagem
+                        // Aciona a notificação de nova mensagem se a aba estiver aberta (PC ou Celular)
                         const isOwnMessage = m.uid === auth.currentUser?.uid;
                         if (!isOwnMessage && userData.notificacoes?.chat && Notification.permission === "granted") {
                             new Notification("Lilies Chat: " + m.nome, {
                                 body: m.texto,
-                                icon: "lily.png",
+                                icon: "/lily-light.png",
                                 silent: false
                             });
                         }
@@ -2807,21 +2798,13 @@ const docSnap = await getDoc(userDocRef);
                 }
             });
 
-            // Se for o primeiro carregamento, injeta tudo na tela de uma vez e finaliza o ciclo inicial
+            // Se for o primeiro carregamento, injeta tudo na tela de uma vez e finaliza o ciclo
             if (isInitialChatLoad) {
                 renderChatMessages();
                 isInitialChatLoad = false;
             }
             
             updateChatBadge();
-        });
-    }   snapshot.forEach((doc) => chatMessages.push({ id: doc.id, ...doc.data() }));
-            
-            renderChatMessages();
-            updateChatBadge();
-            
-            // Depois da primeira leitura, liberta os alarmes
-            isInitialChatLoad = false;
         });
     }
         // PASSO 4: Sorteia uma imagem de fundo do catálogo para a janela de login
