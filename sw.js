@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lilies-cache-v6';
+const CACHE_NAME = 'lilies-cache-v7'; // Subimos para v4 para forçar a limpeza no navegador!
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -8,18 +8,15 @@ const ASSETS_TO_CACHE = [
   '/lily-light.png'
 ];
 
-// Instalação do Service Worker (Guarda o esqueleto da app no telemóvel)
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('Cache aberta com sucesso!');
       return cache.addAll(ASSETS_TO_CACHE);
     })
   );
-  self.skipWaiting(); // Força a atualização imediata se houver código novo
+  self.skipWaiting(); 
 });
 
-// Limpeza de Caches antigos (quando você atualizar a versão do site)
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -35,52 +32,29 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// A MÁGICA: Interceta os pedidos de internet
+// O NOVO MOTOR: Só intercepta o que é seguro!
 self.addEventListener('fetch', (event) => {
-  // Ignora chamadas ao banco de dados (Firebase) para garantir que tem sempre dados frescos
-  if (event.request.url.includes('firestore.googleapis.com') || event.request.url.includes('identitytoolkit')) {
+  // A MÁGICA: Se a requisição NÃO for do seu próprio site (ex: Firebase, Lucide), deixa passar direto pela internet normal!
+  if (!event.request.url.startsWith(self.location.origin)) {
     return;
   }
 
-  // Estratégia "Stale-While-Revalidate": Mostra a versão guardada no telemóvel para ser instantâneo, 
-  // mas puxa a versão nova da internet em segundo plano
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       const fetchPromise = fetch(event.request).then((networkResponse) => {
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, networkResponse.clone());
-        });
+        // Só tenta guardar no cache se a resposta for 100% válida e segura
+        if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
+        }
         return networkResponse;
       }).catch(() => {
-        // Se a pessoa estiver sem internet, apenas falha silenciosamente e usa o cache
+        // Falha silenciosa se estiver sem internet (usa o que tem no cache)
       });
+
       return cachedResponse || fetchPromise;
     })
   );
-});
-
-// --- MÁGICA DAS NOTIFICAÇÕES EM SEGUNDO PLANO ---
-importScripts('https://www.gstatic.com/firebasejs/11.10.0/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/11.10.0/firebase-messaging-compat.js');
-
-firebase.initializeApp({
-    apiKey: "AIzaSyAb2eewnWnHU3xN3Pxio-Hy55SDz_W3zfI",
-    authDomain: "saficos-b5494.firebaseapp.com",
-    projectId: "saficos-b5494",
-    storageBucket: "saficos-b5494.appspot.com",
-    messagingSenderId: "706719668164",
-    appId: "1:706719668164:web:265bbd08b6ad395dbf7691"
-});
-
-const messaging = firebase.messaging();
-
-messaging.onBackgroundMessage(function(payload) {
-    const notificationTitle = "Lilies Chat";
-    const notificationOptions = {
-        body: payload.notification.body,
-        icon: '/lily-light.png',
-        badge: '/lily-light.png',
-        vibrate: [200, 100, 200]
-    };
-    return self.registration.showNotification(notificationTitle, notificationOptions);
 });
