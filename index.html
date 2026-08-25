@@ -309,9 +309,14 @@
           </div>
 
           <div class="admin-row-2">
-            <div class="input-group minimalist-input">
+            <div class="input-group minimalist-input" style="position: relative;">
               <label>Tags</label>
-              <input type="text" id="admin-tags" placeholder="Ex: Drama, Romance, Ação">
+              <div id="admin-tags-container" class="admin-tags-selector">
+                  <span id="admin-tags-preview" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; max-width: 90%;">Selecione as tags...</span>
+                  <i data-lucide="chevron-down" style="width: 16px; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); opacity: 0.7;"></i>
+              </div>
+              <div id="admin-tags-dropdown" class="admin-tags-dropdown">
+                  </div>
             </div>
             <div class="input-group minimalist-input">
               <label>Tempo de tela</label>
@@ -507,7 +512,29 @@ async function ativarNotificacoesFCM() {
             });
         });
     });
-    let filmes = []; 
+let filmes = []; 
+    
+    // --- NOVO SISTEMA DE TAGS ---
+    const tagsPreDefinidas = [
+        "Ação", "Adolescente", "Adulto", "Animação", "Anime", "Aventura", "Biografia", 
+        "Comédia", "Criminal", "Curta", "Dança", "Esporte", "Família", "Fantasia", 
+        "Histórico", "HQ", "Infantil", "Mangá", "Musical", "Natal", "Novela", 
+        "Profissões", "Realeza", "Reality", "Romance", "Sobrenatural", "Super-Herói", 
+        "Suspense", "Terror", "Web Série", "Ficção Científica"
+    ];
+    let tagsSelecionadasAdmin = new Set();
+    
+    function atualizarPreviewTagsAdmin() {
+        const preview = document.getElementById('admin-tags-preview');
+        if (!preview) return;
+        if(tagsSelecionadasAdmin.size === 0) {
+            preview.textContent = "Selecione as tags...";
+            preview.style.opacity = '0.5';
+        } else {
+            preview.textContent = Array.from(tagsSelecionadasAdmin).join(', ');
+            preview.style.opacity = '1';
+        }
+    }
 
     const dom = {
 auth: {
@@ -2034,8 +2061,9 @@ if (btnEdit && btnDelete) {
       const paisHTML = createClickableFilterHTML('pais', f.pais);
       const plataformaHTML = createClickableFilterHTML('plataforma', f.plataforma, ' / ');
       const elencoHTML = createClickableFilterHTML('elenco', f.elenco, ', ');
+      const tagsHTML = createClickableFilterHTML('tags', f.tags, ', '); // PUXA AS TAGS AQUI
 
-      dom.modal.info.innerHTML = `<strong>Ano:</strong> ${anoHTML} | <strong>País:</strong> ${paisHTML}<br><strong>${plataformaLabel}:</strong> ${plataformaHTML}<br><strong>${elencoLabel}:</strong> ${elencoHTML || 'Não informado'}`;
+      dom.modal.info.innerHTML = `<strong>Ano:</strong> ${anoHTML} | <strong>País:</strong> ${paisHTML}<br><strong>${plataformaLabel}:</strong> ${plataformaHTML}<br><strong>${elencoLabel}:</strong> ${elencoHTML || 'Não informado'}<br><strong>Tags:</strong> ${tagsHTML || 'Nenhuma'}`;
       
       updateModalButtons(index);
 
@@ -2135,8 +2163,18 @@ dom.modal.wantBtn.classList.toggle('active', f.queroAssistir);
             tagsDoFilme = tagsDoFilme.filter(t => t !== 'Filmes'); // Limpa se for filme normal
         }
         
-        document.getElementById('admin-categoria').value = categoriaSelecionada;
-        document.getElementById('admin-tags').value = tagsDoFilme.join(', ');
+document.getElementById('admin-categoria').value = categoriaSelecionada;
+        
+        // Atualiza as tags visuais selecionadas
+        tagsSelecionadasAdmin.clear();
+        tagsDoFilme.forEach(t => {
+            if(tagsPreDefinidas.includes(t)) tagsSelecionadasAdmin.add(t);
+        });
+        document.querySelectorAll('.admin-tag-option').forEach(el => {
+            el.classList.toggle('active', tagsSelecionadasAdmin.has(el.textContent));
+        });
+        atualizarPreviewTagsAdmin();
+
         document.getElementById('admin-screentime').value = f.screentime || 'Medium';
         document.getElementById('admin-elenco').value = f.elenco || '';
         document.getElementById('admin-plataforma').value = f.plataforma || '';
@@ -2194,6 +2232,35 @@ dom.modal.wantBtn.classList.toggle('active', f.queroAssistir);
       setupPreview('admin-gallery-1', 'preview-g1');
       setupPreview('admin-gallery-2', 'preview-g2');
       setupPreview('admin-gallery-3', 'preview-g3');
+      // RENDERIZAR DROPDOWN DE TAGS DO ADMIN
+      const adminTagsDropdown = document.getElementById('admin-tags-dropdown');
+      const adminTagsContainer = document.getElementById('admin-tags-container');
+      
+      if (adminTagsDropdown && adminTagsContainer) {
+          adminTagsDropdown.innerHTML = '';
+          tagsPreDefinidas.forEach(tag => {
+              const el = document.createElement('span');
+              el.className = 'dropdown-tag admin-tag-option';
+              el.textContent = tag;
+              el.onclick = (e) => {
+                  e.stopPropagation();
+                  if(tagsSelecionadasAdmin.has(tag)) {
+                      tagsSelecionadasAdmin.delete(tag);
+                      el.classList.remove('active');
+                  } else {
+                      tagsSelecionadasAdmin.add(tag);
+                      el.classList.add('active');
+                  }
+                  atualizarPreviewTagsAdmin();
+              };
+              adminTagsDropdown.appendChild(el);
+          });
+
+          adminTagsContainer.onclick = (e) => {
+              e.stopPropagation();
+              adminTagsDropdown.classList.toggle('show');
+          };
+      }
 if (btnAddFilme) {
           btnAddFilme.onclick = () => {
               editingFilmeId = null; // Garante que é um novo
@@ -2204,7 +2271,9 @@ if (btnAddFilme) {
               document.getElementById('admin-categoria').value = 'Filmes';
               
               document.querySelectorAll('#modal-admin-bg img').forEach(img => img.style.display = 'none');
-              
+tagsSelecionadasAdmin.clear();
+              document.querySelectorAll('.admin-tag-option').forEach(el => el.classList.remove('active'));
+              atualizarPreviewTagsAdmin();              
               // A MÁGICA VOLTOU AQUI: Este comando faz a janela aparecer!
               modalAdmin.style.display = 'flex'; 
               
@@ -2224,7 +2293,7 @@ if (btnAddFilme) {
               if (!titulo) return alert("O título é obrigatório!");
               
               const categoriaSelecionada = document.getElementById('admin-categoria').value;
-              const tagsArray = document.getElementById('admin-tags').value.split(',').map(tag => tag.trim()).filter(tag => tag !== "");
+ const tagsArray = Array.from(tagsSelecionadasAdmin);
               
               // A MÁGICA: Embutir a categoria secreta nas tags
               if (!tagsArray.includes(categoriaSelecionada)) {
@@ -2438,6 +2507,11 @@ try {
           }
           if (dom.sideMenu.profileFlagBtn && !dom.sideMenu.profileFlagBtn.contains(e.target) && dom.sideMenu.profileFlagDropdown.classList.contains('show')) {
               dom.sideMenu.profileFlagDropdown.classList.remove('show');
+          }
+          const adminTagsDropdown = document.getElementById('admin-tags-dropdown');
+          const adminTagsContainer = document.getElementById('admin-tags-container');
+          if (adminTagsDropdown && adminTagsContainer && !adminTagsContainer.contains(e.target) && adminTagsDropdown.classList.contains('show')) {
+              adminTagsDropdown.classList.remove('show');
           }
           
           // --- MÁGICA: FECHAR MODAIS LATERAIS AO CLICAR FORA ---
@@ -2972,6 +3046,46 @@ const docSnap = await getDoc(userDocRef);
             lucide.createIcons();
         }
     });
+window.limpezaGeralNuclear = async function() {
+        if(!confirm("Atenção: Isso vai limpar TODAS as tags secundárias, apagar links de assistir e links de plataforma de todo o catálogo. Continuar?")) return;
+        
+        try {
+            console.log("Iniciando a faxina nuclear...");
+            const querySnapshot = await getDocs(collection(db, "filmes"));
+            let count = 0;
+            
+            for (const documento of querySnapshot.docs) {
+                const dados = documento.data();
+                
+                // Filtra para sobrar APENAS as 3 categorias raízes
+                let tagsBase = [];
+                if(dados.tags && Array.isArray(dados.tags)) {
+                    tagsBase = dados.tags.filter(t => t === 'Filmes' || t === 'Series' || t === 'Livros');
+                }
+                if(tagsBase.length === 0) tagsBase.push('Filmes'); // Prevenção de erro
+                
+                // Atualiza o banco de dados apagando tudo que não queremos
+                await updateDoc(doc(db, "filmes", documento.id), {
+                    tags: tagsBase,
+                    youtubeLink: "", // Apaga link do botão assistir
+                    plataforma: ""   // Apaga link da editora/onde assistir
+                });
+                
+                count++;
+                console.log(`Limpou: ${dados.titulo}`);
+            }
+            
+            alert(`SUCESSO TOTAL! ${count} títulos foram limpos. O site vai recarregar sozinho agora!`);
+            window.location.reload(true); // Força a atualização da tela
+            
+        } catch (e) {
+            console.error("Erro na limpeza nuclear:", e);
+            alert("Erro! Dê uma olhada no console.");
+        }
+    };
+  </script>
+</body>
+</html>
   </script>
 </body>
 </html>

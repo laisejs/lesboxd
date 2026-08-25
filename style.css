@@ -3260,3 +3260,43 @@ body.light-theme .netflix-rank {
     color: #ffffff; /* Fica verde sólido no claro */
     text-shadow: 2px 4px 12px rgba(0, 0, 0, 0.4), 0px 1px 4px rgba(0, 0, 0, 0.3);
 }
+/* =========================================
+   DROPDOWN DE TAGS (MODAL ADMIN)
+   ========================================= */
+.admin-tags-selector {
+    width: 100%; padding: 10px 14px; background: rgba(0,0,0,0.2);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    border-radius: 8px; font-size: 13px; color: var(--cor-texto); 
+    cursor: pointer; position: relative; min-height: 38px;
+    box-sizing: border-box; font-family: 'Inter', sans-serif;
+}
+.admin-tags-selector:hover {
+    background: rgba(0,0,0,0.3);
+}
+.admin-tags-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 0;
+    width: 100%; /* Acompanha a largura do input */
+    background-color: var(--cor-card);
+    max-height: 220px;
+    overflow-y: auto;
+    box-shadow: 0px 10px 30px rgba(0,0,0,0.8);
+    z-index: 2600;
+    border-radius: 12px;
+    padding: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.admin-tags-dropdown.show {
+    display: flex;
+    animation: fadeIn 0.2s ease-in-out;
+}
+body.light-theme .admin-tags-selector {
+    background: #ffffff; border-bottom: 1px solid rgba(0,0,0,0.05); color: #0f172a;
+}
+body.light-theme .admin-tags-dropdown {
+    background: #ffffff; border-color: rgba(0,0,0,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
