@@ -396,14 +396,20 @@
                 <img id="profile-pic-preview" src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png">
             </div>
 
-            <div class="input-group minimalist-input" style="text-align: left;">
-                <label>URL da Imagem</label>
-                <input type="text" id="profile-pic-input" placeholder="Cole o link da imagem aqui...">
+            <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 25px;">
+                <!-- NOVO BOTÃO DA GALERIA -->
+                <button id="btn-upload-galeria" class="minimalist-btn" style="background: transparent; border: 2px dashed var(--cor-principal); width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--cor-texto); box-shadow: none;">
+                    <i data-lucide="upload" style="width: 18px;"></i> Escolher da Galeria
+                </button>
+                <input type="file" id="profile-pic-file" accept="image/*" style="display: none;">
+                
+                <div style="font-size: 12px; color: var(--cor-texto-secundario);">OU COLE UM LINK ABAIXO</div>
+
+                <!-- CAMPO DE LINK ANTIGO -->
+                <div class="input-group minimalist-input" style="text-align: left; margin: 0;">
+                    <input type="text" id="profile-pic-input" placeholder="Cole o link da imagem aqui...">
+                </div>
             </div>
-            
-            <p style="font-size: 13px; color: var(--cor-texto-secundario); margin: 12px 0 25px 0; line-height: 1.5;">
-                Copie o "endereço de imagem" em uma foto do Google, Pinterest, etc.
-            </p>
 
             <button id="save-profile-pic-btn" class="minimalist-btn" style="width: 100%;">Salvar Foto</button>
         </div>
@@ -2755,19 +2761,77 @@ const modalProfile = document.getElementById('modal-profile-pic-bg');
         const inputProfile = document.getElementById('profile-pic-input');
         const previewProfile = document.getElementById('profile-pic-preview');
         const defaultPic = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png";
+        
+        const fileInputProfile = document.getElementById('profile-pic-file');
+        const btnUploadProfile = document.getElementById('btn-upload-galeria');
+        let arquivoParaSubirProfile = null;
 
-        // Abrir o novo pop-up
+        // A MÁGICA DA COMPRESSÃO: Encolhe a foto no celular da pessoa para não gastar internet!
+        function comprimirImagem(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const maxSize = 250; 
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > height) {
+                            if (width > maxSize) { height *= maxSize / width; width = maxSize; }
+                        } else {
+                            if (height > maxSize) { width *= maxSize / height; height = maxSize; }
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        canvas.toBlob((blob) => { resolve(blob); }, 'image/jpeg', 0.8);
+                    };
+                };
+            });
+        }
+
+        // Abrir o pop-up de Foto
         dom.sideMenu.profilePicEditBtn.addEventListener('click', () => {
             const currentPic = userData.foto || defaultPic;
             inputProfile.value = currentPic !== defaultPic ? currentPic : "";
             previewProfile.src = currentPic;
+            arquivoParaSubirProfile = null; 
+            btnUploadProfile.innerHTML = `<i data-lucide="upload" style="width: 18px;"></i> Escolher da Galeria`;
+            lucide.createIcons();
             modalProfile.style.display = 'flex';
         });
 
-        // Atualizar a foto em tempo real enquanto a pessoa cola o link
+        // Se ela preferir digitar um link
         inputProfile.addEventListener('input', () => {
             const val = inputProfile.value.trim();
             previewProfile.src = val ? val : defaultPic;
+            arquivoParaSubirProfile = null; 
+            btnUploadProfile.innerHTML = `<i data-lucide="upload" style="width: 18px;"></i> Escolher da Galeria`;
+            lucide.createIcons();
+        });
+
+        // Clique no botão de Escolher da Galeria
+        btnUploadProfile.addEventListener('click', () => {
+            fileInputProfile.click();
+        });
+
+        // Quando ela seleciona a foto no celular
+        fileInputProfile.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                arquivoParaSubirProfile = file;
+                previewProfile.src = URL.createObjectURL(file); 
+                inputProfile.value = ""; 
+                btnUploadProfile.innerHTML = `<i data-lucide="check" style="width: 18px; color: var(--cor-principal);"></i> Foto Carregada!`;
+                lucide.createIcons();
+            }
         });
 
         // Fechar no "X"
@@ -2775,24 +2839,61 @@ const modalProfile = document.getElementById('modal-profile-pic-bg');
             modalProfile.style.display = 'none';
         });
 
-        // Salvar a nova foto
+        // O BOTÃO DE SALVAR
         document.getElementById('save-profile-pic-btn').addEventListener('click', async () => {
-            const newUrl = inputProfile.value.trim();
-            const finalUrl = newUrl ? newUrl : defaultPic;
+            if (!userDocRef) return;
             
-            if (userDocRef) {
-                const btnSave = document.getElementById('save-profile-pic-btn');
-                btnSave.textContent = 'Salvando...';
+            const btnSave = document.getElementById('save-profile-pic-btn');
+            btnSave.textContent = 'Aguarde, processando...';
+            btnSave.disabled = true;
+
+            let finalUrl = defaultPic;
+
+            try {
+                if (arquivoParaSubirProfile) {
+                    btnSave.textContent = 'Enviando foto...';
+                    
+                    const imagemComprimida = await comprimirImagem(arquivoParaSubirProfile);
+                    
+                    const formData = new FormData();
+                    formData.append('image', imagemComprimida, 'perfil.jpg');
+                    
+                    // --- AQUI VAI A SUA CHAVE DO IMGBB ---
+                    const apiKeyImgBB = '94f73147336c8ff2f78902a34bd56c3f'; 
+                    // -------------------------------------
+
+                    const response = await fetch(`https://api.imgbb.com/1/upload?key=${apiKeyImgBB}`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        finalUrl = data.data.url; // Pega o link que o ImgBB gerou de graça!
+                    } else {
+                        throw new Error("Erro no ImgBB");
+                    }
+                    
+                } else {
+                    const newUrl = inputProfile.value.trim();
+                    if (newUrl) finalUrl = newUrl;
+                }
                 
+                // Salva a foto nova na conta da pessoa
                 await updateDoc(userDocRef, { foto: finalUrl });
                 userData.foto = finalUrl;
                 dom.sideMenu.profilePic.src = finalUrl;
                 
-                btnSave.textContent = 'Salvar Foto';
                 modalProfile.style.display = 'none';
-                
-                // Atualiza a foto imediatamente na aba amigos, se estiver aberta
                 if (currentView === 'amigos') mostrarAmigos();
+
+            } catch (error) {
+                console.error("Erro ao fazer upload:", error);
+                alert("Erro ao enviar a imagem. Tente colocar um link em vez disso.");
+            } finally {
+                btnSave.textContent = 'Salvar Foto';
+                btnSave.disabled = false;
             }
         });
         
