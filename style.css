@@ -1308,10 +1308,7 @@ body.light-theme #modal-close:hover, body.light-theme #chat-close:hover {
     object-fit: cover;
     box-sizing: border-box;
 }
-.chat-pic.has-border {
-    border: 2px solid var(--cor-principal);
-    padding: 2px;
-}
+
 .chat-flag {
     position: absolute;
     top: 0px;
@@ -1537,12 +1534,7 @@ body.light-theme #modal-close:hover, body.light-theme #chat-close:hover {
   box-sizing: content-box; 
 }
 
-.profile-pic.has-border {
-  border: 3px solid var(--cor-principal);
-  padding: 4px; 
-  background-color: var(--cor-fundo);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.7); 
-}
+
 
 .profile-pic-edit-overlay {
   position: absolute;
@@ -1650,12 +1642,6 @@ body.light-theme #modal-close:hover, body.light-theme #chat-close:hover {
     box-sizing: content-box;
 }
 
-.amigo-profile-pic.has-border {
-    border: 3px solid var(--cor-principal);
-    padding: 3px;
-    background-color: var(--cor-fundo);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.6);
-}
 
 .amigo-flag-badge {
     position: absolute;
@@ -1753,7 +1739,6 @@ body.light-theme #logout-btn { background: #e2e8f0; color: #0f172a; }
 body.light-theme #logout-btn:hover { background: #cbe1d3; }
 body.light-theme .section-subtitle { border-bottom-color: rgba(0,0,0,0.1); }
 body.light-theme .comment-bubble, body.light-theme .amigo-recent-comment { background: #f1f5f9; border: 1px solid #e2e8f0; }
-body.light-theme .profile-pic.has-border, body.light-theme .amigo-profile-pic.has-border, body.light-theme .chat-pic.has-border { background-color: #fff; }
 body.light-theme #current-flag-btn, body.light-theme .amigo-flag-badge, body.light-theme .chat-flag { border-color: #fff; }
 body.light-theme .ajuda-card h3 { border-bottom-color: rgba(0,0,0,0.1); }
 body.light-theme .chat-input-area { background: #ffffff; border-top-color: #e2e8f0; }
