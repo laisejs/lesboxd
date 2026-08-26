@@ -313,11 +313,23 @@
               <label>Tags</label>
               <div id="admin-tags-container" class="admin-tags-selector">
                   <span id="admin-tags-preview" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; max-width: 90%;">Selecione as tags...</span>
-                  <i data-lucide="chevron-down" style="width: 16px; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); opacity: 0.7;"></i>
+                  <i data-lucide="external-link" style="width: 16px; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); opacity: 0.7;"></i>
               </div>
-              <div id="admin-tags-dropdown" class="admin-tags-dropdown">
-                  </div>
             </div>
+
+    <!-- NOVO POP-UP DE TAGS QUE ABRE POR CIMA -->
+    <div id="modal-tags-admin-bg" class="admin-modal-overlay" style="display: none; z-index: 5000;">
+        <div class="admin-modal-content minimalist" style="max-width: 450px; padding: 30px;">
+            <button id="close-tags-admin" class="admin-close-btn">×</button>
+            <h2 style="font-size: 20px; color: var(--cor-principal); margin: 0 0 20px 0;">Selecionar Tags</h2>
+            
+            <div id="admin-tags-popup-content" style="display: flex; flex-wrap: wrap; gap: 8px; max-height: 400px; overflow-y: auto;">
+                <!-- As Tags aparecerão aqui dentro -->
+            </div>
+            
+            <button id="confirm-tags-admin" class="minimalist-btn" style="width: 100%; margin-top: 25px;">Pronto</button>
+        </div>
+    </div>
             <div class="input-group minimalist-input">
               <label>Tempo de tela</label>
               <select id="admin-screentime">
@@ -1292,14 +1304,30 @@ window.aprovarSugestao = async function(id) {
                     const container = document.createElement('div');
                     container.className = 'amigo-film-list-container';
                     container.dataset.list = listName;
-                    const linha = document.createElement('div');
-                    linha.className = 'linha-horizontal';
+                    
                     if (filmList.length > 0) {
+                        // ADICIONAMOS A MÁGICA DAS SETAS LATERAIS AQUI!
+                        container.innerHTML = `
+                            <div style="position: relative;">
+                                <button class="scroll-btn left" onclick="scrollLinha(this, -400)">&#10094;</button>
+                                <div class="scroll-wrapper">
+                                    <div class="linha-horizontal" onscroll="handleScrollFade(this)"></div>
+                                </div>
+                                <button class="scroll-btn right" onclick="scrollLinha(this, 400)">&#10095;</button>
+                            </div>
+                        `;
+                        
+                        const linha = container.querySelector('.linha-horizontal');
                         filmList.forEach(filme => linha.appendChild(createCard(filme, 'mini')));
+                        
+                        // Inicia o efeito de degradê suave na borda!
+                        setTimeout(() => handleScrollFade(linha), 150);
                     } else {
+                        const linha = document.createElement('div');
+                        linha.className = 'linha-horizontal';
                         linha.innerHTML = `<p class="no-items-message">Nenhum item para mostrar.</p>`;
+                        container.appendChild(linha);
                     }
-                    container.appendChild(linha);
                     return container;
                 };
 
@@ -2238,16 +2266,22 @@ document.getElementById('admin-categoria').value = categoriaSelecionada;
       setupPreview('admin-gallery-1', 'preview-g1');
       setupPreview('admin-gallery-2', 'preview-g2');
       setupPreview('admin-gallery-3', 'preview-g3');
-      // RENDERIZAR DROPDOWN DE TAGS DO ADMIN
-      const adminTagsDropdown = document.getElementById('admin-tags-dropdown');
+      // NOVO SISTEMA DE TAGS EM POP-UP
+      const modalTagsAdmin = document.getElementById('modal-tags-admin-bg');
+      const adminTagsPopupContent = document.getElementById('admin-tags-popup-content');
       const adminTagsContainer = document.getElementById('admin-tags-container');
       
-      if (adminTagsDropdown && adminTagsContainer) {
-          adminTagsDropdown.innerHTML = '';
+      if (adminTagsPopupContent && adminTagsContainer) {
+          adminTagsPopupContent.innerHTML = '';
           tagsPreDefinidas.forEach(tag => {
               const el = document.createElement('span');
               el.className = 'dropdown-tag admin-tag-option';
               el.textContent = tag;
+              
+              // Deixei a tag mais "gordinha" para ficar perfeito de clicar!
+              el.style.padding = '8px 15px'; 
+              el.style.fontSize = '14px';
+              
               el.onclick = (e) => {
                   e.stopPropagation();
                   if(tagsSelecionadasAdmin.has(tag)) {
@@ -2259,12 +2293,21 @@ document.getElementById('admin-categoria').value = categoriaSelecionada;
                   }
                   atualizarPreviewTagsAdmin();
               };
-              adminTagsDropdown.appendChild(el);
+              adminTagsPopupContent.appendChild(el);
           });
 
+          // Abrir o pop-up
           adminTagsContainer.onclick = (e) => {
-              e.stopPropagation();
-              adminTagsDropdown.classList.toggle('show');
+              e.preventDefault();
+              modalTagsAdmin.style.display = 'flex';
+          };
+          
+          // Fechar o pop-up (no X ou no Pronto)
+          document.getElementById('close-tags-admin').onclick = () => {
+              modalTagsAdmin.style.display = 'none';
+          };
+          document.getElementById('confirm-tags-admin').onclick = () => {
+              modalTagsAdmin.style.display = 'none';
           };
       }
 if (btnAddFilme) {
