@@ -1388,19 +1388,7 @@ window.aprovarSugestao = async function(id) {
                     // Recalcula o degradê/setas de scroll agora que o container ficou visível
                     // (calcular enquanto display:none dá scrollWidth/clientWidth = 0 e trava o scroll)
                     const linha = activeContainer.querySelector('.linha-horizontal');
-                    if (linha) {
-                        handleScrollFade(linha);
-
-                        // BUG DO SAFARI/iOS: uma linha que nasceu com display:none nunca
-                        // é registrada pelo WebKit como área rolável por toque. Forçamos
-                        // um reflow desligando e religando o overflow-x pra ele reconhecer
-                        // a rolagem por arraste do dedo agora que o container está visível.
-                        linha.style.overflowX = 'hidden';
-                        void linha.offsetHeight;
-                        requestAnimationFrame(() => {
-                            linha.style.overflowX = 'auto';
-                        });
-                    }
+                    if (linha) handleScrollFade(linha);
                 });
 });
             
