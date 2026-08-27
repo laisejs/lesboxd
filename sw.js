@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lilies-cache-v8'; // Subimos a versão para forçar a limpeza do cache antigo no celular!
+const CACHE_NAME = 'lilies-cache-v7'; // Subimos para v4 para forçar a limpeza no navegador!
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
