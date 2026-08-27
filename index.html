@@ -1388,7 +1388,17 @@ window.aprovarSugestao = async function(id) {
                     // Recalcula o degradê/setas de scroll agora que o container ficou visível
                     // (calcular enquanto display:none dá scrollWidth/clientWidth = 0 e trava o scroll)
                     const linha = activeContainer.querySelector('.linha-horizontal');
-                    if (linha) handleScrollFade(linha);
+                    if (linha) {
+                        handleScrollFade(linha);
+
+                        // Bug do WebKit/iOS: uma lista que nasceu com display:none nunca é
+                        // registrada como área rolável por toque, mesmo depois de reexibida.
+                        // Forçar um reflow no overflow-x faz o Safari reconhecer a rolagem
+                        // por arraste do dedo assim que o container fica visível.
+                        linha.style.overflowX = 'hidden';
+                        void linha.offsetWidth;
+                        linha.style.overflowX = 'auto';
+                    }
                 });
 });
             
