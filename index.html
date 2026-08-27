@@ -1376,13 +1376,19 @@ window.aprovarSugestao = async function(id) {
 
             document.querySelectorAll('.amigo-tab-btn').forEach(button => {
                 button.addEventListener('click', (e) => {
-                    const targetButton = e.target;
+                    const targetButton = e.target.closest('.amigo-tab-btn');
                     const listToShow = targetButton.dataset.list;
                     const card = targetButton.closest('.amigo-card');
                     card.querySelectorAll('.amigo-tab-btn').forEach(btn => btn.classList.remove('active'));
                     targetButton.classList.add('active');
                     card.querySelectorAll('.amigo-film-list-container').forEach(c => c.style.display = 'none');
-                    card.querySelector(`.amigo-film-list-container[data-list="${listToShow}"]`).style.display = 'flex';
+                    const activeContainer = card.querySelector(`.amigo-film-list-container[data-list="${listToShow}"]`);
+                    activeContainer.style.display = 'flex';
+
+                    // Recalcula o degradê/setas de scroll agora que o container ficou visível
+                    // (calcular enquanto display:none dá scrollWidth/clientWidth = 0 e trava o scroll)
+                    const linha = activeContainer.querySelector('.linha-horizontal');
+                    if (linha) handleScrollFade(linha);
                 });
 });
             
