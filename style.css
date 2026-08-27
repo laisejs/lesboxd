@@ -692,6 +692,7 @@ h1 {
 .linha-horizontal {
   display: flex;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   gap: 15px;
   padding: 10px 0;
   margin-bottom: 40px;
