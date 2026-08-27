@@ -1383,22 +1383,19 @@ window.aprovarSugestao = async function(id) {
                     targetButton.classList.add('active');
                     card.querySelectorAll('.amigo-film-list-container').forEach(c => c.style.display = 'none');
                     const activeContainer = card.querySelector(`.amigo-film-list-container[data-list="${listToShow}"]`);
-                    activeContainer.style.display = 'flex';
+                    // A lista de comentários usa flex-column (definido no CSS); as listas de
+                    // filmes (favoritos/assistidos/lidos/lista) não têm CSS próprio e devem
+                    // usar block, igual ao container de favoritos (que nunca é escondido).
+                    // Colocá-las em display:flex faz o wrapper interno (que é width:100%)
+                    // esticar para caber TODOS os cards lado a lado em vez de ficar limitado
+                    // à largura da tela — aí não sobra overflow nenhum pra rolar e o toque
+                    // não tem efeito nenhum.
+                    activeContainer.style.display = activeContainer.classList.contains('amigo-comments-container') ? 'flex' : 'block';
 
                     // Recalcula o degradê/setas de scroll agora que o container ficou visível
                     // (calcular enquanto display:none dá scrollWidth/clientWidth = 0 e trava o scroll)
                     const linha = activeContainer.querySelector('.linha-horizontal');
-                    if (linha) {
-                        handleScrollFade(linha);
-
-                        // Bug do WebKit/iOS: uma lista que nasceu com display:none nunca é
-                        // registrada como área rolável por toque, mesmo depois de reexibida.
-                        // Forçar um reflow no overflow-x faz o Safari reconhecer a rolagem
-                        // por arraste do dedo assim que o container fica visível.
-                        linha.style.overflowX = 'hidden';
-                        void linha.offsetWidth;
-                        linha.style.overflowX = 'auto';
-                    }
+                    if (linha) handleScrollFade(linha);
                 });
 });
             
