@@ -73,33 +73,65 @@ h1, h2, h3, h4, .section-title, .dynamic-title, .profile-name, .logo-mobile, .de
 input, textarea, select, button, [contenteditable="true"] {
   font-family: 'Inter', sans-serif;
 }
-/* --- BARRAS DE ROLAGEM MINIMALISTAS --- */
-#modal-bg.details-sidebar::-webkit-scrollbar,
-#chat-sidebar.details-sidebar::-webkit-scrollbar,
-.amigo-comments-container::-webkit-scrollbar,
-.chat-messages-container::-webkit-scrollbar {
-    width: 6px; 
+/* =========================================
+   BARRAS DE ROLAGEM PADRONIZADAS (GLOBAIS)
+   ========================================= */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
 }
-#modal-bg.details-sidebar::-webkit-scrollbar-track,
-#chat-sidebar.details-sidebar::-webkit-scrollbar-track,
-.amigo-comments-container::-webkit-scrollbar-track,
-.chat-messages-container::-webkit-scrollbar-track {
-    background: transparent; 
+::-webkit-scrollbar-track {
+    background: transparent;
 }
-#modal-bg.details-sidebar::-webkit-scrollbar-thumb,
-#chat-sidebar.details-sidebar::-webkit-scrollbar-thumb,
-.amigo-comments-container::-webkit-scrollbar-thumb,
-.chat-messages-container::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.2); 
-    border-radius: 10px; 
+::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
 }
-#modal-bg.details-sidebar::-webkit-scrollbar-thumb:hover,
-#chat-sidebar.details-sidebar::-webkit-scrollbar-thumb:hover,
-.amigo-comments-container::-webkit-scrollbar-thumb:hover,
-.chat-messages-container::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(255, 255, 255, 0.4); 
+::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.4);
 }
+body.light-theme ::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.15);
+}
+body.light-theme ::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+/* =========================================
+   BOTÃO DE DELETAR MENSAGEM DO CHAT
+   ========================================= */
+.chat-bubble-container {
+    position: relative;
+}
+.delete-chat-msg-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: -28px;
+    background: transparent;
+    color: var(--cor-texto-secundario);
+    border: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: 0.2s;
+    font-size: 16px;
+    font-weight: bold;
+}
+/* No PC só aparece ao passar o mouse */
+.chat-msg:hover .delete-chat-msg-btn { opacity: 0.6; }
+.delete-chat-msg-btn:hover { opacity: 1 !important; color: #db1f20; background: rgba(219, 31, 32, 0.1); }
+.chat-msg.own .delete-chat-msg-btn { right: auto; left: -28px; }
 
+/* No celular fica sempre visível */
+@media (max-width: 768px) {
+    .delete-chat-msg-btn { opacity: 0.8; right: -22px; }
+    .chat-msg.own .delete-chat-msg-btn { left: -22px; }
+}
 /* --- BOTÃO FLUTUANTE DO CHAT --- */
 .floating-chat-btn {
     position: fixed;

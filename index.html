@@ -280,6 +280,17 @@
         </div>
       </div>
     </aside>
+    <!-- NOVO POP-UP PADRONIZADO (ALERTAS E CONFIRMAÇÕES) -->
+    <div id="custom-modal-bg" class="admin-modal-overlay" style="display: none; z-index: 9999;">
+        <div class="admin-modal-content minimalist" style="max-width: 350px; padding: 25px; text-align: center; margin: auto;">
+            <h3 id="custom-modal-title" style="margin-top: 0; color: var(--cor-principal); font-size: 18px;">Aviso</h3>
+            <p id="custom-modal-message" style="color: var(--cor-texto); font-size: 14px; margin-bottom: 25px; line-height: 1.5;"></p>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button id="custom-modal-cancel" class="minimalist-btn" style="background: #444; display: none; flex: 1;">Cancelar</button>
+                <button id="custom-modal-confirm" class="minimalist-btn" style="flex: 1;">OK</button>
+            </div>
+        </div>
+    </div>
 
 <div id="modal-admin-bg" class="admin-modal-overlay" style="display: none;">
     <div class="admin-modal-content minimalist">
@@ -574,6 +585,41 @@ let filmes = [];
             preview.style.opacity = '1';
         }
     }
+    // --- FUNÇÕES GLOBAIS DO POP-UP PADRONIZADO ---
+    window.customAlert = function(message, title = "Aviso") {
+        return new Promise((resolve) => {
+            const bg = document.getElementById('custom-modal-bg');
+            document.getElementById('custom-modal-title').textContent = title;
+            document.getElementById('custom-modal-message').textContent = message;
+            document.getElementById('custom-modal-cancel').style.display = 'none';
+            bg.style.display = 'flex';
+            document.getElementById('custom-modal-confirm').onclick = () => { bg.style.display = 'none'; resolve(true); };
+        });
+    };
+
+    window.customConfirm = function(message, title = "Confirmação") {
+        return new Promise((resolve) => {
+            const bg = document.getElementById('custom-modal-bg');
+            document.getElementById('custom-modal-title').textContent = title;
+            document.getElementById('custom-modal-message').textContent = message;
+            document.getElementById('custom-modal-cancel').style.display = 'block';
+            bg.style.display = 'flex';
+            document.getElementById('custom-modal-confirm').onclick = () => { bg.style.display = 'none'; resolve(true); };
+            document.getElementById('custom-modal-cancel').onclick = () => { bg.style.display = 'none'; resolve(false); };
+        });
+    };
+
+    // --- FUNÇÃO PARA DELETAR MENSAGEM DO CHAT ---
+    window.deletarMensagemChat = async function(id) {
+        if (await customConfirm("Tem certeza que deseja apagar esta mensagem?", "Excluir Mensagem")) {
+            try {
+                await deleteDoc(doc(db, "mensagens", id));
+            } catch(e) {
+                console.error(e);
+                customAlert("Erro ao excluir mensagem.");
+            }
+        }
+    };
 
     const dom = {
 auth: {
@@ -1144,60 +1190,47 @@ async function mostrarAprovacoes() {
 
     // Comandos de ação que os botões vão chamar
 window.aprovarSugestao = async function(id) {
-        if(!confirm("Deseja aprovar esta sugestão e aplicar as mudanças no catálogo?")) return;
+        if(!(await customConfirm("Deseja aprovar esta sugestão e aplicar as mudanças no catálogo?", "Aprovar"))) return;
         try {
             const docRef = doc(db, "sugestoes", id);
             const docSnap = await getDoc(docRef);
-            
             if(docSnap.exists()){
                 const data = docSnap.data();
                 const isEdit = data.isEdit || false;
                 const filmeId = data.filmeId || null;
-                
-                // Limpa as propriedades de controle da sugestão antes de salvar no catálogo oficial
-                delete data.sugeridoPor; 
-                delete data.isEdit;
-                delete data.filmeId;
+                delete data.sugeridoPor; delete data.isEdit; delete data.filmeId;
                 
                 if (isEdit && filmeId) {
-                    // Se for uma edição, atualiza o documento existente correspondente
                     await updateDoc(doc(db, "filmes", filmeId), data);
                     data.id = filmeId;
                     const idx = filmes.findIndex(f => f.id === filmeId);
                     if (idx !== -1) filmes[idx] = data;
-                    alert("Edição aprovada e aplicada com sucesso!");
+                    await customAlert("Edição aprovada e aplicada com sucesso!", "Sucesso");
                 } else {
-                    // Se for um filme novo, adiciona um documento inédito
                     const novoRef = await addDoc(collection(db, "filmes"), data);
                     data.id = novoRef.id;
                     filmes.push(data);
-                    alert("Novo título aprovado e adicionado ao catálogo!");
+                    await customAlert("Novo título aprovado e adicionado ao catálogo!", "Sucesso");
                 }
-                
                 filmes.sort((a, b) => a.titulo.localeCompare(b.titulo));
                 popularTags();
-                
-                // Exclui a pendência da fila e remove o card da tela
                 await deleteDoc(docRef); 
                 document.getElementById('sugestao-'+id).remove();
-                
                 if(!document.querySelector('.sugestao-card')) mostrarAprovacoes(); 
             }
         } catch(e) {
             console.error(e);
-            alert("Erro ao aprovar.");
+            customAlert("Erro ao aprovar.", "Erro");
         }
     };
 
     window.rejeitarSugestao = async function(id) {
-        if(!confirm("Tem certeza que deseja apagar esta sugestão?")) return;
+        if(!(await customConfirm("Tem certeza que deseja apagar esta sugestão?", "Rejeitar"))) return;
         try {
             await deleteDoc(doc(db, "sugestoes", id));
             document.getElementById('sugestao-'+id).remove();
             if(!document.querySelector('.sugestao-card')) mostrarAprovacoes(); 
-        } catch(e) {
-            alert("Erro ao rejeitar.");
-        }
+        } catch(e) { customAlert("Erro ao rejeitar.", "Erro"); }
     };
  async function mostrarAmigos() {
         currentView = 'amigos';
@@ -1489,8 +1522,11 @@ function updateChatBadge() {
     }
 
     // Nova função ultra-rápida: renderiza apenas a mensagem nova
-    function renderSingleChatMessage(m) {
+function renderSingleChatMessage(m) {
         const isOwn = m.uid === auth.currentUser?.uid;
+        // MÁGICA: Verifica se é o dono da mensagem ou se a pessoa é Administradora
+        const canDelete = isOwn || isAdmin; 
+
         const date = new Date(m.timestamp);
         const dia = date.getDate().toString().padStart(2, '0');
         const mes = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -1502,13 +1538,13 @@ function updateChatBadge() {
         const borderClass = m.bandeira ? 'has-border' : '';
         const bubbleClass = isOwn ? 'chat-msg own' : 'chat-msg';
 
-        // MÁGICA: Decide se desenha uma bolha de texto ou um Sticker Quadrado
-        const bubbleContent = m.imagem 
-            ? `<img src="${m.imagem}" class="chat-sticker-img" loading="lazy" style="cursor: pointer;" title="Clique para salvar este sticker!" onclick="salvarStickerDoChat('${m.imagem}')">`
-            : `<div class="chat-bubble">${m.texto}</div>`;
+        // Cria o botão de deletar se a pessoa tiver permissão
+        const deleteBtnHtml = canDelete 
+            ? `<button class="delete-chat-msg-btn" onclick="deletarMensagemChat('${m.id}')" title="Excluir">×</button>` 
+            : '';
 
         const html = `
-            <div class="${bubbleClass}">
+            <div class="${bubbleClass}" id="msg-${m.id}">
                 <div class="chat-user-profile">
                     <div class="chat-pic-wrapper">
                         <img src="${m.foto}" class="chat-pic ${borderClass}">
@@ -1518,8 +1554,9 @@ function updateChatBadge() {
                 </div>
                 
                 <div class="chat-bubble-container">
-                    ${bubbleContent}
+                    <div class="chat-bubble">${m.texto}</div>
                     <div class="chat-time">${timeStr}</div>
+                    ${deleteBtnHtml}
                 </div>
             </div>
         `;
@@ -1938,48 +1975,27 @@ async function toggleFavorite(titulo) {
       
       // A linha render() foi removida para parar de embaralhar a tela!
     }
-    async function adicionarComentario(titulo) {
+async function adicionarComentario(titulo) {
         const texto = dom.modal.commentInput.value.trim();
         if(!texto) return;
-
         if (!userData.comentarios) userData.comentarios = [];
-        
-        const novoComentario = {
-            filme: titulo,
-            texto: texto,
-            timestamp: Date.now()
-        };
-        
+        const novoComentario = { filme: titulo, texto: texto, timestamp: Date.now() };
         userData.comentarios.push(novoComentario);
-        
         try {
             await updateDoc(userDocRef, { comentarios: userData.comentarios });
             dom.modal.commentInput.value = ''; 
             renderCommentsForMovie(titulo); 
-        } catch(e) {
-            console.error("Erro ao salvar comentário", e);
-            alert("Erro ao publicar comentário.");
-        }
+        } catch(e) { customAlert("Erro ao publicar comentário.", "Erro"); }
     }
 
     async function deletarComentario(timestamp, titulo) {
-        if(!confirm("Tem certeza que deseja excluir este comentário?")) return;
-        
+        if(!(await customConfirm("Tem certeza que deseja excluir este comentário?", "Excluir"))) return;
         userData.comentarios = userData.comentarios.filter(c => c.timestamp !== timestamp);
-        
         try {
             await updateDoc(userDocRef, { comentarios: userData.comentarios });
-            
-            if (dom.modal.bg.classList.contains("open")) {
-                renderCommentsForMovie(titulo); 
-            }
-            if (currentView === 'amigos') {
-                mostrarAmigos();
-            }
-        } catch(e) {
-            console.error("Erro ao deletar comentário", e);
-            alert("Erro ao excluir comentário.");
-        }
+            if (dom.modal.bg.classList.contains("open")) renderCommentsForMovie(titulo); 
+            if (currentView === 'amigos') mostrarAmigos();
+        } catch(e) { customAlert("Erro ao excluir comentário.", "Erro"); }
     }
 
     async function renderCommentsForMovie(titulo) {
@@ -2301,24 +2317,18 @@ dom.modal.wantBtn.classList.toggle('active', f.queroAssistir);
         dom.modal.bg.classList.remove("open");
         if (typeof heroInterval !== 'undefined') clearInterval(heroInterval);
     }
-    async function deletarFilme(index) {
+async function deletarFilme(index) {
         const f = filmes[index];
-        if (!confirm(`Tem certeza que deseja excluir o filme "${f.titulo}" do catálogo?`)) return;
-
+        if (!(await customConfirm(`Tem certeza que deseja excluir o filme "${f.titulo}" do catálogo?`, "Excluir"))) return;
         try {
             dom.modal.deleteBtn.textContent = 'Excluindo...';
-            await deleteDoc(doc(db, "filmes", f.id)); // Deleta do Google
-            filmes.splice(index, 1); // Deleta da tela
-            alert("Excluído com sucesso!");
+            await deleteDoc(doc(db, "filmes", f.id)); 
+            filmes.splice(index, 1); 
+            await customAlert("Excluído com sucesso!", "Sucesso");
             fecharModal();
             mostrarTelaInicial(); 
-        } catch (error) {
-            console.error("Erro ao excluir:", error);
-            alert("Erro ao excluir.");
-        } finally {
-            dom.modal.deleteBtn.textContent = 'Excluir';
-        }
-
+        } catch (error) { customAlert("Erro ao excluir.", "Erro");
+        } finally { dom.modal.deleteBtn.textContent = 'Excluir'; }
     }
 
     function abrirModalEdicao(index) {
@@ -2522,50 +2532,41 @@ tagsSelecionadasAdmin.clear();
 
 try {
                   btnSalvarAdmin.textContent = "Salvando...";
-                  
                   if (editingFilmeId) {
                       if (isAdmin) {
-                          // Admin edita diretamente o catálogo oficial
                           await updateDoc(doc(db, "filmes", editingFilmeId), novoFilme);
                           novoFilme.id = editingFilmeId;
                           const idx = filmes.findIndex(f => f.id === editingFilmeId);
                           if (idx !== -1) filmes[idx] = novoFilme;
-                          alert("Atualizado com sucesso no catálogo!");
+                          await customAlert("Atualizado com sucesso no catálogo!", "Sucesso");
                       } else {
-                          // Usuário comum envia a edição para a fila de aprovações
                           novoFilme.sugeridoPor = userData.apelido || "Anônimo";
                           novoFilme.isEdit = true;
-                          novoFilme.filmeId = editingFilmeId; // Guarda qual filme está sendo alterado
-                          
+                          novoFilme.filmeId = editingFilmeId; 
                           await addDoc(collection(db, "sugestoes"), novoFilme);
-                          alert("Sua sugestão de edição foi enviada para aprovação! Obrigada ❤");
+                          await customAlert("Sua sugestão de edição foi enviada para aprovação! Obrigada ❤", "Recebido");
                       }
                   } else {
-                      // CADASTRO DE NOVO FILME
                       if (isAdmin) {
                           const docRef = await addDoc(collection(db, "filmes"), novoFilme);
                           novoFilme.id = docRef.id;
                           filmes.push(novoFilme);
-                          alert("Adicionado ao catálogo com sucesso!");
+                          await customAlert("Adicionado ao catálogo com sucesso!", "Sucesso");
                       } else {
                           novoFilme.sugeridoPor = userData.apelido || "Anônimo";
                           await addDoc(collection(db, "sugestoes"), novoFilme);
-                          alert("Sua sugestão foi enviada para aprovação! Obrigada ❤");
+                          await customAlert("Sua sugestão foi enviada para aprovação! Obrigada ❤", "Recebido");
                       }
                   }
-                  
-                  // Organiza e limpa a tela
                   filmes.sort((a, b) => a.titulo.localeCompare(b.titulo));
                   popularTags();
                   mostrarTelaInicial(); 
-                  
                   document.querySelectorAll('#modal-admin-bg input, #modal-admin-bg textarea').forEach(input => input.value = '');
                   document.querySelectorAll('#modal-admin-bg img').forEach(img => img.style.display = 'none');
                   modalAdmin.style.display = 'none';
 
               } catch (e) {
-                  console.error("Erro: ", e);
-                  alert("Erro ao enviar. Tente novamente.");
+                  customAlert("Erro ao enviar. Tente novamente.", "Erro");
               } finally {
                   btnSalvarAdmin.textContent = isAdmin ? "Salvar no Catálogo" : "Enviar Sugestão";
               }
@@ -3129,7 +3130,7 @@ const docSnap = await getDoc(userDocRef);
 
 
 
-    function initChatListener() {
+function initChatListener() {
         if (unsubscribeChat) unsubscribeChat();
         const q = query(collection(db, "mensagens"), orderBy("timestamp", "asc"));
         
@@ -3138,38 +3139,34 @@ const docSnap = await getDoc(userDocRef);
                 if (change.type === "added") {
                     const m = { id: change.doc.id, ...change.doc.data() };
                     
-                    // Se for o carregamento inicial, apenas empilha para renderizar depois
                     if (isInitialChatLoad) {
                         chatMessages.push(m);
                     } else {
-                        // Se for uma mensagem NOVA, desenha instantaneamente sem piscar a tela
                         chatMessages.push(m);
                         renderSingleChatMessage(m);
                         
-                        // Rola para o fim automaticamente
                         if (dom.chat.sidebar.classList.contains('open')) {
                             dom.chat.messagesContainer.scrollTop = dom.chat.messagesContainer.scrollHeight;
                         }
 
-                        // Aciona a notificação de nova mensagem se a aba estiver aberta (PC ou Celular)
                         const isOwnMessage = m.uid === auth.currentUser?.uid;
                         if (!isOwnMessage && userData.notificacoes?.chat && Notification.permission === "granted") {
-                            new Notification("Lilies Chat: " + m.nome, {
-                                body: m.texto,
-                                icon: "/lily-light.png",
-                                silent: false
-                            });
+                            new Notification("Lilies Chat: " + m.nome, { body: m.texto, icon: "/lily-light.png", silent: false });
                         }
                     }
                 }
+                // MÁGICA: Se apagarem a mensagem, ela some da tela na mesma hora!
+                if (change.type === "removed") {
+                    chatMessages = chatMessages.filter(msg => msg.id !== change.doc.id);
+                    const msgDiv = document.getElementById(`msg-${change.doc.id}`);
+                    if (msgDiv) msgDiv.remove();
+                }
             });
 
-            // Se for o primeiro carregamento, injeta tudo na tela de uma vez e finaliza o ciclo
             if (isInitialChatLoad) {
                 renderChatMessages();
                 isInitialChatLoad = false;
             }
-            
             updateChatBadge();
         });
     }
