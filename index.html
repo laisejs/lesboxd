@@ -1397,13 +1397,26 @@ window.aprovarSugestao = async function(id) {
 
             document.querySelectorAll('.amigo-tab-btn').forEach(button => {
                 button.addEventListener('click', (e) => {
-                    const targetButton = e.target;
+                    const targetButton = e.target.closest('.amigo-tab-btn');
                     const listToShow = targetButton.dataset.list;
                     const card = targetButton.closest('.amigo-card');
                     card.querySelectorAll('.amigo-tab-btn').forEach(btn => btn.classList.remove('active'));
                     targetButton.classList.add('active');
                     card.querySelectorAll('.amigo-film-list-container').forEach(c => c.style.display = 'none');
-                    card.querySelector(`.amigo-film-list-container[data-list="${listToShow}"]`).style.display = 'flex';
+                    const activeContainer = card.querySelector(`.amigo-film-list-container[data-list="${listToShow}"]`);
+                    // A lista de comentários usa flex-column (definido no CSS); as listas de
+                    // filmes (favoritos/assistidos/lidos/lista) não têm CSS próprio e devem
+                    // usar block, igual ao container de favoritos (que nunca é escondido).
+                    // Colocá-las em display:flex faz o wrapper interno (que é width:100%)
+                    // esticar para caber TODOS os cards lado a lado em vez de ficar limitado
+                    // à largura da tela — aí não sobra overflow nenhum pra rolar e o toque
+                    // não tem efeito nenhum.
+                    activeContainer.style.display = activeContainer.classList.contains('amigo-comments-container') ? 'flex' : 'block';
+
+                    // Recalcula o degradê/setas de scroll agora que o container ficou visível
+                    // (calcular enquanto display:none dá scrollWidth/clientWidth = 0 e trava o scroll)
+                    const linha = activeContainer.querySelector('.linha-horizontal');
+                    if (linha) handleScrollFade(linha);
                 });
 });
             
