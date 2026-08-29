@@ -3286,3 +3286,40 @@ body.light-theme .admin-tags-selector {
 body.light-theme .admin-tags-dropdown {
     background: #ffffff; border-color: rgba(0,0,0,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.1);
 }
+/* =========================================
+   STICKERS DO CHAT
+   ========================================= */
+.chat-sticker-img {
+    width: 160px;
+    height: 160px;
+    object-fit: cover; /* Mantém a imagem quadrada perfeita */
+    border-radius: 12px;
+    border: 3px solid #444; /* Borda padrão (cinza) para os outros */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    margin-top: 5px;
+}
+/* A MÁGICA: Bordinha verde para os SEUS stickers! */
+.chat-msg.own .chat-sticker-img {
+    border-color: var(--cor-principal); 
+}
+
+.sticker-item {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s, border 0.2s;
+    border: 2px solid transparent;
+}
+.sticker-item:hover {
+    transform: scale(1.1);
+    border-color: var(--cor-principal);
+}
+
+/* Deixa o clipe verdinho ao passar o mouse */
+#chat-clip-btn:hover {
+    color: var(--cor-principal) !important;
+}
+
+body.light-theme .chat-sticker-img { border-color: #e2e8f0; }

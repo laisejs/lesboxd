@@ -253,7 +253,28 @@
         <div id="chat-messages" class="chat-messages-container">
             </div>
 
+        <!-- GAVETA DE STICKERS (Fica escondida por padrão) -->
+        <div id="chat-sticker-drawer" style="display: none; position: absolute; bottom: 85px; left: 15px; right: 15px; background: var(--cor-card); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.5); z-index: 100;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <h4 style="margin: 0; font-size: 14px; color: var(--cor-texto);">Seus Stickers</h4>
+                <button id="add-sticker-btn" style="background: var(--cor-principal); border: none; color: white; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold;" title="Adicionar novo link">+</button>
+            </div>
+            
+            <div id="new-sticker-input-area" style="display: none; margin-bottom: 15px; gap: 8px;">
+                <input type="text" id="new-sticker-url" placeholder="Cole o URL da imagem aqui..." style="flex-grow: 1; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 8px 12px; border-radius: 8px; font-size: 12px; outline: none;">
+                <button id="save-sticker-btn" style="background: var(--cor-principal); color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: bold;">Salvar</button>
+            </div>
+            
+            <div id="sticker-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; max-height: 200px; overflow-y: auto; padding-right: 5px;">
+                <!-- As imagens quadradas aparecerão aqui -->
+            </div>
+        </div>
+
         <div class="chat-input-area">
+            <!-- BOTÃO DO CLIPE -->
+            <button id="chat-clip-btn" title="Enviar Sticker" style="background: transparent; border: none; color: var(--cor-texto-secundario); cursor: pointer; padding: 5px; display: flex; align-items: center; justify-content: center; transition: 0.2s;">
+                <i data-lucide="paperclip" style="width: 22px;"></i>
+            </button>
             <textarea id="chat-input" placeholder="Mensagem..."></textarea>
             <button id="send-chat-btn" title="Enviar">➤</button>
         </div>
@@ -1468,6 +1489,11 @@ function updateChatBadge() {
         const borderClass = m.bandeira ? 'has-border' : '';
         const bubbleClass = isOwn ? 'chat-msg own' : 'chat-msg';
 
+        // MÁGICA: Decide se desenha uma bolha de texto ou um Sticker Quadrado
+        const bubbleContent = m.imagem 
+            ? `<img src="${m.imagem}" class="chat-sticker-img" loading="lazy" style="cursor: pointer;" title="Clique para salvar este sticker!" onclick="salvarStickerDoChat('${m.imagem}')">`
+            : `<div class="chat-bubble">${m.texto}</div>`;
+
         const html = `
             <div class="${bubbleClass}">
                 <div class="chat-user-profile">
@@ -1479,13 +1505,91 @@ function updateChatBadge() {
                 </div>
                 
                 <div class="chat-bubble-container">
-                    <div class="chat-bubble">${m.texto}</div>
+                    ${bubbleContent}
                     <div class="chat-time">${timeStr}</div>
                 </div>
             </div>
         `;
         dom.chat.messagesContainer.insertAdjacentHTML('beforeend', html);
     }
+
+    // --- LÓGICA DA GAVETA DE STICKERS ---
+    window.addEventListener('DOMContentLoaded', () => {
+        const clipBtn = document.getElementById('chat-clip-btn');
+        const stickerDrawer = document.getElementById('chat-sticker-drawer');
+        const addStickerBtn = document.getElementById('add-sticker-btn');
+        const newStickerArea = document.getElementById('new-sticker-input-area');
+        const saveStickerBtn = document.getElementById('save-sticker-btn');
+        const newStickerUrl = document.getElementById('new-sticker-url');
+        const stickerGrid = document.getElementById('sticker-grid');
+
+        if (clipBtn) {
+            clipBtn.onclick = () => {
+                stickerDrawer.style.display = stickerDrawer.style.display === 'none' ? 'block' : 'none';
+                if (stickerDrawer.style.display === 'block') renderStickers();
+            };
+
+            addStickerBtn.onclick = () => {
+                newStickerArea.style.display = newStickerArea.style.display === 'none' ? 'flex' : 'none';
+            };
+
+            saveStickerBtn.onclick = async () => {
+                const url = newStickerUrl.value.trim();
+                if (url) {
+                    saveStickerBtn.textContent = "...";
+                    if (!userData.stickers) userData.stickers = [];
+                    userData.stickers.push(url);
+                    
+                    await updateDoc(userDocRef, { stickers: userData.stickers });
+                    
+                    newStickerUrl.value = '';
+                    newStickerArea.style.display = 'none';
+                    saveStickerBtn.textContent = "Salvar";
+                    renderStickers();
+                }
+            };
+
+            window.renderStickers = function() {
+                stickerGrid.innerHTML = '';
+                if (!userData.stickers || userData.stickers.length === 0) {
+                    stickerGrid.innerHTML = '<p style="font-size: 12px; color: #888; grid-column: span 4; text-align: center; margin: 20px 0;">Clique no + para adicionar seu primeiro sticker!</p>';
+                    return;
+                }
+                
+                [...userData.stickers].reverse().forEach(url => {
+                    const img = document.createElement('img');
+                    img.src = url;
+                    img.className = 'sticker-item';
+                    img.loading = 'lazy';
+                    
+                    img.onclick = async () => {
+                        stickerDrawer.style.display = 'none';
+                        try {
+                            await addDoc(collection(db, "mensagens"), {
+                                uid: auth.currentUser.uid,
+                                nome: userData.apelido || "Anônimo",
+                                foto: userData.foto,
+                                bandeira: userData.bandeira || "",
+                                texto: "", 
+                                imagem: url, 
+                                timestamp: Date.now()
+                            });
+                        } catch(e) { console.error(e); }
+                    };
+                    
+                    img.oncontextmenu = async (e) => {
+                        e.preventDefault();
+                        if(confirm('Excluir este sticker da sua coleção?')) {
+                            userData.stickers = userData.stickers.filter(s => s !== url);
+                            await updateDoc(userDocRef, { stickers: userData.stickers });
+                            renderStickers();
+                        }
+                    };
+                    stickerGrid.appendChild(img);
+                });
+            };
+        }
+    });
 
     function renderChatMessages() {
         dom.chat.messagesContainer.innerHTML = '';
@@ -1494,6 +1598,36 @@ function updateChatBadge() {
             dom.chat.messagesContainer.scrollTop = dom.chat.messagesContainer.scrollHeight;
         }
     }
+    // --- FUNÇÃO PARA "ROUBAR" O STICKER DOS OUTROS ---
+    window.salvarStickerDoChat = async function(url) {
+        if (!userDocRef) return; // Garante que a pessoa está logada
+        
+        if (!userData.stickers) userData.stickers = [];
+        
+        // Verifica se a pessoa já tem esse sticker
+        if (userData.stickers.includes(url)) {
+            alert("Você já tem este sticker na sua coleção! 😎");
+            return;
+        }
+
+        // Pergunta se ela quer salvar
+        if (confirm("Deseja salvar este sticker na sua coleção?")) {
+            userData.stickers.push(url); // Adiciona na lista dela
+            
+            try {
+                await updateDoc(userDocRef, { stickers: userData.stickers });
+                alert("Sticker salvo com sucesso! 📎");
+                
+                // Se a gaveta estiver aberta, atualiza ela na hora
+                if (typeof window.renderStickers === 'function') {
+                    window.renderStickers();
+                }
+            } catch (e) {
+                console.error("Erro ao salvar sticker:", e);
+                alert("Erro ao salvar. Tente novamente.");
+            }
+        }
+    };
 
 function formatScreentimeText(screentime) {
       if (!screentime) return '';
@@ -2557,10 +2691,11 @@ try {
           if (dom.sideMenu.profileFlagBtn && !dom.sideMenu.profileFlagBtn.contains(e.target) && dom.sideMenu.profileFlagDropdown.classList.contains('show')) {
               dom.sideMenu.profileFlagDropdown.classList.remove('show');
           }
-          const adminTagsDropdown = document.getElementById('admin-tags-dropdown');
-          const adminTagsContainer = document.getElementById('admin-tags-container');
-          if (adminTagsDropdown && adminTagsContainer && !adminTagsContainer.contains(e.target) && adminTagsDropdown.classList.contains('show')) {
-              adminTagsDropdown.classList.remove('show');
+          // Fechar Gaveta de Stickers ao clicar fora
+          const stickerDrawer = document.getElementById('chat-sticker-drawer');
+          const clipBtn = document.getElementById('chat-clip-btn');
+          if (stickerDrawer && stickerDrawer.style.display === 'block' && !stickerDrawer.contains(e.target) && !clipBtn.contains(e.target)) {
+              stickerDrawer.style.display = 'none';
           }
           
           // --- MÁGICA: FECHAR MODAIS LATERAIS AO CLICAR FORA ---
