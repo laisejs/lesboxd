@@ -1276,7 +1276,7 @@ body.light-theme #modal-close:hover, body.light-theme #chat-close:hover {
     height: 50px;
     background: rgba(255,255,255,0.08);
     border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 25px; /* Formato de pílula */
+    border-radius: 0px; /* Formato de pílula */
     color: var(--cor-texto);
     padding: 14px 20px;
     resize: none;
