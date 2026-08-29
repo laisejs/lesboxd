@@ -127,10 +127,11 @@ body.light-theme ::-webkit-scrollbar-thumb:hover {
 .delete-chat-msg-btn:hover { opacity: 1 !important; color: #db1f20; background: rgba(219, 31, 32, 0.1); }
 .chat-msg.own .delete-chat-msg-btn { right: auto; left: -28px; }
 
-/* No celular fica sempre visível */
+/* No celular o "X" é escondido (pois apaga segurando) */
 @media (max-width: 768px) {
-    .delete-chat-msg-btn { opacity: 0.8; right: -22px; }
-    .chat-msg.own .delete-chat-msg-btn { left: -22px; }
+    .delete-chat-msg-btn { 
+        display: none !important; 
+    }
 }
 /* --- BOTÃO FLUTUANTE DO CHAT --- */
 .floating-chat-btn {
@@ -3055,11 +3056,19 @@ body.light-theme .side-menu-bottom {
    RESGATAR O BOTÃO DE FECHAR (ADMIN/CONFIG)
    ========================================= */
 .admin-close-btn {
-    position: fixed !important; /* Prende o botão na tela (não rola com o texto) */
-    top: 25px !important; 
-    right: 25px !important; 
-    z-index: 9999 !important; /* Garante que fica por cima de tudo */
-    background: rgba(0,0,0,0.15) !important; /* Deixa-o ligeiramente mais visível */
+    position: absolute !important; /* A MÁGICA: Fica preso DENTRO do pop-up! */
+    top: 20px !important; 
+    right: 20px !important; 
+    z-index: 9999 !important; 
+    background: rgba(0,0,0,0.15) !important; 
+}
+
+@media (max-width: 900px) {
+    /* No celular, mantemos fixo só para não sumir na rolagem */
+    #admin-close, #settings-close, #profile-pic-close {
+        position: fixed !important; 
+        top: 45px !important; 
+    }
 }
 
 /* Garante que o X fica escuro e visível no Tema Claro */
@@ -3355,3 +3364,9 @@ body.light-theme .admin-tags-dropdown {
 }
 
 body.light-theme .chat-sticker-img { border-color: #e2e8f0; }
+/* Bloqueia o menu nativo do celular ao segurar o dedo na imagem */
+.chat-sticker-img, .sticker-item {
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+}

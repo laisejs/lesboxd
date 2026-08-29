@@ -280,7 +280,7 @@
         </div>
       </div>
     </aside>
-    <!-- NOVO POP-UP PADRONIZADO (ALERTAS E CONFIRMAÇÕES) -->
+<!-- NOVO POP-UP PADRONIZADO (ALERTAS E CONFIRMAÇÕES) -->
     <div id="custom-modal-bg" class="admin-modal-overlay" style="display: none; z-index: 9999;">
         <div class="admin-modal-content minimalist" style="max-width: 350px; padding: 25px; text-align: center; margin: auto;">
             <h3 id="custom-modal-title" style="margin-top: 0; color: var(--cor-principal); font-size: 18px;">Aviso</h3>
@@ -291,7 +291,6 @@
             </div>
         </div>
     </div>
-
 <div id="modal-admin-bg" class="admin-modal-overlay" style="display: none;">
     <div class="admin-modal-content minimalist">
         <button id="admin-close" class="admin-close-btn">×</button>
@@ -585,31 +584,38 @@ let filmes = [];
             preview.style.opacity = '1';
         }
     }
-    // --- FUNÇÕES GLOBAIS DO POP-UP PADRONIZADO ---
+// --- FUNÇÕES GLOBAIS DO POP-UP PADRONIZADO ---
     window.customAlert = function(message, title = "Aviso") {
         return new Promise((resolve) => {
             const bg = document.getElementById('custom-modal-bg');
+            if(!bg) { alert(message); return resolve(true); } 
             document.getElementById('custom-modal-title').textContent = title;
             document.getElementById('custom-modal-message').textContent = message;
             document.getElementById('custom-modal-cancel').style.display = 'none';
             bg.style.display = 'flex';
-            document.getElementById('custom-modal-confirm').onclick = () => { bg.style.display = 'none'; resolve(true); };
+            document.getElementById('custom-modal-confirm').onclick = (e) => { 
+                e.stopPropagation(); bg.style.display = 'none'; resolve(true); 
+            };
         });
     };
 
     window.customConfirm = function(message, title = "Confirmação") {
         return new Promise((resolve) => {
             const bg = document.getElementById('custom-modal-bg');
+            if(!bg) { return resolve(confirm(message)); } 
             document.getElementById('custom-modal-title').textContent = title;
             document.getElementById('custom-modal-message').textContent = message;
             document.getElementById('custom-modal-cancel').style.display = 'block';
             bg.style.display = 'flex';
-            document.getElementById('custom-modal-confirm').onclick = () => { bg.style.display = 'none'; resolve(true); };
-            document.getElementById('custom-modal-cancel').onclick = () => { bg.style.display = 'none'; resolve(false); };
+            document.getElementById('custom-modal-confirm').onclick = (e) => { 
+                e.stopPropagation(); bg.style.display = 'none'; resolve(true); 
+            };
+            document.getElementById('custom-modal-cancel').onclick = (e) => { 
+                e.stopPropagation(); bg.style.display = 'none'; resolve(false); 
+            };
         });
     };
-
-    // --- FUNÇÃO PARA DELETAR MENSAGEM DO CHAT ---
+// --- FUNÇÃO PARA DELETAR MENSAGEM DO CHAT ---
     window.deletarMensagemChat = async function(id) {
         if (await customConfirm("Tem certeza que deseja apagar esta mensagem?", "Excluir Mensagem")) {
             try {
@@ -619,6 +625,28 @@ let filmes = [];
                 customAlert("Erro ao excluir mensagem.");
             }
         }
+        // A MÁGICA DE DESTRAVAR: Limpa a memória de que você estava segurando a mensagem
+        setTimeout(() => { window.isLongPressChat = false; }, 300);
+    };
+
+    // --- MÁGICA: APAGAR COM BOTÃO DIREITO OU SEGURANDO ---
+    window.abrirOpcoesMensagem = function(e, id) {
+        e.preventDefault(); // Bloqueia o menu feio do navegador no PC
+        deletarMensagemChat(id);
+    };
+
+    let timerToqueMensagem;
+    window.isLongPressChat = false; 
+
+    window.iniciarToqueMensagem = function(e, id) {
+        window.isLongPressChat = false;
+        timerToqueMensagem = setTimeout(() => {
+            window.isLongPressChat = true; // Ativa a trava global
+            deletarMensagemChat(id);
+        }, 700); 
+    };
+    window.cancelarToqueMensagem = function() {
+        clearTimeout(timerToqueMensagem); 
     };
 
     const dom = {
@@ -1521,10 +1549,9 @@ function updateChatBadge() {
         }
     }
 
-    // Nova função ultra-rápida: renderiza apenas a mensagem nova
-function renderSingleChatMessage(m) {
+// --- NOVA FUNÇÃO DE DESENHAR CHAT ---
+    function renderSingleChatMessage(m) {
         const isOwn = m.uid === auth.currentUser?.uid;
-        // MÁGICA: Verifica se é o dono da mensagem ou se a pessoa é Administradora
         const canDelete = isOwn || isAdmin; 
 
         const date = new Date(m.timestamp);
@@ -1538,9 +1565,17 @@ function renderSingleChatMessage(m) {
         const borderClass = m.bandeira ? 'has-border' : '';
         const bubbleClass = isOwn ? 'chat-msg own' : 'chat-msg';
 
-        // Cria o botão de deletar se a pessoa tiver permissão
+        const bubbleContent = m.imagem 
+            ? `<img src="${m.imagem}" class="chat-sticker-img" loading="lazy" style="cursor: pointer;" title="Clique para salvar" onclick="salvarStickerDoChat('${m.imagem}')">`
+            : `<div class="chat-bubble">${m.texto}</div>`;
+
+        // O botão X volta, mas agora puxa o pop-up bonitinho!
         const deleteBtnHtml = canDelete 
             ? `<button class="delete-chat-msg-btn" onclick="deletarMensagemChat('${m.id}')" title="Excluir">×</button>` 
+            : '';
+
+        const actionHtml = canDelete 
+            ? `oncontextmenu="abrirOpcoesMensagem(event, '${m.id}')" ontouchstart="iniciarToqueMensagem(event, '${m.id}')" ontouchend="cancelarToqueMensagem()" ontouchmove="cancelarToqueMensagem()"` 
             : '';
 
         const html = `
@@ -1553,8 +1588,8 @@ function renderSingleChatMessage(m) {
                     <div class="chat-name">${m.nome}</div>
                 </div>
                 
-                <div class="chat-bubble-container">
-                    <div class="chat-bubble">${m.texto}</div>
+                <div class="chat-bubble-container" ${actionHtml}>
+                    ${bubbleContent}
                     <div class="chat-time">${timeStr}</div>
                     ${deleteBtnHtml}
                 </div>
@@ -1563,83 +1598,115 @@ function renderSingleChatMessage(m) {
         dom.chat.messagesContainer.insertAdjacentHTML('beforeend', html);
     }
 
-    // --- LÓGICA DA GAVETA DE STICKERS ---
-    window.addEventListener('DOMContentLoaded', () => {
-        const clipBtn = document.getElementById('chat-clip-btn');
-        const stickerDrawer = document.getElementById('chat-sticker-drawer');
-        const addStickerBtn = document.getElementById('add-sticker-btn');
-        const newStickerArea = document.getElementById('new-sticker-input-area');
-        const saveStickerBtn = document.getElementById('save-sticker-btn');
-        const newStickerUrl = document.getElementById('new-sticker-url');
-        const stickerGrid = document.getElementById('sticker-grid');
+    // --- LÓGICA DA GAVETA DE STICKERS (UNIFICADA E CORRIGIDA) ---
+    const clipBtn = document.getElementById('chat-clip-btn');
+    const stickerDrawer = document.getElementById('chat-sticker-drawer');
+    const addStickerBtn = document.getElementById('add-sticker-btn');
+    const newStickerArea = document.getElementById('new-sticker-input-area');
+    const saveStickerBtn = document.getElementById('save-sticker-btn');
+    const newStickerUrl = document.getElementById('new-sticker-url');
+    const stickerGrid = document.getElementById('sticker-grid');
 
-        if (clipBtn) {
-            clipBtn.onclick = () => {
-                stickerDrawer.style.display = stickerDrawer.style.display === 'none' ? 'block' : 'none';
-                if (stickerDrawer.style.display === 'block') renderStickers();
-            };
+    if (clipBtn) {
+        clipBtn.onclick = () => {
+            stickerDrawer.style.display = stickerDrawer.style.display === 'none' ? 'block' : 'none';
+            if (stickerDrawer.style.display === 'block') window.renderStickers();
+        };
 
-            addStickerBtn.onclick = () => {
-                newStickerArea.style.display = newStickerArea.style.display === 'none' ? 'flex' : 'none';
-            };
+        addStickerBtn.onclick = () => {
+            newStickerArea.style.display = newStickerArea.style.display === 'none' ? 'flex' : 'none';
+        };
 
-            saveStickerBtn.onclick = async () => {
-                const url = newStickerUrl.value.trim();
-                if (url) {
-                    saveStickerBtn.textContent = "...";
-                    if (!userData.stickers) userData.stickers = [];
-                    userData.stickers.push(url);
-                    
-                    await updateDoc(userDocRef, { stickers: userData.stickers });
-                    
-                    newStickerUrl.value = '';
-                    newStickerArea.style.display = 'none';
-                    saveStickerBtn.textContent = "Salvar";
-                    renderStickers();
-                }
-            };
-
-            window.renderStickers = function() {
-                stickerGrid.innerHTML = '';
-                if (!userData.stickers || userData.stickers.length === 0) {
-                    stickerGrid.innerHTML = '<p style="font-size: 12px; color: #888; grid-column: span 4; text-align: center; margin: 20px 0;">Clique no + para adicionar seu primeiro sticker!</p>';
-                    return;
-                }
+        saveStickerBtn.onclick = async () => {
+            const url = newStickerUrl.value.trim();
+            if (url) {
+                saveStickerBtn.textContent = "...";
+                if (!userData.stickers) userData.stickers = [];
+                userData.stickers.push(url);
                 
-                [...userData.stickers].reverse().forEach(url => {
-                    const img = document.createElement('img');
-                    img.src = url;
-                    img.className = 'sticker-item';
-                    img.loading = 'lazy';
+                await updateDoc(userDocRef, { stickers: userData.stickers });
+                
+                newStickerUrl.value = '';
+                newStickerArea.style.display = 'none';
+                saveStickerBtn.textContent = "Salvar";
+                window.renderStickers();
+            }
+        };
+
+        window.renderStickers = function() {
+            stickerGrid.innerHTML = '';
+            if (!userData.stickers || userData.stickers.length === 0) {
+                stickerGrid.innerHTML = '<p style="font-size: 12px; color: #888; grid-column: span 4; text-align: center; margin: 20px 0;">Clique no + para adicionar seu primeiro sticker!</p>';
+                return;
+            }
+            
+            [...userData.stickers].reverse().forEach(url => {
+                const img = document.createElement('img');
+                img.src = url;
+                img.className = 'sticker-item';
+                img.loading = 'lazy';
+                
+// --- INÍCIO DA LÓGICA DO STICKER ---
+                let timerSticker;
+                let travaDeToqueLongo = false;
+
+                const abrirExclusao = async () => {
+                    travaDeToqueLongo = true;
+                    // MÁGICA: Dá uma leve vibrada no celular para confirmar o toque longo
+                    if(navigator.vibrate) navigator.vibrate(50); 
                     
-                    img.onclick = async () => {
-                        stickerDrawer.style.display = 'none';
-                        try {
-                            await addDoc(collection(db, "mensagens"), {
-                                uid: auth.currentUser.uid,
-                                nome: userData.apelido || "Anônimo",
-                                foto: userData.foto,
-                                bandeira: userData.bandeira || "",
-                                texto: "", 
-                                imagem: url, 
-                                timestamp: Date.now()
-                            });
-                        } catch(e) { console.error(e); }
-                    };
+                    const querApagar = await customConfirm('Excluir este sticker da sua coleção?', 'Aviso');
                     
-                    img.oncontextmenu = async (e) => {
-                        e.preventDefault();
-                        if(confirm('Excluir este sticker da sua coleção?')) {
-                            userData.stickers = userData.stickers.filter(s => s !== url);
-                            await updateDoc(userDocRef, { stickers: userData.stickers });
-                            renderStickers();
-                        }
-                    };
-                    stickerGrid.appendChild(img);
-                });
-            };
-        }
-    });
+                    if (querApagar) {
+                        userData.stickers = userData.stickers.filter(s => s !== url);
+                        await updateDoc(userDocRef, { stickers: userData.stickers });
+                        window.renderStickers();
+                    } else {
+                        // A SOLUÇÃO DO CONGELAMENTO: Se cancelar, destrava o sticker!
+                        setTimeout(() => { travaDeToqueLongo = false; }, 300);
+                    }
+                };
+
+                // 1. Enviar para o chat
+                img.onclick = async (e) => {
+                    e.preventDefault();
+                    if (travaDeToqueLongo) return; // Ignora o clique se estava segurando
+                    
+                    stickerDrawer.style.display = 'none';
+                    try {
+                        await addDoc(collection(db, "mensagens"), {
+                            uid: auth.currentUser.uid,
+                            nome: userData.apelido || "Anônimo",
+                            foto: userData.foto,
+                            bandeira: userData.bandeira || "",
+                            texto: "", 
+                            imagem: url, 
+                            timestamp: Date.now()
+                        });
+                    } catch(err) { console.error(err); }
+                };
+                
+                // 2. Apagar no PC (Botão Direito)
+                img.oncontextmenu = (e) => {
+                    e.preventDefault();
+                    abrirExclusao();
+                };
+                
+                // 3. Apagar no Celular (Segurar o dedo)
+                img.ontouchstart = (e) => {
+                    travaDeToqueLongo = false;
+                    timerSticker = setTimeout(() => {
+                        abrirExclusao();
+                    }, 600);
+                };
+                img.ontouchend = () => clearTimeout(timerSticker);
+                img.ontouchmove = () => clearTimeout(timerSticker);
+                // --- FIM DA LÓGICA DO STICKER ---
+
+                stickerGrid.appendChild(img);
+            });
+        };
+    }
 
     function renderChatMessages() {
         dom.chat.messagesContainer.innerHTML = '';
@@ -1648,37 +1715,39 @@ function renderSingleChatMessage(m) {
             dom.chat.messagesContainer.scrollTop = dom.chat.messagesContainer.scrollHeight;
         }
     }
+
     // --- FUNÇÃO PARA "ROUBAR" O STICKER DOS OUTROS ---
     window.salvarStickerDoChat = async function(url) {
-        if (!userDocRef) return; // Garante que a pessoa está logada
+        if (window.isLongPressChat) {
+            window.isLongPressChat = false;
+            return; // Se a pessoa segurou para apagar a mensagem, cancela o "salvar sticker"
+        }
+        
+        if (!userDocRef) return; 
         
         if (!userData.stickers) userData.stickers = [];
         
-        // Verifica se a pessoa já tem esse sticker
         if (userData.stickers.includes(url)) {
-            alert("Você já tem este sticker na sua coleção! 😎");
+            customAlert("Você já tem este sticker na sua coleção! 😎", "Aviso");
             return;
         }
 
-        // Pergunta se ela quer salvar
-        if (confirm("Deseja salvar este sticker na sua coleção?")) {
-            userData.stickers.push(url); // Adiciona na lista dela
+        if (await customConfirm("Deseja salvar este sticker na sua coleção?", "Salvar Sticker")) {
+            userData.stickers.push(url); 
             
             try {
                 await updateDoc(userDocRef, { stickers: userData.stickers });
-                alert("Sticker salvo com sucesso! 📎");
+                customAlert("Sticker salvo com sucesso! 📎", "Sucesso");
                 
-                // Se a gaveta estiver aberta, atualiza ela na hora
                 if (typeof window.renderStickers === 'function') {
                     window.renderStickers();
                 }
             } catch (e) {
                 console.error("Erro ao salvar sticker:", e);
-                alert("Erro ao salvar. Tente novamente.");
+                customAlert("Erro ao salvar. Tente novamente.", "Erro");
             }
         }
     };
-
 function formatScreentimeText(screentime) {
       if (!screentime) return '';
       const lower = screentime.toLowerCase();
@@ -2576,12 +2645,6 @@ try {
       // EVENTOS DO CHAT
       dom.chat.floatingBtn.addEventListener('click', abrirChat);
       dom.chat.sendBtn.addEventListener('click', enviarMensagemChat);   
-      // EVENTOS DO CHAT
-      dom.chat.floatingBtn.addEventListener('click', abrirChat);
-      dom.chat.sendBtn.addEventListener('click', enviarMensagemChat);
-
-      dom.chat.floatingBtn.addEventListener('click', abrirChat);
-      dom.chat.sendBtn.addEventListener('click', enviarMensagemChat);
       dom.chat.input.addEventListener('keydown', (e) => {
           if(e.key === 'Enter' && !e.shiftKey) {
               e.preventDefault();
@@ -2712,18 +2775,18 @@ try {
               stickerDrawer.style.display = 'none';
           }
           
-          // --- MÁGICA: FECHAR MODAIS LATERAIS AO CLICAR FORA ---
+// --- MÁGICA: FECHAR MODAIS LATERAIS AO CLICAR FORA ---
           // Fechar Detalhes do Filme
           if (dom.modal.bg.classList.contains('open')) {
-              // Só fecha se o clique não foi dentro da aba, não foi na capa, não foi no destaque E NÃO FOI NA PÍLULA
-              if (!dom.modal.bg.contains(e.target) && !e.target.closest('.card-base') && !e.target.closest('#destaque-ver-mais') && !e.target.closest('.mini-comment-card')) {
+              // Só fecha se o clique não for na aba, capa, destaque E NÃO FOR NO POP-UP DE AVISO
+              if (!dom.modal.bg.contains(e.target) && !e.target.closest('.card-base') && !e.target.closest('#destaque-ver-mais') && !e.target.closest('.mini-comment-card') && !e.target.closest('#custom-modal-bg')) {
                   fecharModal();
               }
           }
           // Fechar Chat Global
           if (dom.chat.sidebar.classList.contains('open')) {
-              // Só fecha se o clique não foi dentro do chat, e não foi no botão de abrir o chat
-              if (!dom.chat.sidebar.contains(e.target) && !e.target.closest('.floating-chat-btn')) {
+              // Só fecha se o clique não for no chat, no botão de abrir E NÃO FOR NO POP-UP DE AVISO
+              if (!dom.chat.sidebar.contains(e.target) && !e.target.closest('.floating-chat-btn') && !e.target.closest('#custom-modal-bg')) {
                   fecharChat();
               }
           }
@@ -3372,9 +3435,6 @@ window.limpezaGeralNuclear = async function() {
             alert("Erro! Dê uma olhada no console.");
         }
     };
-  </script>
-</body>
-</html>
   </script>
 </body>
 </html>
